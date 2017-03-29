@@ -1,0 +1,6 @@
+/* Git Ignore File */
+
+/* Python Temporary Files */
+*.pyc
+
+
