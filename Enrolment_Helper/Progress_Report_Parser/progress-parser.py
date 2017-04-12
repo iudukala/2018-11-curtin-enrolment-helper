@@ -9,11 +9,46 @@ import re
 # REGULAR EXPRESSIONS (compiled)#
 # # # # # # # # # # # # # # # # #
 
+# Regex for eliminating multiple lines
+multi_line = re.compile(r'\n{2,}')
+
 # Regex for garbage found at the start of each progress report page
 start_of_page_garbage_regex = re.compile(r'Curtin University[\s]+Student Progress Report[\s]+Student One[\s]+As At[\s]+')
 
 # Regex for garbage found at the end of each progress report page
 end_of_page_garbage_regex = re.compile(r'\[[0-9, a-z, A-Z]{5,}\](?s)(.*?)of[\s]+[0-9]+[\s]+')
+
+# List of smaller, exact regex for garbage words and data
+garbage_list = re.compile(r'(Student ID:|'  # Eliminates student ID label
+                            'Student Name:|'  # Eliminates student name label
+                            'Course:|'  # Eliminates course label
+                            'Attempt:\s*[0-9]*|'  # Eliminates course attempts label and also the number
+                            'Stage:\s*[A-Z]*|'  # Eliminates the stage label, and also the data
+                            'Default Location: [A-Z, a-z]*|'  # Eliminates the location label, and also the data
+                            'Not on plan|'  # Not on plans can be ignored
+
+                            # Eliminates status, academic status labels and their data.
+                            '(Academic\s*)?Status(:\s*(Good Standing|Conditional|Terminated|[A-Z]*)(\s*(Good Standing|Conditional|Terminated)?)?)?|'
+
+                            # Eliminates labels for unit blocks
+                            'BOE|'
+                            'Final|'
+                            'Grade|'
+                            'Mark|'
+                            'Credit[s]?|'
+                            'On Study Plan\?|'
+                            'Spk[A-Z, a-z]*|'  # All instances of Spk labels
+                            'Ver|'
+                            'SWA:\s*[0-9, .]*|'  # Plus data
+                            'CWA:|'
+                            'ADM|'
+                            'POTC|'
+                            '(Total\s*)?Automatic\s*Credit:?|'
+                            'Received|'
+                            'Total number of credits for course completion:|'
+                            'Total number of credits completed:)\s+')
+
+
 
 # # # # # # # # # # # # # # # # #
 # MARKERS FOR REPLACING GARBAGE #
@@ -22,19 +57,13 @@ end_of_page_garbage_regex = re.compile(r'\[[0-9, a-z, A-Z]{5,}\](?s)(.*?)of[\s]+
 # Blank Replacement
 blank_replacement = ''
 
-# Start of page text
-start_of_page_replacement = 'START OF PAGE\n'
-
-# End of page replacement
-end_of_page_replacement = 'END OF PAGE\n'
-
 # # # # # # # # # # # # # # # # #
 #            METHODS            #
 # # # # # # # # # # # # # # # # #
 
 # Name:     remove_garbage
 #
-# Purpose:  Removes unneeded lines in progress report text and inserts useful markers
+# Purpose:  Removes unneeded lines and data in the progress reporter output
 #
 # Params:   report: The progress report output (string)
 #
@@ -45,8 +74,14 @@ end_of_page_replacement = 'END OF PAGE\n'
 def remove_garbage(report):
 
     # Replace start and end of page garbage with START OF PAGE and END OF PAGE
-    report = re.sub(start_of_page_garbage_regex, start_of_page_replacement, report)
-    report = re.sub(end_of_page_garbage_regex, end_of_page_replacement, report)
+    report = re.sub(start_of_page_garbage_regex, blank_replacement, report)
+    report = re.sub(end_of_page_garbage_regex, blank_replacement, report)
+
+    # Remove other unneeded information and labels
+    report = re.sub(garbage_list, blank_replacement, report)
+
+    # Replace multiple newlines with one newline
+    report = re.sub(multi_line, '\n', report)
     return report
 
 
