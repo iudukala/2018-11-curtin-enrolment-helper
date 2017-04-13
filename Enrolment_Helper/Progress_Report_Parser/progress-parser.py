@@ -63,7 +63,7 @@ garbage_list = re.compile(r'(Student ID:|'  # Eliminates student ID label
 #
 # Params:   report: The progress report output (string)
 #
-# Return:   The improved proress report output (string)
+# Return:   The improved progress report output (string)
 #
 # Notes:    None
 
@@ -81,10 +81,6 @@ def remove_garbage(report):
     report = re.sub(multi_line, '\n', report)
 
     return report
-
-
-    improved_report = report
-    return improved_report
 
 
 # Name:     convert_pdf_to_txt
