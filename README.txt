@@ -19,7 +19,7 @@ In initilise a locally hosted Django
       |      |- /lib/
       |      |- ...
       |
-      |—  Enrolment_Helper
+      |—  Enrolment_Helper (REPOSITORY)
              |- requirements.txt
              |- manage.py
              |—  Enrolment_Helper/
@@ -94,6 +94,7 @@ MySQL database with Django:
 
    $ python manage.py makemigrations
    $ python manage.py migrate
+
    $ python manage.py createsuperusr
 
    Django_Superuser:
