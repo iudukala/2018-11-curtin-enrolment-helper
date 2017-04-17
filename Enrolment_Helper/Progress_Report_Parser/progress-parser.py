@@ -50,8 +50,11 @@ garbage_list = re.compile(r'(Student ID:|'  # Eliminates student ID label
                             'Designated|'
                             '(Total\s*)?Automatic\s*Credit:?|'
                             'Received|'
-                            'Total number of credits for course completion:|'
-                            'Total number of credits completed:)\s+')
+                            'Total number of credits for course completion: [0-9, .]+|'
+                            'Total number of credits completed: [0-9, .]+|'
+                            'Total Recognition of Prior Learning(.*?)[0-9, .]+|'
+                            'RECOGNITION OF PRIOR LEARNING|'
+                            'PLANNED AND COMPLETED COMPONENTS)\s+')
 
 # # # # # # # # # # # # # # # # #
 #            METHODS            #
@@ -132,5 +135,5 @@ def parse_progress_report(path):
     improved_report = remove_garbage(report)
     print(improved_report)
 
-path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Steven-pr.pdf'
+path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf'
 parse_progress_report(path)
