@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class EnrolmentHelperConfig(AppConfig):
-    name = 'enrolment_helper'
+class Core_AppConfig(AppConfig):
+    name = 'core_app'
