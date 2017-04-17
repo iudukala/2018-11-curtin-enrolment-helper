@@ -28,3 +28,45 @@ class Prerequiste(models.Model):
     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
     # And is false, and Or is true
     AndOr = models.BooleanField(default=False)
+
+# Credential for representing authenticated login info
+class Credential(models.Model):
+    StaffID = models.CharField(max_length=7, primary_key=True)
+    Name = models.CharField(max_length=100)
+    Password = models.CharField(max_length=100)
+
+# Student for representing student information.
+class Student(models.Model):
+    StudentID = models.IntegerField(primary_key=True)
+    Name = models.CharField(max_length=100)
+    CreditsCompleted = models.IntegerField()
+    # 1 - good standing, 0 - conditional and -1 - terminated
+    AcademicStatus = models.IntegerField(validators=[-1, 0, 1])
+    CourseID = models.ForeignKey(Course)
+
+class StudentUnit(models.Model):
+    class Meta:
+        unique_together = (('StudentID', 'UnitID'),)
+    StudentID = models.ForeignKey(Student, on_delete=models.PROTECT)
+    UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
+
+    Attempts = models.IntegerField()
+    # True is pass but False is failed
+    Status = models.BooleanField(default=False)
+    PrerequisteAchieved = models.BooleanField(default=False)
+
+#
+class CourseTemplate(models.Model):
+    class Meta:
+        unique_together = (('CourseID', 'UnitID'),)
+
+    #
+    CourseID = models.ForeignKey(Course, on_delete=models.CASCADE)
+    UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
+
+    #
+    CourseUnitID = models.IntegerField(primary_key=True)
+
+    #
+    Year = models.IntegerField(validators=[1, 2, 3, 4])
+    Semester = models.IntegerField(validators=[1, 2])
