@@ -90,19 +90,18 @@ def remove_garbage(report):
 #
 # Purpose:  Extracts the text contents of a PDF into a string.
 #
-# Params:   path: The filepath of the PDF to be extracted from (string)
+# Params:   path: The file pointer of the PDF to be extracted from (string)
 #
 # Return:   The extracted text (string)
 #
 # Notes:    Works with pdfminer.six for Python 3.5.2 as of 11 April 2017
 
-def convert_pdf_to_txt(path):
+def convert_pdf_to_txt(fp):
     rsrcmgr = PDFResourceManager()
     retstr = StringIO()
     codec = 'utf-8'
     laparams = LAParams()
     device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
-    fp = open(path, 'rb')
     interpreter = PDFPageInterpreter(rsrcmgr, device)
     password = ""
     maxpages = 0
@@ -135,5 +134,6 @@ def parse_progress_report(path):
     improved_report = remove_garbage(report)
     print(improved_report)
 
-path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf'
-parse_progress_report(path)
+path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf'
+fp = open(path, 'rb')
+parse_progress_report(fp)
