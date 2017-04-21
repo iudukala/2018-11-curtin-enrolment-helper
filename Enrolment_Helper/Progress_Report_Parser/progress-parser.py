@@ -36,6 +36,8 @@ garbage_list = re.compile(r'(BOE|'
                             'ADM|'
                             'POTC|'
                             'Type|'
+                            'Student ID:|'
+                            'Student Name:|'
                             'Total number of credits for course completion: [0-9, .]+|'
                             'Total number of credits completed: [0-9, .]+|'
                             'Total Recognition of Prior Learning(.*?)[0-9, .]+|'
@@ -87,8 +89,8 @@ def extract_student_details(report):
     dict = {}
     splitLines = report.split('\n')
     dict['date'] = splitLines[1]
-    dict['id'] = splitLines[2]
-    dict['name'] = splitLines[3]
+    dict['id'] = splitLines[3]
+    dict['name'] = splitLines[4]
     report = re.sub(remove_start_of_page_regex, '', report)
     report = re.sub(remove_all_unneeded_strings, '', report)
     report = re.sub(multiple_newline, '\n', report)
@@ -141,6 +143,8 @@ def parse_progress_report(path):
     report = convert_pdf_to_txt(path) # Converts PDF to text
     report = remove_garbage(report) # Removes unneeded labels from report
     report_dict, report = extract_student_details(report) # Extracts student details, including report date
+    print(report)
+    print(report_dict)
 
 path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf'
 fp = open(path, 'rb')
