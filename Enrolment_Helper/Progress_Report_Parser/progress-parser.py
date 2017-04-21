@@ -10,7 +10,9 @@ import re
 # # # # # # # # # # # # # # # # #
 
 # Regex for eliminating multiple lines
-multi_line = re.compile(r'\n{2,}')
+multiple_newline = re.compile(r'\n{2,}')
+start_of_line_spaces = re.compile(r'^ +', re.MULTILINE)
+end_of_line_spaces = re.compile(r' +$', re.MULTILINE)
 
 # Regex for garbage found at the start of each progress report page
 start_of_page_garbage_regex = re.compile(r'Curtin University[\s]+Student Progress Report[\s]+Student One[\s]+As At[\s]+')
@@ -19,26 +21,14 @@ start_of_page_garbage_regex = re.compile(r'Curtin University[\s]+Student Progres
 page_number_garbage_regex = re.compile(r'(Page\s*[0-9]+(\s)+of[\s]+[0-9]+[\s]+)')
 report_id_garbage_regex = re.compile(r'\[[0-9, a-z, A-Z]{10}\]\s*[0-9, A-Z, a-z]{7}')
 report_timestamp_garbage_regex = re.compile(r'[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}(AM|PM)')
-start_of_page_remove_start_of_page_regex = re.compile(r'START OF PAGE\n(.*\s*){4}')
+remove_start_of_page_regex = re.compile(r'(START OF PAGE)\s+(.*\s){3}')
+remove_all_unneeded_strings = re.compile(r'^(?!Course:|Automatic|[0-9]{4}).+[a-z]+.*$', re.MULTILINE)
 
 # List of smaller, exact regex for garbage words and data
-garbage_list = re.compile(r'(Student ID:|'  # Eliminates student ID label
-                            'Student Name:|'  # Eliminates student name label
-                            'Attempt:\s*[0-9]*|'  # Eliminates course attempts label and also the number
-                            'Stage:\s*[A-Z]*|'  # Eliminates the stage label, and also the data
-                            'Default Location: [A-Z, a-z]*|'  # Eliminates the location label, and also the data
-                            'Not on plan|'  # Not on plans can be ignored
-
-                            # Eliminates status, academic status labels and their data.
-                            '(Academic\s*)?Status(:\s*(Good Standing|Conditional|Terminated|[A-Z]*)(\s*(Good Standing|Conditional|Terminated)?)?)?|'
-
-                            # Eliminates labels for unit blocks
-                            'BOE|'
+garbage_list = re.compile(r'(BOE|'
                             'Final|'
                             'Grade|'
                             'Mark|'
-                            'Credit[s]?|'
-                            'On Study Plan\?|'
                             'Spk[A-Z, a-z]*|'  # All instances of Spk labels
                             'Ver|'
                             'SWA:\s*[0-9, .]*|'  # Plus data
@@ -46,15 +36,11 @@ garbage_list = re.compile(r'(Student ID:|'  # Eliminates student ID label
                             'ADM|'
                             'POTC|'
                             'Type|'
-                            'Exempt|'
-                            'Designated|'
-                            '(Total\s*)?Automatic\s*Credit:?|'
-                            'Received|'
                             'Total number of credits for course completion: [0-9, .]+|'
                             'Total number of credits completed: [0-9, .]+|'
                             'Total Recognition of Prior Learning(.*?)[0-9, .]+|'
-                            'RECOGNITION OF PRIOR LEARNING|'
-                            'PLANNED AND COMPLETED COMPONENTS)\s+')
+                            'PLANNED AND COMPLETED COMPONENTS|'
+                            'RECOGNITION OF PRIOR LEARNING)', re.MULTILINE)
 
 # # # # # # # # # # # # # # # # #
 #            METHODS            #
@@ -80,11 +66,33 @@ def remove_garbage(report):
     # Remove other unneeded information and labels
     report = re.sub(garbage_list, '', report)
 
-    # Replace multiple newlines with one newline to ensure that every line has content
-    report = re.sub(multi_line, '\n', report)
+    # Remove all gross unneeded whitespace
+    report = re.sub(multiple_newline, '\n', report)
+    report = re.sub(start_of_line_spaces, '', report)
+    report = re.sub(end_of_line_spaces, '', report)
 
     return report
 
+# Name:     extract_student_details
+#
+# Purpose:  Extracts the report date, student ID and student name. Also further unlabels input.
+#
+# Params:   report: The progress report output (string)
+#
+# Return:   A dictionary, containing the report date, students name, and ID, and the report
+#           with these details removed.
+#
+# Notes:    None
+def extract_student_details(report):
+    dict = {}
+    splitLines = report.split('\n')
+    dict['date'] = splitLines[1]
+    dict['id'] = splitLines[2]
+    dict['name'] = splitLines[3]
+    report = re.sub(remove_start_of_page_regex, '', report)
+    report = re.sub(remove_all_unneeded_strings, '', report)
+    report = re.sub(multiple_newline, '\n', report)
+    return dict, report
 
 # Name:     convert_pdf_to_txt
 #
@@ -130,10 +138,10 @@ def convert_pdf_to_txt(fp):
 # Notes:    Only importing this method is necessary.
 
 def parse_progress_report(path):
-    report = convert_pdf_to_txt(path)
-    improved_report = remove_garbage(report)
-    print(improved_report)
+    report = convert_pdf_to_txt(path) # Converts PDF to text
+    report = remove_garbage(report) # Removes unneeded labels from report
+    report_dict, report = extract_student_details(report) # Extracts student details, including report date
 
-path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf'
+path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf'
 fp = open(path, 'rb')
 parse_progress_report(fp)
