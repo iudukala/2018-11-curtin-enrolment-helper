@@ -19,10 +19,10 @@ start_of_page_garbage_regex = re.compile(r'Curtin University[\s]+Student Progres
 
 # Regex for garbage found at the end of each progress report page
 page_number_garbage_regex = re.compile(r'(Page\s*[0-9]+(\s)+of[\s]+[0-9]+[\s]+)')
-report_id_garbage_regex = re.compile(r'\[[0-9, a-z, A-Z]{10}\]\s*[0-9, A-Z, a-z]{7}')
+report_id_garbage_regex = re.compile(r'(\[[0-9, a-z, A-Z]{10}\]|[0-9]{6}[A-Z]{1})')
 report_timestamp_garbage_regex = re.compile(r'[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}(AM|PM)')
 remove_start_of_page_regex = re.compile(r'(START OF PAGE)\s+(.*\s){3}')
-remove_all_unneeded_strings = re.compile(r'^(?!Course:|Automatic|[0-9]{4}).+[a-z]+.*$', re.MULTILINE)
+remove_all_unneeded_strings = re.compile(r'^(?!Course:|Elective|[0-9]{4}|\bNot assigned\b).+[a-z]+.*$', re.MULTILINE)
 
 # List of smaller, exact regex for garbage words and data
 garbage_list = re.compile(r'(BOE|'
@@ -61,8 +61,8 @@ garbage_list = re.compile(r'(BOE|'
 def remove_garbage(report):
     # Replace start and end of page garbage. Start of page signified by 'START OF PAGE'
     report = re.sub(start_of_page_garbage_regex, 'START OF PAGE\n', report)
-    report = re.sub(page_number_garbage_regex, '', report)
     report = re.sub(report_id_garbage_regex, '', report)
+    report = re.sub(page_number_garbage_regex, '', report)
     report = re.sub(report_timestamp_garbage_regex, '', report)
 
     # Remove other unneeded information and labels
@@ -146,6 +146,15 @@ def parse_progress_report(path):
     print(report)
     print(report_dict)
 
-path = '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf'
-fp = open(path, 'rb')
-parse_progress_report(fp)
+paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf']#,
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Steven-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-First-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-Second-pr.pdf',
+         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
+for path in paths:
+    fp = open(path, 'rb')
+    parse_progress_report(fp)
