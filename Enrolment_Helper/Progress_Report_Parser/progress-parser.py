@@ -339,18 +339,19 @@ def convert_pdf_to_txt(fp):
 #
 # Purpose:  Extracts PDF contents and interprets the results into a JSON-structured python dictionary.
 #
-# Params:   path: The filepath of the PDF to be extracted from (string)
+# Params:   fp: The file pointer of the pdf file to parse
 #
 # Return:   A JSON-structured python dictionary representing the student's progress report.
 #
-# Notes:    Only importing this method is necessary.
-def parse_progress_report(path):
-    report = convert_pdf_to_txt(path) # Converts PDF to text
+# Notes:    IMPORT THIS METHOD, THEN CALL IT
+def parse_progress_report(fp):
+    report = convert_pdf_to_txt(fp) # Converts PDF to text
     report = remove_garbage(report) # Removes unneeded labels from report
     report_dict, report = extract_student_details(report) # Extracts student details, including report date
     report_dict = extract_progress_details(report, report_dict)  # Extracts unit details, including units done and units planned
-    print(report_dict)
+    return report_dict
 
+# Test code
 paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf']#,
         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell.pdf', < Works
          # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
