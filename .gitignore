@@ -3,6 +3,11 @@
 /* Python Temporary Files */
 *.pyc
 
+/* Various linter/Vim stuff */
+.pylintrc
+.ropeproject/
+Session.vim
+Yoakim_Parsed_PDF.json
 
 /*****OSX Gitignore*****/
 *.DS_Store

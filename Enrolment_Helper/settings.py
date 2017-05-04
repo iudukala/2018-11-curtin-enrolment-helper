@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import logging
+# from Enrolment_Helper import core_app
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+MY_APPS = [
+    'core_app',
+]
+
+INSTALLED_APPS += MY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,7 +124,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Perth'
 
 USE_I18N = True
 
@@ -129,3 +138,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            # 'format': '%(asctime)s - %(levelname)s - %(funcName) - %(message)s'
+            'format': '%(asctime)s - %(levelname)s - %(message)s'
+            },
+        },
+    'handlers': {
+        'core_app_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'logging.log',
+            'formatter': 'default',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            },
+    },
+    'loggers': {
+        'core_app': {
+            'handlers': ['core_app_handler'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
