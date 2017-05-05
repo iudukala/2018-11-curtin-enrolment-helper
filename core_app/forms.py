@@ -44,6 +44,8 @@ class UploadedFile(forms.Form):
         with open('/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf', 'rb') as fp:
             json_parsed_file = parse_progress_report(fp)
 
+        print(parse_progress_report(request.FILES('filename')))
+
         print(json_parsed_file)
 
         output_message = ''

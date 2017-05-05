@@ -42,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MY_APPS = [
-    'core_app',
+    'Enrolment_Helper.core_app',
 ]
 
 INSTALLED_APPS += MY_APPS

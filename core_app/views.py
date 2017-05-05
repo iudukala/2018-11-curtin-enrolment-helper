@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.core import serializers
 from .models import Student
 from .forms import UploadedFile
+from .create_student_enrolment_plan import handle_file
 # from .file_validator import
 # from .file_validator import upload_parsed_file
 
@@ -45,11 +46,24 @@ def upload_file(request):
     if request.method == 'POST' or request.method == 'GET':
         # TODO: Store file.
         # FIXME: HARD CODING
-        parsed_file = UploadedFile(request.POST, request.FILES)
+        # parsed_file = UploadedFile(request.POST, request.FILES)
+        upload_file = UploadedFile(request.POST, request.FILES)
+
+        if upload_file.is_valid:
+            parsed_file = upload_file(request.FILE['filename'])
+            if parsed_file.is_valid:
+                parsed_json = parsed_file.getJSON()
+
         if parsed_file.is_valid:
+            parsed_json = parsed_file.getJSON()
+            # NEED SOMETHING HERE TO CREATE STUDENT PLAN.
+           # handle_file()
             # ACTUALLY CREATE A VALID 'template' to send to front-end.
             logging.debug("PDF form was successfully validated")
             # TODO: This actually should be the check_parsed_information stuff.
+
+        else:
+            print("FAILED")
 
     output = "PDF upload method: Work in progress"
     return HttpResponse(output)

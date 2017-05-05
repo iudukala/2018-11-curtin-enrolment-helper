@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.http import cookie
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .models import *
+from Enrolment_Helper.core_app.models import *
 # from .views import *
-from .forms import UploadedFile
+from Enrolment_Helper.core_app.forms import UploadedFile
 from django.test import RequestFactory
 # from .views import UploadedFile
 
