@@ -317,7 +317,6 @@ def no_remaining_units(i, lines, ignoredCredits):
 #
 # Params:   lines: The progress report output after being thrown into extract_student_details (list of lines).
 #           i: The current line number the parser is reading
-#           semHeaderPrev: The semester the parser is currently examining
 #           semHeaderRecent: The last unique semester header that the parser has hit
 #           semHeaderPrevIdx: The line index of the last unique semester header that the parser has hit
 #
@@ -326,7 +325,7 @@ def no_remaining_units(i, lines, ignoredCredits):
 # Notes:    Should only be called from extract_progress_details
 def advance_line(lines, i, semHeaderPrev, semHeaderRecent, semHeaderRecentIdx):
     i += 1
-    if re.match(semester_header_regex, lines[i]) and lines[i] != semHeaderPrev:
+    if re.match(semester_header_regex, lines[i]) and lines[i] != semHeaderRecent and semHeaderPrev == semHeaderRecent:
         semHeaderRecent = lines[i]
         semHeaderRecentIdx = i
     return i, semHeaderRecent, semHeaderRecentIdx
