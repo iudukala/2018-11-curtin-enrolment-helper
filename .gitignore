@@ -3,6 +3,8 @@
 /*****Python Temporary Files*****/
 *.pyc
 
+/*****Prepros Ignores*****/
+prepros_6.config
 
 /*****OSX Gitignore*****/
 *.DS_Store
