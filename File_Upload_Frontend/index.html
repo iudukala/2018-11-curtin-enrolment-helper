@@ -9,15 +9,37 @@
   <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
 <body>
-  <input type="button" value="Browse..." id="file-browse">
-  <input type="file" id="file-input" style="display:none;" multiple>
-  <ul ng-repeat="file in filelist">
-    <li>
-      {{ file.name }}
-      <input type="button" value = "❌" ng-click="removeFile(file)">
-    </li>
+  <div class="content-wrapper">
+    <!--Page title-->
+    <div class="header-wrapper">
+      <h1>IMPORT PROGRESS REPORT</h1>
+    </div>
 
-  </ul>
+    <!--Upload Widget-->
+    <div class="upload-wrapper">
+      <div class="upload-outer">
+        <div class="upload-inner">
+          <img src="assets/img/file-icon.svg">
+          <h2>Drag and drop files here</h2>
+          <h4>or</h4>
+          <input type="button" class="button reverse-button" value="BROWSE FILES" id="file-browse">
+          <input type="file" id="file-input" style="display:none;" multiple>
+        </div>
+
+        <!--List of selected files-->
+        <ul ng-repeat="file in filelist">
+          <li>
+            {{ file.name }}
+            <input type="button" value = "❌" ng-click="removeFile(file)">
+          </li>
+        </ul>
+
+      </div>
+
+      <!--Upload button-->
+      <input type="button" class="button" value="UPLOAD REPORTS" id="upload-files">
+    </div>
+  </div>
 </body>
 <script src="assets/js/functions.js" type="text/javascript"></script>
 </html>

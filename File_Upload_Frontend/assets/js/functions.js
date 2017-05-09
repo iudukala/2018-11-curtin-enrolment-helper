@@ -3,6 +3,7 @@
 /*********************************/
 var browseButton = document.getElementById('file-browse');
 var fileInput = document.getElementById('file-input');
+var uploadWidgetOuter= document.getElementById('upload-container');
 
 /*********************************/
 /*      DOM Element Events       */
