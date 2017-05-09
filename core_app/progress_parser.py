@@ -11,9 +11,11 @@ import re
 
 # Regex for finding specific data points in the report output
 course_id_regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$')
-
-semester_header_regex = re.compile(r'^([0-9]{4}\s+Semester\s+[1-2]{1}|Automatic Credit|Exempt|Not Assigned.*)$')
-unit_id_regex = re.compile(r'(^[A-Z]{4}[0-9]{4}$|^[0-9]{4,})$')
+semester_header_regex = re.compile(
+    r'^([0-9]{4}\s+Semester\s+[1-2]{1}|Automatic Credit|Exempt|General|Elective|Designated|Not assigned to a specific year)$')
+elective_header_regex = re.compile(r'^(Automatic Credit|Exempt|Elective|Designated|General)$')
+unit_id_regex = re.compile(r'(^[A-Z]{4}[0-9]{4}$|^[0-9]{4,}|General|Elective|\b(Elective|Option) not yet selected\b)$')
+improper_unit_id_regex = re.compile(r'^(General|Elective|\b(Elective|Option) not yet selected\b)$')
 version_regex = re.compile(r'^[0-9]{1,2}$')
 credit_value_regex = re.compile(r'^[0-9]{1,3}\.[0-9]{1,2}$')
 unit_status_regex = re.compile(r'^(PASS|FAIL|PLN|ENR|WD)$')
@@ -24,35 +26,45 @@ start_of_line_spaces = re.compile(r'^ +', re.MULTILINE)
 end_of_line_spaces = re.compile(r' +$', re.MULTILINE)
 
 # Regex for garbage found at the start of each progress report page
-start_of_page_garbage_regex = re.compile(r'Curtin University[\s]+Student Progress Report[\s]+Student One[\s]+As At[\s]+')
+start_of_page_garbage_regex = re.compile(
+    r'Curtin University[\s]+Student Progress Report[\s]+Student One[\s]+As At[\s]+')
 
 # Regex for garbage found at the end of each progress report page
 page_number_garbage_regex = re.compile(r'(Page\s*[0-9]+(\s)+of[\s]+[0-9]+[\s]+)')
 report_id_garbage_regex = re.compile(r'(\[[0-9, a-z, A-Z]{10}\]|[0-9]{6}[A-Z]{1})')
 report_timestamp_garbage_regex = re.compile(r'[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}(AM|PM)')
 remove_start_of_page_regex = re.compile(r'(START OF PAGE)\s+(.*\s){3}')
-remove_all_unneeded_strings_regex = re.compile(r'^(?!Course:|Automatic|Exempt|Elective|[0-9]{4}|\bNot assigned\b|\bElective not yet selected\b).+[a-z]+.*$', re.MULTILINE)
-remove_exempt_regex = re.compile(r'Exempt\s*')
+remove_all_unneeded_strings_regex = re.compile(r'^(?!Course:|'
+                                               'Automatic|'
+                                               'Exempt|'
+                                               'Elective|'
+                                               'Designated|'
+                                               'Option|'
+                                               'General|'
+                                               '[0-9]{4}|'
+                                               'Not assigned to a specific year|'
+                                               '\bElective not yet selected\b).+[a-z]+.*$', re.MULTILINE)
 
 # List of smaller, exact regex for garbage words and data
 garbage_list = re.compile(r'(^BOE$|'
-                            '^Final$|'
-                            '^Grade$|'
-                            '^Mark$|'
-                            '^SWA:\s*[0-9, .]*$|'  # Plus data
-                            '^CWA:.*|'
-                            '^ADM$|'
-                            '^POTC$|'
-                            '^Type$|'
-                            '^Student ID:$|'
-                            '^Student Name:$|'
-                            '^Total number of credits for course completion: [0-9, .]+$|'
-                            '^Total number of credits completed: [0-9, .]+$|'
-                            '^Total Recognition of Prior Learning(.*?)[0-9, .]+$|'
-                            '^PLANNED AND COMPLETED COMPONENTS$|'
-                            '^RECOGNITION OF PRIOR LEARNING$|'
-                            '^v. |'
-                            '^Student Name: )', re.MULTILINE)
+                          '^Final$|'
+                          '^Grade$|'
+                          '^Mark$|'
+                          '^SWA:\s*[0-9, .]*$|'  # Plus data
+                          '^CWA:.*|'
+                          '^ADM$|'
+                          '^POTC$|'
+                          '^Type$|'
+                          '^Student ID:$|'
+                          '^Student Name:$|'
+                          '^Total number of credits for course completion: [0-9, .]+$|'  # Plus data
+                          '^Total number of credits completed: [0-9, .]+$|'  # Plus data
+                          '^Total Recognition of Prior Learning(.*?)[0-9, .]+$|'  # Plus data
+                          '^PLANNED AND COMPLETED COMPONENTS$|'
+                          '^RECOGNITION OF PRIOR LEARNING$|'
+                          '^v. |'
+                          '^Student Name: )', re.MULTILINE)
+
 
 # # # # # # # # # # # # # # # # #
 #            METHODS            #
@@ -103,8 +115,6 @@ def extract_student_details(report):
     dict['name'] = splitLines[4]
     report = re.sub(remove_start_of_page_regex, '', report)
     report = re.sub(remove_all_unneeded_strings_regex, '', report)
-    if 'Exempt' in report and 'Automatic' in report:
-        report = re.sub(remove_exempt_regex, '', report)
     report = re.sub(multiple_newline, '\n', report)
     return dict, report
 
@@ -124,13 +134,8 @@ def extract_progress_details(report, report_dict):
     lines = report.split('\n')  # Split report into lines
     indexCount = len(lines) - 1
     i = 0  # Index for line counting
-    ignoredUnits = set()  # Variable stores unit IDs the parser should ignore in future
-    ignoredVersions = set()  # Variable stores unit versions the parser should ignore in future
-    ignoredCredits = set()  # Variable stores unit credit worths the parser should ignore in future
-    ignoredStatus = set()  # # Variable stores unit statuses the parser should ignore in future
     units = {}  # Variable stores all units in a dictionary
-    unitsAuto = {}  # Varible stores the most recently automatically credited units list
-
+    unitsAuto = {}  # Variable stores the most recently automatically credited units list
 
     while not lines[i]:  # Go to start of file, skipping any whitespace (if applicable)
         i += 1
@@ -144,8 +149,14 @@ def extract_progress_details(report, report_dict):
         # Replace current course detail with new detail
         report_dict, i = extract_course_details(lines, report_dict, i)
 
-        # Clear credited units for previous courses
+        # Clear data from previous courses
+        ignoredUnits = set()  # Variable stores unit IDs the parser should ignore in future
+        ignoredVersions = set()  # Variable stores unit versions the parser should ignore in future
+        ignoredCredits = set()  # Variable stores unit credit worths the parser should ignore in future
+        ignoredStatus = set()  # # Variable stores unit statuses the parser should ignore in future
         unitsAuto = {}
+        unitsPlanned = {}
+        electiveCount = 1
 
         # Now you're at first semester header
         semHeaderRecent = lines[i]
@@ -154,7 +165,8 @@ def extract_progress_details(report, report_dict):
         # For each semester header, extract information about units completed.
         while i < indexCount and 'Course' not in lines[i]:  # While not at EOF and not at the next course header
             semHeaderPrev = semHeaderRecent  # Keep track of last sem header seen
-            while i < indexCount and ('Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
+            while i < indexCount and (
+                            'Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
                 semUnitIDs = []  # Stores the units taken in each semester
                 semUnitDetails = []  # Stores the units version, credit worth and status as dictionaries
 
@@ -162,67 +174,116 @@ def extract_progress_details(report, report_dict):
 
                 ### GET UNIT IDs ###
                 # Advance to first unit ID from semester header that hasn't been read already
-                while (i < indexCount and not re.match(unit_id_regex, lines[i])) or i in ignoredUnits:
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                while (i < indexCount and not re.match(unit_id_regex,
+                                                       lines[i])) or i == semHeaderRecentIdx or i in ignoredUnits:
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
 
-                while re.match(unit_id_regex, lines[i]):  # Iterate unit ID list
-                    semUnitIDs.append(lines[i])  # Add unit ID to list
+                # If header is Elective or General, only 1 unit ID. Otherwise, there are potentially more.
+                expression = 're.match(unit_id_regex, lines[i])'
+                if 'Elective' in semHeaderPrev or 'General' in semHeaderPrev:
+                    expression = 'lines[i] == semHeaderPrev'
+
+                while eval(expression):  # Iterate unit ID list
+                    # If ID is an elective, store as ELECTIVE instead
+                    unitID = lines[i]
+                    if re.match(improper_unit_id_regex, lines[i]):
+                        unitID = 'ELECTIVE' + str(electiveCount)
+                        electiveCount += 1
+                    semUnitIDs.append(unitID)  # Add unit ID to list
                     ignoredUnits.add(i)  # Add current line to ignored index list
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
+
+                improperList = improper_unit_location(semUnitIDs)
 
                 ### GET UNIT VERSIONS ###
                 # Advance to first version from semester header that hasn't been read already
-                while (i < indexCount and not re.match(version_regex, lines[i])) or i in ignoredVersions:
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                if len(semUnitIDs) != len(improperList):  # Only advance to next version if versions could exist
+                    while (i < indexCount and not re.match(version_regex, lines[i])) or i in ignoredVersions:
+                        i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                              semHeaderRecentIdx)
 
-                for count in range(0, len(semUnitIDs)):  # Iterate version list
+                for count in range(0, (len(semUnitIDs) - len(improperList))):  # Iterate version list
                     semUnitDetails.append({'ver': lines[i]})  # Add unit version to list
                     ignoredVersions.add(i)  # Add current line to ignored version list
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
 
                 ### GET UNIT CREDIT WORTH ###
                 # Advance to first credit worth from semester header that hasn't been read already
                 while (i < indexCount and not re.match(credit_value_regex, lines[i])) or i in ignoredCredits:
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
 
                 for count in range(0, len(semUnitIDs)):  # Iterate credit worth list
-                    semUnitDetails[count].update({'credits': lines[i]})  # Add credit worth to list
+                    if count in improperList:
+                        semUnitDetails.append({'credits': lines[i]})
+                    else:
+                        semUnitDetails[count].update({'credits': lines[i]})
                     ignoredCredits.add(i)  # Add current line to ignored version list
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
-
-                # If in automatic credit or exempt semester, add last credit num (total credits) to ignore list
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
 
                 ### GET UNIT STATUS ###
-                if 'Automatic' in semHeaderPrev or 'Exempt' in semHeaderPrev:  # If in autocredit header
-                    ignoredCredits.add(i)  # Add total credit value to ignore list, then advance beyond that.
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                if re.match(elective_header_regex, semHeaderPrev):  # If in autocredit header
+                    if 'Automatic' in semHeaderPrev:
+                        ignoredCredits.add(i)  # Add total credit value to ignore list, then advance beyond that.
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                          semHeaderRecentIdx)
                     # If no credit information is between this line and next header, advance to next header
                     if no_remaining_units(i, lines, ignoredCredits):
                         while i < indexCount and not re.match(semester_header_regex, lines[i]):
-                            i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                            i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev,
+                                                                                  semHeaderRecent,
+                                                                                  semHeaderRecentIdx)
                 else:  # If in actual semester
                     # Advance to first unit status from semester header that hasn't been read already
                     while (i < indexCount and not re.match(unit_status_regex, lines[i])) or i in ignoredStatus:
-                        i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                        i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                              semHeaderRecentIdx)
 
                     for count in range(0, len(semUnitIDs)):  # Iterate unit status list
                         semUnitDetails[count].update({'status': lines[i]})  # Add unit status to list
                         ignoredStatus.add(i)  # Add current line to ignored version list
-                        i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx)
+                        i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
+                                                                              semHeaderRecentIdx)
 
                 ### ADD UNITS TO DICTIONARY ###
                 for index, unit in enumerate(semUnitIDs):
-                    if 'Automatic' in semHeaderPrev or 'Exempt' in semHeaderPrev:
+                    if re.match(elective_header_regex, semHeaderPrev):
                         unitsAuto.update({unit: semUnitDetails[index]})
+                    elif 'ENR' in (semUnitDetails[index])['status'] or 'PLN' in (semUnitDetails[index])['status']:
+                        unitsPlanned.update({unit: semUnitDetails[index]})
                     else:
-                        extender = 1
-                        while(unit in units):
-                            extender += 1
-                            unit = unit + '~:' + str(extender)
+                        if unit in units and 'attempt' in units[unit]:
+                            attempt = int((units[unit])['attempt']) + 1
+                        else:
+                            attempt = 1
+                        semUnitDetails[index].update({'attempt': attempt})
                         units.update({unit: semUnitDetails[index]})
     report_dict['units'] = units
     report_dict['automatic'] = unitsAuto
+    report_dict['planned'] = unitsPlanned
     return report_dict
+
+
+# Name:     proper_unit_count
+#
+# Purpose:  Returns the indexes that improper unit IDs are located in a list
+#
+# Params:   unitList: A list containing unit IDs
+#
+# Return:   improperList: A list of indexes which contain non-proper unit IDs
+#
+# Notes:    Should only be called from extract_progress_details
+def improper_unit_location(unitList):
+    improperList = []
+    for idx, unit in enumerate(unitList):
+        if 'ELECTIVE' in unit:
+            improperList.append(idx)
+    return improperList
+
 
 # Name:     no_remaining_units
 #
@@ -240,7 +301,7 @@ def no_remaining_units(i, lines, ignoredCredits):
     nextSemHeader = i
 
     # Go to next header and store its line index
-    while not re.match(semester_header_regex, lines[nextSemHeader]):
+    while nextSemHeader < len(lines) and not re.match(semester_header_regex, lines[nextSemHeader]):
         nextSemHeader += 1
 
     # If between current position and header there is a credit value, return true instead of false.
@@ -248,6 +309,7 @@ def no_remaining_units(i, lines, ignoredCredits):
         if re.match(credit_value_regex, lines[count]) and lines[count] not in ignoredCredits:
             noneRemaining = False
     return noneRemaining
+
 
 # Name:     advance_line
 #
@@ -261,9 +323,9 @@ def no_remaining_units(i, lines, ignoredCredits):
 # Return:   i, the newly incremented line counter and semHeaderPrev, the updated (or not) semester header
 #
 # Notes:    Should only be called from extract_progress_details
-def advance_line(lines, i, semHeaderRecent, semHeaderRecentIdx):
+def advance_line(lines, i, semHeaderPrev, semHeaderRecent, semHeaderRecentIdx):
     i += 1
-    if re.match(semester_header_regex, lines[i]):
+    if re.match(semester_header_regex, lines[i]) and lines[i] != semHeaderRecent and semHeaderPrev == semHeaderRecent:
         semHeaderRecent = lines[i]
         semHeaderRecentIdx = i
     return i, semHeaderRecent, semHeaderRecentIdx
@@ -322,9 +384,10 @@ def convert_pdf_to_txt(fp):
     password = ""
     maxpages = 0
     caching = True
-    pagenos=set()
+    pagenos = set()
 
-    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
+    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
+                                  check_extractable=True):
         interpreter.process_page(page)
 
     text = retstr.getvalue()
@@ -345,25 +408,27 @@ def convert_pdf_to_txt(fp):
 #
 # Notes:    IMPORT THIS METHOD, THEN CALL IT
 def parse_progress_report(fp):
-    report = convert_pdf_to_txt(fp) # Converts PDF to text
-    report = remove_garbage(report) # Removes unneeded labels from report
-    report_dict, report = extract_student_details(report) # Extracts student details, including report date
-    report_dict = extract_progress_details(report, report_dict)  # Extracts unit details, including units done and units planned
+    report = convert_pdf_to_txt(fp)  # Converts PDF to text
+    report = remove_garbage(report)  # Removes unneeded labels from report
+    report_dict, report = extract_student_details(report)  # Extracts student details, including report date
+    report_dict = extract_progress_details(report,
+                                           report_dict)  # Extracts unit details, including units done and units planned
     return report_dict
+    # print(report_dict)
+
 
 # Test code
-paths = ['/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'#, 
-        # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf']#,
-        # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell.pdf', < Works
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Steven-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-First-pr.pdf',
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-Second-pr.pdf', < Works
-         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
-         ]
+# paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-pr.pdf',
+#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
+paths = [
+        '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
+        ]
+
 for path in paths:
     fp = open(path, 'rb')
     parse_progress_report(fp)

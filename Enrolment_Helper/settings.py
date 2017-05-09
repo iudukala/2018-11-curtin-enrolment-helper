@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-import logging
+# import logging
 # from Enrolment_Helper import core_app
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MY_APPS = [
-    'Enrolment_Helper.core_app',
+    'core_app',
 ]
 
 INSTALLED_APPS += MY_APPS

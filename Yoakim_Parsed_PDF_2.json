@@ -1,0 +1,50 @@
+{
+    'date': '27 Mar 2017', 
+    'planned': {
+        'ISAD3001': {'ver': '2', 'credits': '25.0', 'status': 'ENR'}, 
+        'ISAD3002': {'ver': '1', 'credits': '25.0', 'status': 'ENR'}, 
+        'ISEC2000': {'ver': '1', 'credits': '25.0', 'status': 'ENR'}
+    }, 
+    'name': 'Mr Yoakim Sadao Persson', 
+    'automatic': {
+        '313394': {'ver': '3', 'credits': '12.5'}, 
+        '307590': {'ver': '2', 'credits': '25.0'}, 
+        '307554': {'ver': '1', 'credits': '25.0'}, 
+        '313391': {'ver': '3', 'credits': '12.5'}
+    }, 
+    'course': {
+        '311148': '5', 'MJRU-COMPT': '1', '313799': '2', 'STRU-SWENG': '1'
+    }, 
+    'units': {
+        '312649': {'ver': '4', 'credits': '12.5', 'attempt': 1, 'status': 'WD'}, 
+        '1920': {'ver': '8', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'CNCO2000': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '8933': {'ver': '11', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '314151': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'CMPE4001': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'CMPE2002': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '10163': {'ver': '10', 'credits': '25.0', 'attempt': 1, 'status': 'FAIL'}, 
+        'ISAD4002': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'FAIL'}, 
+        '313394': {'ver': '3', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'PRJM3000': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'ISEC2001': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '314152': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'WD'}, 
+        '314512': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'WD'}, 
+        'ISAD3000': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'COMP1000': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '313392': {'ver': '2', 'credits': '25.0', 'attempt': 1, 'status': 'WD'}, 
+        '313401': {'ver': '3', 'credits': '25.0', 'attempt': 1, 'status': 'FAIL'}, 
+        '313391': {'ver': '3', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '10926': {'ver': '5', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'COMP2004': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'COMP2006': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '1922': {'ver': '8', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '4533': {'ver': '6', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'COMP3001': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'COMP3003': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        'ICTE4000': {'ver': '1', 'credits': '25.0', 'attempt': 1, 'status': 'PASS'}, 
+        '314510': {'ver': '1', 'credits': '12.5', 'attempt': 1, 'status': 'WD'}, 
+        'COMP2003': {'ver': '1', 'credits': '25.0', 'attempt': 2, 'status': 'PASS'}
+    }, 
+    'id': '17080170'
+}
