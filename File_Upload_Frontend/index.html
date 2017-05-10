@@ -17,8 +17,9 @@
 
     <!--Upload Widget-->
     <div class="upload-wrapper">
-      <div class="upload-outer">
-        <div class="upload-inner">
+      <span id="error-text" ng-class="{'error-text-visible': errorMessage, 'error-text-invisible': !errorMessage}">{{ errorText }}</span>
+      <div class="upload-outer" ng-class="{'upload-outer-uploading': fileState.indexOf('uploading') >= 0}">
+        <div class="upload-inner" ng-class="{ 'upload-inner-active': draggedover, 'upload-inner-filled': filledFilelist, 'upload-inner-uploading': uploading}" id="drag-target">
           <img src="assets/img/file-icon.svg">
           <h2>Drag and drop files here</h2>
           <h4>or</h4>
@@ -27,17 +28,25 @@
         </div>
 
         <!--List of selected files-->
-        <ul ng-repeat="file in filelist">
-          <li>
-            {{ file.name }}
-            <input type="button" value = "❌" ng-click="removeFile(file)">
+        <ul class="file-list" ng-class="{'file-list-filled': filledFilelist && !uploading, 'file-list-uploading': uploading}">
+          <li ng-repeat="file in filelist track by $index" id="{{ 'file-item-' + $index }}">
+            <div>
+              <span>{{ file.name }}</span>
+              <p>{{ ((file.size / 1000) | number:2)  + 'kb'}}</p>
+            </div>
+            <div>
+              <img src="assets/img/tick-icon.svg" ng-class="{'visible-element': fileState[$index] === 'success', 'invisible-element': fileState[$index] !== 'success'}">
+              <img type="image" src="assets/img/cross-icon.svg" ng-class="{'visible-element': fileState[$index] === 'failure', 'invisible-element': fileState[$index] !== 'failure'}">
+              <img type="image" class="loading-icon" src="assets/img/loading-icon.svg" ng-class="{'visible-element': fileState[$index] === 'uploading', 'invisible-element': fileState[$index] !== 'uploading'}">
+              <input type="image" src="assets/img/trash-icon.svg" ng-click="removeFile($index)" ng-class="{'visible-element': fileState.indexOf('uploading') < 0, 'invisible-element': fileState.indexOf('uploading') >= 0}">
+            </div>
           </li>
         </ul>
 
       </div>
 
       <!--Upload button-->
-      <input type="button" class="button" value="UPLOAD REPORTS" id="upload-files">
+      <input type="button" class="button" value="UPLOAD REPORTS" id="upload-files" ng-click="uploadFiles()">
     </div>
   </div>
 </body>
