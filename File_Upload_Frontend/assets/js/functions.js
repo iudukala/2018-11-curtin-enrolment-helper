@@ -188,6 +188,17 @@ app.run(function($rootScope) {
      }
    }
 
+   /*
+    * Name: setupAjaxRequest
+    *
+    * Purpose: Sets up an ajax request for each file being uploaded
+    *
+    * Params: fileIndex, the index of the file to be uploaded
+    *
+    * Return: none
+    *
+    * Notes: Randomly generates outcome for now, actual AJAX will be in future
+    */
    function setupAjaxRequest(fileIndex) {
      setTimeout(function(){
        if(1) {//Math.random() >= 0.5) {

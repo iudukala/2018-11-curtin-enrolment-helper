@@ -4,7 +4,7 @@
 *.pyc
 
 /*****Prepros Ignores*****/
-prepros_6.config
+prepros-6.config
 
 /*****OSX Gitignore*****/
 *.DS_Store
