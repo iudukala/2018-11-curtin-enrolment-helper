@@ -53,8 +53,10 @@ class enrolment_plan_creation(TestCase):
         cls.unit1 = Unit.objects.create(UnitID='COMP2003',  Version='1',  Credits=12.5, Semester=1)
 
         filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
-        cls.validator = pdf_validator(filename)
-        cls.validator.read_file()
+        with open(filename, 'rb') as fp:
+            cls.validator = pdf_validator(fp)
+            cls.validator.read_file()
+        # cls.validator = pdf_validator(filename)
 
         cls.information_saver = student_information_saver(cls.validator.get_validated_information())
 

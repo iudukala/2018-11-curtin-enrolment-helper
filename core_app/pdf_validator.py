@@ -8,44 +8,47 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class pdf_validator():
 
-    def __init__(self, in_filename):
-        self.filename = in_filename
-        self.output_message = ''
+    def __init__(self, file):
+        self.in_file = file
+        self.output_message = 'Issue detected during pdf validation:\n---------------------------------------------\n'
         self.json_parsed_file = {}
         self.is_parsed_pdf_valid = True
         # HARDCODED: Should be able to create these automatically.
         self.HARDCODED_REQUIRED_JSON_FIELDS = ["course", "id", "name", "date", "units", "automatic"]
 
     def read_file(self):
-        # For dev purposed use a locally stored file.
-        # with open('/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf', 'rb') as fp:
-        #     json_parsed_file = parse_progress_report(fp)
-        # USED FOR TESTING
         try:
-            with open(self.filename, 'rb') as fp:
-                self.json_parsed_file = parse_progress_report(fp)
+            self.json_parsed_file = parse_progress_report(self.in_file)
+            # self.in_file.close()
+            # print(self.json_parsed_file)
+            return True
 
         except IOError:
-            self.output_message += "File does not exist"
+            self.output_message += "File does not exist\n"
             self.is_parsed_pdf_valid = False
             return False
 
         except TypeError:
-            self.output_message += "There is an issue with the file"
+            self.output_message += "There is an issue with the file\n"
             self.is_parsed_pdf_valid = False
             return False
+
+        # except ValueError:
+        #     self.output_message += "There is an issue with the file\n"
+        #     self.is_parsed_pdf_valid = False
+        #     return False
 
     # CHECKING THAT ALL KEYS ARE CORRECT ONE.
     def check_attributes(self):
         for key in self.json_parsed_file.keys():
             if key not in self.HARDCODED_REQUIRED_JSON_FIELDS:
-                self.output_message += "All JSON attribute key are not correct"
+                self.output_message += "All JSON attribute key are not correct\n"
                 self.is_parsed_pdf_valid = False
 
         # CHECKING THAT ALL KEYS IN THE PARSED REPORT
         for key in self.HARDCODED_REQUIRED_JSON_FIELDS:
             if key not in self.json_parsed_file.keys():
-                self.output_message += "All required attribute keys are not in the parsed information"
+                self.output_message += "All required attribute keys are not in the parsed information\n"
                 self.is_parsed_pdf_valid = False
 
     def check_courses(self):
@@ -58,17 +61,16 @@ class pdf_validator():
 
     def check_units(self):
         # THE UNITS DATABASE IS LIMITED TO COMPUTING UNITS.
-        # THEREFORE CANNOT 'VALIDATE' THE AUTOMATIC UNITS.
         for unit_ID, unit_comp in self.json_parsed_file['units'].items():
             try:
                 current_unit = Unit.objects.get(UnitID=unit_ID)
                 if current_unit.Version != unit_comp['ver'] or current_unit.Credits != unit_comp['credits']:
                         self.is_parsed_pdf_valid = False
-                        self.output_message += "Unit: {}, exists, however unit information appears to be incorrect.".format(unit_ID)
+                        self.output_message += "Unit: {}, exists, however unit information appears to be incorrect.\n".format(unit_ID)
 
             # UNIT CAN BE ELECTIVE AND THEREFORE SHOULD NOT FAIL VALIDATOR
             except ObjectDoesNotExist:
-                self.output_message += "Unit: {}, does not exist in the database".format(unit_ID)
+                self.output_message += "Unit: {}, does not exist in the database, potentially can be an elective.\n".format(unit_ID)
 
     def check_student(self):
         # Testing whether the student exist.
@@ -77,7 +79,7 @@ class pdf_validator():
         s_name = self.json_parsed_file['name'].split(' ')
         joined_name = ' '.join(s_name[1:])
         if not Student.objects.filter(StudentID=self.json_parsed_file['id'], Name=joined_name).exists():
-            print("Student needs to be created")
+            self.output_message += "Student: {} needs to be created\n".format(self.json_parsed_file['id'])
             # TODO: Create a student as one does not exist in system.
             # student = Student(StudentID=json_parsed_file['id'], Name=json_parsed_file['name']);
             # student.save()
@@ -90,7 +92,7 @@ class pdf_validator():
 
         # Check that the parsed date is older then the current date.
         if parse_date < current_day:
-            self.output_message += "Issue detected on date of the progress report"
+            self.output_message += "Issue detected on date of the progress report\n"
             self.is_parsed_pdf_valid = False
 
     def toString_error_message(self):
@@ -113,13 +115,8 @@ class pdf_validator():
             self.check_units()
             self.check_student()
             self.check_date()
-            print(self.toString_error_message())
 
-        if self.is_parsed_pdf_valid:
-            return True, self.output_message
-
-        elif not self.is_parsed_pdf_valid:
-            return False, self.output_message
+        return self.is_parsed_pdf_valid, self.output_message
 
     # The method Eugene will can to then create and setup the student templates.
     def get_validated_information(self):

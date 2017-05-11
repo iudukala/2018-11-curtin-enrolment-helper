@@ -1,22 +1,19 @@
 """
 View page. Responsible for getting data
 """
-import logging
-# import json
-# import request
-# from django.shortcuts import render
+import json
 from django.http import HttpResponse
 from django.core import serializers
 from .models import *
-from .forms import UploadedFile
 from .enrolment_generator import Enrolment_Generator
-# from .create_student_enrolment_plan import handle_file
-# from .file_validator import
-# from .file_validator import upload_parsed_file
+from django.shortcuts import render
+from django.core.files.storage import FileSystemStorage
+from django.core.files import File
+from .models import Student
+from .pdf_validator import pdf_validator
+from .student_information_saver import student_information_saver
 
 # TODO: Somewhere to store functions for parse checking.
-
-logging.getLogger(__name__)
 
 
 def index(request):
@@ -33,30 +30,30 @@ def upload_file(request):
     Handles pdf files being uploaded.
     https://docs.djangoproject.com/en/1.10/topics/http/file-uploads/
     """
-    if request.method == 'POST' or request.method == 'GET':
-        # TODO: Store file.
-        # FIXME: HARD CODING
-        # parsed_file = UploadedFile(request.POST, request.FILES)
-        upload_file = UploadedFile(request.POST, request.FILES)
+    if request.method == 'POST' and request.FILES['myfile']:
 
-        if upload_file.is_valid:
-            parsed_file = upload_file(request.FILE['filename'])
-            if parsed_file.is_valid:
-                parsed_json = parsed_file.getJSON()
-
-        if parsed_file.is_valid:
-            parsed_json = parsed_file.getJSON()
-            # NEED SOMETHING HERE TO CREATE STUDENT PLAN.
-            # handle_file()
-            # ACTUALLY CREATE A VALID 'template' to send to front-end.
-            logging.debug("PDF form was successfully validated")
-            # TODO: This actually should be the check_parsed_information stuff.
-
+        myfile = request.FILES['myfile']
+        file = File(myfile)
+        validator = pdf_validator(file)
+        valid, output_message = validator.pdf_isValid()
+        if valid:
+            information_saver = student_information_saver(validator.get_validated_information())
+            information_saver.set_student_unit()
+            d = {'pdf_valid': 'True'}
+            HARDCODED_JSON = json.dumps(d)
+            return HttpResponse(HARDCODED_JSON, content_type='application/json')
         else:
-            print("FAILED")
+            print(validator.output_message)
+            d = {'pdf_valid': 'False'}
+            HARDCODED_JSON = json.dumps(d)
+            return HttpResponse(HARDCODED_JSON, content_type='application/json')
 
-    output = "PDF upload method: Work in progress"
-    return HttpResponse(output)
+    d = {'Campbell': 'Front-end God'}
+    HARDCODED_JSON = json.dumps(d)
+    return HttpResponse(HARDCODED_JSON, content_type='application/json')
+
+    # Links to Eugene's html template.
+    # return render(request, 'simple_upload.html')
 
 
 def get_student_list(request):
@@ -71,7 +68,6 @@ def get_student_list(request):
         # test_student = Student(StudentID='17080170', Name='Yoakim Persson', CreditsCompleted=550, AcademicStatus=1, CourseID=course)
         # test_student.save()
 
-        # all_students = Student.objects.all().values('StudentID', 'Name')
         serializers_students = serializers.serialize("json", Student.objects.all(), fields=('StudentID', 'Name'))
 
         return HttpResponse(serializers_students, content_type='application/json')

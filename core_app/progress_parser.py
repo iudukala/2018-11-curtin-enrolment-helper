@@ -413,22 +413,22 @@ def parse_progress_report(fp):
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
+    # fp.close()
     return report_dict
-    # print(report_dict)
 
 
 # Test code
-# paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-pr.pdf',
-#          '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
-paths = [
-        '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
-        ]
+paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
+# paths = [
+#         '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
+#         ]
 
-for path in paths:
-    fp = open(path, 'rb')
-    parse_progress_report(fp)
+# for path in paths:
+#     fp = open(path, 'rb')
+#     parse_progress_report(fp)

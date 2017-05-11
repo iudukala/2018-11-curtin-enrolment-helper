@@ -1,5 +1,5 @@
 from django.test import TestCase
-# from core_app.models import *
+from django.core.files import File
 from core_app.models import Student
 from core_app.models import Course
 from core_app.models import Unit
@@ -10,8 +10,9 @@ import unittest
 # 'python manage test core_app.tests'
 
 
-@unittest.skip("Skipping")
+# @unittest.skip("Skipping")
 class pdf_validation(TestCase):
+
     # Setting up a database with correct values for student 17080170 .
     @classmethod
     def setUpTestData(cls):
@@ -56,8 +57,11 @@ class pdf_validation(TestCase):
         cls.unit1 = Unit.objects.create(UnitID='COMP2003',  Version='1',  Credits=12.5, Semester=1)
 
         filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
-        cls.validator = pdf_validator(filename)
-        cls.validator.read_file()
+        with open(filename, 'rb') as fp:
+            file = File(fp)
+            cls.validator = pdf_validator(file)
+            cls.validator.read_file()
+            print(cls.validator.json_parsed_file)
 
     def test_file(self):
         self.validator.is_parsed_pdf_valid = True

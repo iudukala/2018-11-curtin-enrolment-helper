@@ -59,10 +59,21 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Enrolment_Helper.urls'
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            # '/Users/Eugene/SEP1_Project/2017-11.3-enrolment-helper/templates',
+            # '/home/yoakim/UNI/2017/SEP2/',
+            # './2017-11.3-enrolment-helper/templates',
+            'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,6 +100,7 @@ DATABASES = {
     # }
 
     # Utilising the MySQL database
+
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Enrolment_Helper',
@@ -98,6 +110,15 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'Enrolment_Helper',
+    #     'USER': 'root',
+    #     'PASSWORD': '0204Billy()',
+    #     'HOST': 'localhost',
+    #     'PORT': '',
+    # }
 
 
 # Password validation

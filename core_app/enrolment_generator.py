@@ -44,14 +44,18 @@ class Enrolment_Generator():
         # Use CourseTemplate
         template = {'balh': 'blahblah'}
         all_course_templates = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
-        all_course_templates = all_course_templates.values()
+        # all_course_templates = all_course_templates.values()
+        # all_course_templates = all_course_templates
         # print(all_course_templates['17080170', '312649'])
-        # print(all_course_templates[])
+        # print(all_course_templates)
         return template
 
     def generate_plan(self, student):
         all_student_units = StudentUnit.objects.all().filter(StudentID=student.StudentID)
-        print(all_student_units)
+        student_unit_dict = all_student_units.values()
+        # print(student_unit_dict[0])
+        # print(student_unit_dict.StudentID_id.values())
+
         # Use StudentUnit
         plan = {'id': '17080170'}
         return plan

@@ -6,19 +6,20 @@ import logging
 import time
 
 from django import forms
-
+from django.core.files import File
 from .progress_parser import parse_progress_report
 from .models import *
 
 # logging.getLogger(__name__)
 
-class UploadedFile(forms.Form):
+class UploadedFileForm(forms.Form):
+
     '''
     The form that will hold single PDF student files.
     '''
     logging.debug("Start of UploadedFile()")
-    file_name = forms.CharField(max_length=50)
-    parsed_file = forms.FileField()
+    file_name = models.CharField(max_length=255)
+    parsed_file = models.FileField()
 
     # File parsing will be something like that. WEIRD THIS RUNS NOT WHEN 'upload_file' is called.
     # with open('/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf', 'rb') as fp:
@@ -30,8 +31,6 @@ class UploadedFile(forms.Form):
     #     json.dump(parsed_file, output_fp)
     # output_fp.write(str(parsed_file))
     # output_fp.close()
-
-
     # CHECKING FIELDS.
     HARDCODED_REQUIRED_JSON_FIELDS = ["course", "id", "name", "date", "units"]
 
@@ -41,10 +40,11 @@ class UploadedFile(forms.Form):
         """
         :return: 
         """
-        with open('/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf', 'rb') as fp:
-            json_parsed_file = parse_progress_report(fp)
+        #Convert FileField pointer to File pointer to read
+        myfile = File(fp)
 
-        print(parse_progress_report(request.FILES('filename')))
+        json_parsed_file = parse_progress_report(myfile)
+
 
         print(json_parsed_file)
 

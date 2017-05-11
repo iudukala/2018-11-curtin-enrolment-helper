@@ -1,5 +1,8 @@
 # TESTING
 from django.db import models
+from django.core.files.storage import FileSystemStorage
+
+fs = FileSystemStorage(location='/Users/Eugene/SEP1_Project/2017-11.3-enrolment-helper/core_app/storage')
 
 class Course(models.Model):
     CourseID = models.CharField(max_length=10, primary_key=True)
@@ -56,6 +59,10 @@ class StudentUnit(models.Model):
     Status = models.BooleanField(default=False)
     PrerequisteAchieved = models.BooleanField(default=False)
 
+    # def _str__(self):
+    #     # return StudentID + " " + UnitID
+    #     return "{} {}".format(self.StudentID, self.UnitID)
+
 #
 class CourseTemplate(models.Model):
     class Meta:
@@ -71,3 +78,13 @@ class CourseTemplate(models.Model):
     #
     Year = models.IntegerField(validators=[1, 2, 3, 4])
     Semester = models.IntegerField(validators=[1, 2])
+
+
+#Class UploadedFile supports for UploadedFileForm in forms.py and allow us to access to FileField pointer
+# class UploadedFile(models.Model):
+#     title = models.CharField(max_length=255, unique=True)
+#     parsed_file = models.FileField()
+#
+#     def __unicode__(self):
+#         return self.title
+#
