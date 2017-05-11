@@ -5,6 +5,7 @@ from .models import Unit
 from .models import CourseTemplate
 from .models import Credential
 from .models import StudentUnit
+from django.core.exceptions import ObjectDoesNotExist
 # from .progress_parser import parse_progress_report
 # from .pdf_validator import pdf_validator
 """
@@ -41,13 +42,18 @@ class student_information_saver():
     def set_student_unit(self):
         student = Student.objects.get(StudentID=self.parsed_report['id'])
         for unitID, unit_info in self.parsed_report['units'].items():
-            unit = Unit.objects.get(UnitID=unitID)
-            if unit_info['status'] == 'FAIL' or unit_info['status'] == 'WD':
-                unit_status = False
-            else:
-                unit_status = True
-            new_student_unit = StudentUnit(StudentID=student, UnitID=unit, Attempts=unit_info['attempt'], Status=unit_status)
-            new_student_unit.save()
+            try:
+                unit = Unit.objects.get(UnitID=unitID)
+                if unit_info['status'] == 'FAIL' or unit_info['status'] == 'WD':
+                    unit_status = False
+                else:
+                    unit_status = True
+                new_student_unit = StudentUnit(StudentID=student, UnitID=unit, Attempts=unit_info['attempt'], Status=unit_status)
+                new_student_unit.save()
+
+            # Unit can be elective.
+            except ObjectDoesNotExist:
+                print("AN ELECTIVE!!")
 
 
 def determine_unit_progress(unit_set):

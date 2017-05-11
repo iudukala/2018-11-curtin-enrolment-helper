@@ -5,11 +5,10 @@ from core_app.models import Course
 from core_app.models import Unit
 from core_app.pdf_validator import pdf_validator
 from core_app.student_information_saver import student_information_saver
-import unittest
+from core_app.enrolment_generator import Enrolment_Generator
 
 
-@unittest.skip("Skipping")
-class enrolment_plan_creation(TestCase):
+class test_enrolment_plan_creation(TestCase):
     @classmethod
     def setUpTestData(cls):
         # COURSES
@@ -54,9 +53,12 @@ class enrolment_plan_creation(TestCase):
 
         filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'
         cls.validator = pdf_validator(filename)
-        cls.validator.read_file()
+        if cls.validator.pdf_isValid():
+            cls.information_saver = student_information_saver(cls.validator.get_validated_information())
+            cls.information_saver.set_student_unit()
+            cls.plan_generator = Enrolment_Generator('17080170')
+        else:
+            print("Pdf validator failed")
 
-        cls.information_saver = student_information_saver(cls.validator.get_validated_information())
-
-    def test_set_student_unit(self):
-        self.information_saver.set_student_unit()
+    def test_get_templates_and_plans(self):
+        self.plan_generator.get_templates_and_plan()

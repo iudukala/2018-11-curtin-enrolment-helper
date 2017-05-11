@@ -66,6 +66,7 @@ class pdf_validator():
                         self.is_parsed_pdf_valid = False
                         self.output_message += "Unit: {}, exists, however unit information appears to be incorrect.".format(unit_ID)
 
+            # UNIT CAN BE ELECTIVE AND THEREFORE SHOULD NOT FAIL VALIDATOR
             except ObjectDoesNotExist:
                 self.output_message += "Unit: {}, does not exist in the database".format(unit_ID)
 
@@ -115,7 +116,7 @@ class pdf_validator():
             print(self.toString_error_message())
 
         if self.is_parsed_pdf_valid:
-            return True
+            return True, self.output_message
 
         elif not self.is_parsed_pdf_valid:
             return False, self.output_message

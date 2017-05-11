@@ -2,13 +2,14 @@
 View page. Responsible for getting data
 """
 import logging
-import json
+# import json
 # import request
 # from django.shortcuts import render
 from django.http import HttpResponse
 from django.core import serializers
 from .models import *
 from .forms import UploadedFile
+from .enrolment_generator import Enrolment_Generator
 # from .create_student_enrolment_plan import handle_file
 # from .file_validator import
 # from .file_validator import upload_parsed_file
@@ -60,7 +61,7 @@ def upload_file(request):
 
 def get_student_list(request):
     """
-    :param request: 
+    :param request:
     :return: A JSON dict object of StudentID and name
     """
     if request.method == 'GET':
@@ -70,7 +71,17 @@ def get_student_list(request):
         # test_student = Student(StudentID='17080170', Name='Yoakim Persson', CreditsCompleted=550, AcademicStatus=1, CourseID=course)
         # test_student.save()
 
-        all_students = Student.objects.all().values('StudentID', 'Name')
+        # all_students = Student.objects.all().values('StudentID', 'Name')
         serializers_students = serializers.serialize("json", Student.objects.all(), fields=('StudentID', 'Name'))
 
         return HttpResponse(serializers_students, content_type='application/json')
+
+
+def generate_enrolment_plan(request):
+    if request.method == 'GET':
+
+        # recieve student ID
+        e_generator = Enrolment_Generator('17080170')
+        combine_JSON = e_generator.get_templates_and_plan()
+
+    return HttpResponse(combine_JSON, content_type='application/json')
