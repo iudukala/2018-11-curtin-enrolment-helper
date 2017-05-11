@@ -51,7 +51,7 @@ def determine_unit_progress(unit_set):
     return attempt_dict
 
 
-with open('/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf', 'rb') as fp:
+with open('/Users/Eugene/Downloads/StudentProgressReport-17898755-27_Mar_2017.pdf', 'rb') as fp:
     json_parsed_file = parse_progress_report(fp)
 
 student = Student.objects.get(StudentID=json_parsed_file['id'])
@@ -63,7 +63,7 @@ for unit_ID, unit_info in json_parsed_file['units'].items():
 
     studentUnit = StudentUnit(StudentID=student.StudentID, UnitID=unit_ID)
     studentUnit.Attempts = unit_attempts[unit_ID]['attempts']
-    studentUnit.Status = unit_attempts[unit_ID]['status']
+    # studentUnit.Status = unit_attempts[unit_ID]['status']
     # studentUnit.Status = unit_info['status']
 
     # studentUnit.Attempts = unit_info['']

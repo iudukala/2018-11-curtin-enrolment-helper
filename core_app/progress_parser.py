@@ -352,7 +352,7 @@ def parse_progress_report(fp):
     return report_dict
 
 # Test code
-paths = ['/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-17080170-27_Mar_2017.pdf'#, 
+paths = ['/Users/Eugene/Downloads/StudentProgressReport-17898755-27_Mar_2017.pdf'#,
         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf']#,
         # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell.pdf', < Works
          # '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',

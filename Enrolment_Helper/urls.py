@@ -18,7 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
 
-    # url(r'^core_app/', include('core_app.urls')),
-    url(r'^', include('core_app.urls')),
+    url(r'^app/', include('core_app.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^login/', include('login.urls'))
 ]

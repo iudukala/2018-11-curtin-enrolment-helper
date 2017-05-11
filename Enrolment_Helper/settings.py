@@ -42,7 +42,8 @@ INSTALLED_APPS = [
 ]
 
 MY_APPS = [
-    'Enrolment_Helper.core_app',
+    'core_app',
+    'login',
 ]
 
 INSTALLED_APPS += MY_APPS
@@ -59,10 +60,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Enrolment_Helper.urls'
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            '/Users/Eugene/SEP1_Project/2017-11.3-enrolment-helper/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,8 +101,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Enrolment_Helper',
-        'USER': 'enrolment_helperuser',
-        'PASSWORD': 'user',
+        'USER': 'root',
+        'PASSWORD': '0204Billy()',
         'HOST': 'localhost',
         'PORT': '',
     }
