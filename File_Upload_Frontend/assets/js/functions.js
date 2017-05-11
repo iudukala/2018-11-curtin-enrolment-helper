@@ -188,31 +188,44 @@ app.run(function($rootScope) {
      }
    }
 
-   /*
-    * Name: setupAjaxRequest
-    *
-    * Purpose: Sets up an ajax request for each file being uploaded
-    *
-    * Params: fileIndex, the index of the file to be uploaded
-    *
-    * Return: none
-    *
-    * Notes: Randomly generates outcome for now, actual AJAX will be in future
-    */
-   function setupAjaxRequest(fileIndex) {
-     setTimeout(function(){
-       if(1) {//Math.random() >= 0.5) {
-         $rootScope.fileState[fileIndex] = "success";
-       }
-       else {
-         $rootScope.fileState[fileIndex] = "failure";
-       }
-       if($rootScope.fileState.indexOf("uploading") < 0) {
-         $rootScope.uploading = false;
-       }
-       $rootScope.$apply();
-     }, Math.floor(Math.random() * 6000) + 2000);
-   }
+  /*
+   * Name: setupAjaxRequest
+   *
+   * Purpose: Sets up an ajax request for each file being uploaded
+   *
+   * Params: fileIndex, the index of the file to be uploaded
+   *
+   * Return: none
+   *
+   * Notes: Randomly generates outcome for now, actual AJAX will be in future
+   */
+  //Endpoint: /pdfFileUpload
+  function setupAjaxRequest(fileIndex) {
+    var formData = new FormData();
+    xhr = new XMLHttpRequest();
+
+    //Setup formdata for file
+    formData.append('file[]', $rootScope.filelist[fileIndex]);
+
+    //Setup callback for request
+    xhr.onload = function() {
+      //Switch on status codes
+      if(Math.random() >= 0.5) {
+        $rootScope.fileState[fileIndex] = 'success';
+      }
+      else {
+        $rootScope.fileState[fileIndex] = 'failure';
+      }
+
+      if($rootScope.fileState.indexOf('uploading') < 0) {
+        $rootScope.uploading = false;
+      }
+      $rootScope.$apply();
+    };
+
+    xhr.open('post', '/pdfFileUpload');
+    xhr.send(formData);
+  }
 
   /*
    * Name: uploadWidgetInner.ondrop

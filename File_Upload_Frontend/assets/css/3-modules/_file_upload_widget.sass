@@ -48,7 +48,14 @@
         justify-content: space-between
         overflow: hidden
         padding: 10px
+        border-top: 1px solid rgba(0,0,0,0)
         border-bottom: 1px solid #C1C1C1
+
+        &:first-of-type
+          border-top: none
+
+        &:last-of-type
+          border-bottom: none
 
         span
           font-size: 18px
@@ -61,17 +68,30 @@
           font-size: 12px
           font-weight: 200px
 
-        input, img
-          display: inline
-          border-style: none
-          height: 20px
-          width: 20px
-
         .visible-element
           display: inline
 
         .invisible-element
           display: none
+
+        .icon-container
+          position: relative
+          height: 20px
+          width: 20px
+
+        .icon-overlay
+          height: 100%
+          width: 100%
+          pointer-events: none
+          position: absolute
+          top: 0
+          left: 0
+
+        .icon
+          height: 100%
+          width: 100%
+          background-color: #F5F5F5
+          border: none
 
         .loading-icon
           animation: spinnerAnim 1.2s linear infinite
@@ -82,10 +102,26 @@
           100%
             +transform(rotate(-360deg))
 
+      .file-item-success
+        +box-sizing(border-box)
+        background-color: rgba(50,205,50,0.5)
+        border-bottom-color: rgb(50,205,50)
+
+        span, p
+          color: #FFFFFF
+
+      .file-item-failure
+        +box-sizing(border-box)
+        background-color: rgba(255,0,0,0.5)
+        border-bottom-color: rgb(255,0,0)
+
+        span, p
+          color: #FFFFFF
+
     .file-list-filled
       width: 50%
       padding: 0 10px
-      box-sizing: border-box
+      +box-sizing(border-box)
 
     .file-list-uploading
       width: 100%
@@ -93,7 +129,7 @@
     .upload-inner
       width: 100%
       height: 100%
-      box-sizing: border-box
+      +box-sizing(border-box)
       display: inline-flex
       flex-direction: column
       align-items: center
