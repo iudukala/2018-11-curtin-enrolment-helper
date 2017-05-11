@@ -210,7 +210,7 @@ app.run(function($rootScope) {
     //Setup callback for request
     xhr.onload = function() {
       //Switch on status codes
-      if(Math.random() >= 0.5) {
+      if(xhr.status === '200') {
         $rootScope.fileState[fileIndex] = 'success';
       }
       else {
