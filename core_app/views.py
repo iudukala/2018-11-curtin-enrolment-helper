@@ -3,6 +3,11 @@ from django.http import JsonResponse
 import json
 
 
+######################################################################################################
+# For retrieving the student course progress information, 1st get the student id
+# from request with json object, and retrieving the data from data model and forming
+# the new json object return back to the Front-end
+######################################################################################################
 def course_progress(request):
     if request.is_ajax():
         try:
@@ -25,7 +30,9 @@ def course_progress(request):
 
     return JsonResponse(resp)
 
-
+######################################################################################################
+# Form the json object
+######################################################################################################
 def return_resp(templates, plans):
     resp = {
         'template': templates
@@ -34,7 +41,10 @@ def return_resp(templates, plans):
 
     return resp
 
-
+######################################################################################################
+# Finding each data as required and save and construct with the pre-defined
+# json data, for both templates and plans
+######################################################################################################
 def form_templates(all_template):
     templates = {}
     years = {}
@@ -58,3 +68,4 @@ def form_plans(all_plans):
         semesters[plan.UnitID] = {'name':single_unit.Name, 'credits':single_unit.Credits, 'attempts':plan.Attempts}
 
     return plans
+######################################################################################################
