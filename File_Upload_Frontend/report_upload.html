@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="uploadApp" ng-controller="uploadCtrl">
+<script src="assets/js/angular.min.js"></script>
+<head>
+  <title>eTracker - Report Upload</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/report_upload.css" />
+</head>
+<body>
+  <div class="content-wrapper">
+    <!--Page title-->
+    <div class="header-wrapper">
+      <h1>IMPORT PROGRESS REPORT</h1>
+    </div>
+
+    <!--Upload Widget-->
+    <div class="upload-wrapper">
+      <span id="error-text" ng-class="{'error-text-visible': errorMessage, 'error-text-invisible': !errorMessage}">{{ errorText }}</span>
+      <div class="upload-outer" ng-class="{'upload-outer-uploading': fileState.indexOf('uploading') >= 0}">
+        <div class="upload-inner" ng-class="{ 'upload-inner-active': draggedover, 'upload-inner-filled': filledFilelist, 'upload-inner-uploading': uploading}" id="drag-target">
+          <img src="assets/img/file-icon.svg">
+          <h2>Drag and drop files here</h2>
+          <h4>or</h4>
+          <input type="button" class="button reverse-button" value="BROWSE FILES" id="file-browse">
+          <input type="file" id="file-input" style="display:none;" multiple>
+        </div>
+
+        <!--List of selected files-->
+        <ul class="file-list" ng-class="{'file-list-filled': filledFilelist && !uploading, 'file-list-uploading': uploading}">
+          <li ng-repeat="file in filelist track by $index" id="{{ 'file-item-' + $index }}" ng-class="{'file-item-success': fileState[$index] === 'success', 'file-item-failure': fileState[$index] === 'failure'}">
+            <div>
+              <span>{{ file.name }}</span>
+              <p>{{ ((file.size / 1000) | number:2)  + 'kb'}}</p>
+            </div>
+            <div class="icon-container">
+              <div class="icon-overlay" ng-class="{'file-item-success': fileState[$index] === 'success' && !uploading, 'file-item-failure': fileState[$index] === 'failure' && !uploading}"></div>
+              <img src="assets/img/loading-icon.svg" class="icon loading-icon" ng-class="{'visible-element': fileState[$index] === 'uploading', 'invisible-element': fileState[$index] !== 'uploading'}">
+              <input type="image" src="assets/img/trash-icon.svg" class="icon trash-icon" ng-click="removeFile($index)" ng-class="{'visible-element': !uploading, 'invisible-element': uploading}">
+            </div>
+          </li>
+        </ul>
+
+      </div>
+
+      <!--Upload button-->
+      <input type="button" class="button" value="UPLOAD REPORTS" id="upload-files" ng-click="uploadFiles()">
+    </div>
+  </div>
+</body>
+<script src="assets/js/report_upload.js" type="text/javascript"></script>
+</html>
