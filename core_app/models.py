@@ -29,23 +29,32 @@ class Equivalence(models.Model):
     EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
 
 
-# Prerequisite Table - Keeps track of which unit is the prerequisite of which unit.
+# Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
+#                      which when getting a particular unit it will give all records of that unit which gives a set of
+#                      options.
 class Prerequisite(models.Model):
     class Meta:
-        unique_together = (('PreUnitID', 'UnitID'),)
+        unique_together = (('Option', 'UnitID'),)
 
     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
-    PreUnitID = models.ForeignKey(Unit, related_name='PreUnit', on_delete=models.CASCADE)
-    # This is to keep track if the prerequisite unit is either an AND or an OR relation to the unit.
-    # AND is False, OR is True.
-    AndOr = models.BooleanField(default=False)
+    Option = models.IntegerField(primary_key=True)
+
+
+# Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
+#                 getting the option record will give all the units in the option.
+class Options(models.Model):
+    class Meta:
+        unique_together = (('UnitID', 'Option'),)
+
+    UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
+    Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
 
 
 # Credential Table - Stores access information to eTracker.
-#class Credential(models.Model):
-#    StaffID = models.CharField(max_length=7, primary_key=True)
-#    Name = models.CharField(max_length=100)
-#    Password = models.CharField(max_length=100)
+# class Credential(models.Model):
+#      StaffID = models.CharField(max_length=7, primary_key=True)
+#      Name = models.CharField(max_length=100)
+#      Password = models.CharField(max_length=100)
 
 
 # Student Table - Stores essential information of student.
@@ -71,17 +80,27 @@ class StudentUnit(models.Model):
     # 1 = Not Done, 2 = passed, 3 = failed
     Status = models.IntegerField(default=1, validators=[1, 2, 3])
     PrerequisiteAchieved = models.BooleanField(default=False)
-    Year = models.IntegerField(validators=[1, 2, 3, 4])
+    Year = models.IntegerField()
     Semester = models.IntegerField(validators=[1, 2])
 
 
-# CourseTemplate Table - Keeps track of which course contains which units.
+# CourseTemplate Table - Table can be a representation of an AND's table. Each course has a couple of option records,
+#                        which can be used to find which the list of units in that course.
 class CourseTemplate(models.Model):
     class Meta:
-        unique_together = (('CourseID', 'UnitID'),)
+        unique_together = (('CourseID', 'Option'),)
 
+    Option = models.IntegerField(primary_key=True)
     CourseID = models.ForeignKey(Course, on_delete=models.CASCADE)
-    UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
-    CourseUnitID = models.IntegerField(primary_key=True)
+
+
+# CourseTemplateOptions Table - Table can be a representation of an OR's table. Each option has a unit linked to it.
+#                               A list of unit for that option will be given when an option is queried.
+class CourseTemplateOptions(models.Model):
+    class Meta:
+        unique_together = (('UnitID', 'Option'),)
+
+    Option = models.ForeignKey(CourseTemplate, on_delete=models.CASCADE)
+    UnitID = models.ForeignKey(Unit, on_delete=models.CASCADE)
     Year = models.IntegerField(validators=[1, 2, 3, 4])
     Semester = models.IntegerField(validators=[1, 2])
