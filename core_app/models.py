@@ -48,7 +48,7 @@ class Prerequisite(models.Model):
 #    Password = models.CharField(max_length=100)
 
 
-# Student Table - Stores basic information of student.
+# Student Table - Stores essential information of student.
 class Student(models.Model):
     StudentID = models.IntegerField(primary_key=True)
     Name = models.CharField(max_length=100)
@@ -58,7 +58,7 @@ class Student(models.Model):
     CourseID = models.ForeignKey(Course)
 
 
-# StudentUnit Table - Stores all units that the student has taken and future units.
+# StudentUnit Table - Keeps track of which unit within the student plan.
 class StudentUnit(models.Model):
     class Meta:
         unique_together = (('StudentID', 'UnitID'),)
@@ -71,6 +71,8 @@ class StudentUnit(models.Model):
     # 1 = Not Done, 2 = passed, 3 = failed
     Status = models.IntegerField(default=1, validators=[1, 2, 3])
     PrerequisiteAchieved = models.BooleanField(default=False)
+    Year = models.IntegerField(validators=[1, 2, 3, 4])
+    Semester = models.IntegerField(validators=[1, 2])
 
 
 # CourseTemplate Table - Keeps track of which course contains which units.
