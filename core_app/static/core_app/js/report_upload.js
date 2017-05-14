@@ -62,7 +62,9 @@ function sameFile(x, y){
 /*********************************/
 /*       ANGULAR APP CODE        */
 /*********************************/
-var app = angular.module('uploadApp', []);
+var app = angular.module('uploadApp', []).config(function($interpolateProvider) {
+  $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+});
 app.controller('uploadCtrl', function($scope) {
 });
 app.run(function($rootScope) {

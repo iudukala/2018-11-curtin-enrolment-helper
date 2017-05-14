@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Title{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block link %}{% endblock %}
+</head>
+
+<body>
+  <div class="content-wrapper">
+    <!--Page title-->
+    <div class="header-wrapper">
+      <h1>{% block header %}{% endblock %}</h1>
+        <h3>{% block sub %}{% endblock %}</h3>
+    </div>
+
+    {% block body %}
+    {% endblock %}
+  </div>
+</body>
+</html>
