@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Title{% endblock %}</title>
-    {% load staticfiles %}
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block link %}{% endblock %}
 </head>
 
 <body>
-<h1>Index page!</h1>
-{% block body %}
-{% endblock %}
+  <div class="content-wrapper">
+    <!--Page title-->
+    <div class="header-wrapper">
+      <h1>{% block header %}{% endblock %}</h1>
+        <h3>{% block sub %}{% endblock %}</h3>
+    </div>
+
+    {% block body %}
+    {% endblock %}
+  </div>
 </body>
 </html>

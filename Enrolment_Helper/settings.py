@@ -134,4 +134,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Default page
-LOGIN_REDIRECT_URL = 'login'
+# LOGIN_REDIRECT_URL = 'login'
