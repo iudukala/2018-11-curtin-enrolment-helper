@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>{% block title %}Title{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block link %}{% endblock %}
+    {% block link %}
+    {% endblock %}
 </head>
 
 <body>
@@ -18,5 +19,7 @@
     {% block body %}
     {% endblock %}
   </div>
+    {% block bottom%}
+    {% endblock %}
 </body>
 </html>

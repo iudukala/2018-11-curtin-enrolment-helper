@@ -15,7 +15,7 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return render(request, 'core_app/report_upload.html', context=None)
+                return render(request, 'core_app/home.html', context=None)
             else:
                 return render(request, 'core_app/login.html', {'error_message': 'Your account has been disabled'})
         else:
@@ -30,4 +30,8 @@ def logout_user(request):
 
 
 def report_upload(request):
-    return  render(request, 'core_app/report_upload.html')
+    return render(request, 'core_app/report_upload.html')
+
+
+def home(request):
+    return render(request, 'core_app/home.html')

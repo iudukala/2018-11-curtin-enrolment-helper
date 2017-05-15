@@ -1,5 +1,6 @@
 {% extends 'core_app/base.html' %}
 {% block title %}eTracker - Report Upload{% endblock %}
+{% block header %}IMPORT PROGRESS REPORT{% endblock %}
 {% block link %}
   {% load staticfiles %}
   <link rel="stylesheet" href="{% static 'core_app/css/report_upload.css' %}"/>
@@ -8,11 +9,6 @@
 
 {% block body %}
   <div class="content-wrapper"  ng-app="uploadApp" ng-controller="uploadCtrl">
-    <!--Page title-->
-    <div class="header-wrapper">
-      <h1>IMPORT PROGRESS REPORT</h1>
-    </div>
-
     <!--Upload Widget-->
     <div class="upload-wrapper">
       <span id="error-text" ng-class="{'error-text-visible': errorMessage, 'error-text-invisible': !errorMessage}">{[{ errorText }]}</span>
