@@ -16,25 +16,26 @@ def course_progress(request):
         try:
             student_id = received_data.get['id']
             student = Student.objects.get(pk=student_id)
-            all_template = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
+            course_temp = CourseTemplate.objects.get(CourseID=student.CourseID)
+            all_template_option = CourseTemplateOptions.objects.all().filter(Option=course_temp.Option)
             all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID)
         except Student.DoesNotExist:
             raise RuntimeError('errors: wrong student ID input') from error
     else:
         raise Http404()
 
-    templates = form_templates(all_template)
+    template_options = form_templates(all_template_option)
     plans = form_plans(all_plan)
-    resp = return_couseTemp(templates, plans)
+    resp = return_couseTemp(template_options, plans)
 
     return JsonResponse(resp)
 
 ######################################################################################################
 # Form the json object
 ######################################################################################################
-def return_resp(templates, plans):
+def return_resp(template_options, plans):
     resp = {
-        'template': templates
+        'template_option': template_options
         'plan': plans
     }
 
@@ -42,19 +43,19 @@ def return_resp(templates, plans):
 
 ######################################################################################################
 # Finding each data as required and save and construct with the pre-defined
-# json data, for both templates and plans, i.e.# template = {'1':{'2':{'16102183':'SE200', 'credits',:'25'}}}
+# json data, for both template_option and plans, i.e.# template = {'1':{'2':{'16102183':'SE200', 'credits',:'25'}}}
 ######################################################################################################
-def form_templates(all_template):
-    template = {}
-    for temp in all_template:
+def form_templates(all_template_option):
+    template_option = {}
+    for temp in all_template_option:
         single_unit = Unit.object.get(pk=temp.UnitID)
         unit = {'name':single_unit.Name, 'credits':single_unit.Credits}
         semester[unit.UnitID] = unit
         semester_info = temp.Semester
         year_info = temp.Year
-        template.update({year_info:{semester_info:semester}})
+        template_option.update({year_info:{semester_info:semester}})
 
-    return template
+    return template_option
 
 def form_plans(all_plans):
     plan = {}
