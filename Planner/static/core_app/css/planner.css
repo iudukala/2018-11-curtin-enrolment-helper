@@ -323,7 +323,7 @@ span {
     .student-selector .student-name-table li:last-of-type {
       border-bottom: none; }
     .student-selector .student-name-table .student-table-header {
-      background-color: #E5E5E5;
+      background-color: #F5F5F5;
       border-bottom: 1px solid #979797; }
     .student-selector .student-name-table .student-table-row {
       position: relative;
