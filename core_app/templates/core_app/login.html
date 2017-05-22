@@ -1,0 +1,36 @@
+{% extends 'core_app/base.html' %}
+{% block title %}eTracker Login{% endblock %}
+{% block header %}eTracker{% endblock %}
+{% block sub %}Curtin's Student Enrolment Tracker{% endblock %}
+{% block link %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'core_app/css/login.css' %}"/>
+{% endblock %}
+
+{% block body %}
+<div class="login-wrapper">
+    <form  action="{% url 'core_app:login_user'%}" method="post" enctype="multipart/form-data">
+        {% if error_message %}
+            <div class="errors-style">
+                <p><strong>{{ error_message }}</strong></p>
+            </div>
+        {% endif %}
+        {% csrf_token %}
+        <!--Username Field-->
+        <div>
+            <input class="input" type="text" name="username" placeholder="Username">
+            <span class="underline"></span>
+        </div>
+        <br>
+        <!--Password Field-->
+        <div>
+            <input class="input" type="password" name="password" placeholder="Password">
+            <span class="underline"></span>
+        </div>
+        <br>
+        <div class="button-center">
+            <button type="submit" class="button" value="LOGIN" id="login">LOGIN</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
