@@ -313,17 +313,22 @@ span {
     margin: 0 0 10px 0; }
   .student-selector .student-name-table {
     list-style: none;
+    border: 1px solid #979797;
     padding: 0;
     width: 40%;
     max-width: 450px;
-    min-width: 300px; }
+    min-width: 300px;
+    max-height: 50vh;
+    overflow-y: scroll; }
+    .student-selector .student-name-table li:last-of-type {
+      border-bottom: none; }
     .student-selector .student-name-table .student-table-header {
-      background-color: #F5F5F5;
-      border: 1px solid #979797; }
+      background-color: #E5E5E5;
+      border-bottom: 1px solid #979797; }
     .student-selector .student-name-table .student-table-row {
       position: relative;
       background-color: #FFFFFF;
-      border: 1px solid #979797; }
+      border-bottom: 1px solid #979797; }
       .student-selector .student-name-table .student-table-row:hover ::after {
         z-index: 10;
         pointer-events: none;

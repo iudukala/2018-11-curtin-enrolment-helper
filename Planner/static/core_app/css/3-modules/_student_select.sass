@@ -10,19 +10,25 @@
 
   .student-name-table
     list-style: none
+    border: 1px solid #979797
     padding: 0
     width: 40%
     max-width: 450px
     min-width: 300px
+    max-height: 50vh
+    overflow-y: scroll
+
+    li:last-of-type
+      border-bottom: none
 
     .student-table-header
-      background-color: #F5F5F5
-      border: 1px solid #979797
+      background-color: #E5E5E5
+      border-bottom: 1px solid #979797
 
     .student-table-row
       position: relative
       background-color: #FFFFFF
-      border: 1px solid #979797
+      border-bottom: 1px solid #979797
 
       &:hover
         ::after
