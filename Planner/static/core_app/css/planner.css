@@ -247,7 +247,10 @@ span {
   align-items: left;
   position: absolute;
   bottom: 0;
+  left: 0;
   padding-top: 10px; }
+  .button-bottom a {
+    text-decoration: none; }
   .button-bottom .button-logout {
     font-size: 2em;
     background-color: transparent;
@@ -384,7 +387,8 @@ span {
 .content-wrapper {
   transition: -webkit-transform 0.75s ease;
   transition: transform 0.75s ease;
-  transition: transform 0.75s ease, -webkit-transform 0.75s ease; }
+  transition: transform 0.75s ease, -webkit-transform 0.75s ease;
+  position: relative; }
 
 .hidden-student-select {
   -webkit-transform: translateY(-100vh);

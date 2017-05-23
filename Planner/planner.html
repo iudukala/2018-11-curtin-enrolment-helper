@@ -44,6 +44,9 @@
              value="EDIT PLAN"
              id="edit-plan"
              ng-click="editStudentPlan()">
+      <div class="button-bottom">
+        <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
+      </div>
     </div>
     <!--{% endblock %}-->
   </div>
@@ -54,12 +57,13 @@
     <div class="header-wrapper">
       <h1>{[{ theStudent.name }]}</h1>
     </div>
-    <a href="#" id="back-to-students" ng-click="backToStudents()">^ SELECT STUDENT</a>
+    <div class="button-bottom">
+      <a href="#"
+         class="button-logout"
+         ng-click="backToStudents()">&#60; STUDENT SELECT</a>
+    </div>
   </div>
     <!--{% block bottom%}-->
-    <div class="button-bottom">
-        <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
-    </div>
     <!--{% endblock %}-->
 </body>
 </html>
