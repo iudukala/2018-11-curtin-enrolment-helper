@@ -351,7 +351,7 @@ span {
     .student-selector .student-name-table .row-selected:hover ::after {
       background-color: rgba(0, 137, 255, 0.25); }
     .student-selector .student-name-table .cell {
-      padding: 10px 15px;
+      padding: 10px 5px;
       display: inline-block;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;

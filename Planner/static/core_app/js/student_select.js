@@ -1,20 +1,36 @@
 /*********************************/
 /*       ANGULAR APP CODE        */
 /*********************************/
-var app = angular.module('studentSelectApp', []).config(function($interpolateProvider) {
+var app = angular.module('plannerApp', [])
+.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 });
-app.controller('studentSelectCtrl', function($scope) {
-});
-app.run(function($rootScope) {
-  $rootScope.students = [];
-  $rootScope.selectedStudentID = '';
+//Factory for sharing student name with planner controller
+app.factory('StudentService', function() {
+  var selectedStudent = ''
 
-  $rootScope.selectStudent = function(id) {
-    $rootScope.selectedStudentID = id;
+  return {
+      getStudent: function () {
+          return selectedStudent
+      },
+      setStudent: function (id) {
+         selectedStudent = id;
+      }
   };
+});
 
-  //Testing input only
+app.controller('studentSelectCtrl', function($scope, StudentService) {
+  $scope.students = [];
+  $scope.selectedStudentID = '';
+  $scope.$watch('selectedStudentID', function (newValue, oldValue) {
+      if (newValue !== oldValue) StudentService.setStudent(newValue);
+  });
+
+  $scope.selectStudent = function(id) {
+    $scope.selectedStudentID = id;
+  }
+
+  //INITIALIZATION OF DATA
   var json =  { '16171921': 'Campbell Pedersen',
                 '16365481': 'Chung-Yen Lu',
                 '16102183': 'Chen Bi',
@@ -24,6 +40,6 @@ app.run(function($rootScope) {
 
   //Append student JSON to array
   angular.forEach(json, function (value, key) {
-    $rootScope.students.push({'id': key, 'name': value});
+    $scope.students.push({'id': key, 'name': value});
   });
 });

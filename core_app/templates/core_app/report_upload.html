@@ -24,7 +24,7 @@
         <!--List of selected files-->
         <ul class="file-list" ng-class="{'file-list-filled': filledFilelist && !uploading, 'file-list-uploading': uploading}">
           <li ng-repeat="file in filelist track by $index" id="{[{ 'file-item-' + $index }]}" ng-class="{'file-item-success': fileState[$index] === 'success', 'file-item-failure': fileState[$index] === 'failure'}">
-            <div>
+            <div class="file-item-info">
               <span>{[{ file.name }]}</span>
               <p>{[{ ((file.size / 1000) | number:2)  + 'kb'}]}</p>
             </div>

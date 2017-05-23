@@ -64,19 +64,17 @@ function sameFile(x, y){
 /*********************************/
 var app = angular.module('uploadApp', []).config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
-});
-app.controller('uploadCtrl', function($scope) {
-});
-app.run(function($rootScope) {
+})
+.controller('uploadCtrl', function($scope) {
   /**************************/
   /*  SCOPE INITIALIZATION  */
   /**************************/
-  $rootScope.filelist = [];
-  $rootScope.fileState = [];
-  $rootScope.draggedover = false;
-  $rootScope.filledFilelist = false;
-  $rootScope.errorMessage = false;
-  $rootScope.uploading = false;
+  $scope.filelist = [];
+  $scope.fileState = [];
+  $scope.draggedover = false;
+  $scope.filledFilelist = false;
+  $scope.errorMessage = false;
+  $scope.uploading = false;
 
   /*
    * Name: removeFile
@@ -89,12 +87,12 @@ app.run(function($rootScope) {
    *
    * Notes: N/A
    */
-  $rootScope.removeFile = function(index) {
+  $scope.removeFile = function(index) {
     if(index > -1) {
-      $rootScope.filelist.splice(index, 1);
-      $rootScope.fileState.splice(index, 1);
-      if($rootScope.filelist.length == 0){
-        $rootScope.filledFilelist = false;
+      $scope.filelist.splice(index, 1);
+      $scope.fileState.splice(index, 1);
+      if($scope.filelist.length == 0){
+        $scope.filledFilelist = false;
       }
     }
   };
@@ -115,18 +113,18 @@ app.run(function($rootScope) {
       if(inFiles[i].type != "application/pdf") {
         showErrorMessage("Non-PDF files entered, please only input PDF files.")
       }
-      else if(!containsFile(inFiles[i], $rootScope.filelist)) {
-        $rootScope.filelist.push(inFiles[i]);
-        $rootScope.fileState.push('selecting');
+      else if(!containsFile(inFiles[i], $scope.filelist)) {
+        $scope.filelist.push(inFiles[i]);
+        $scope.fileState.push('selecting');
       }
     }
-    if($rootScope.filelist.length > 0){
-      $rootScope.filledFilelist = true;
+    if($scope.filelist.length > 0){
+      $scope.filledFilelist = true;
     }
     else {
-      $rootScope.filledFilelist = false;
+      $scope.filledFilelist = false;
     }
-    $rootScope.$apply();
+    $scope.$apply();
     fileInput.value = "";
   }
 
@@ -142,11 +140,11 @@ app.run(function($rootScope) {
    * Notes: N/A
    */
   function showErrorMessage(inputMessage) {
-    $rootScope.errorText = inputMessage
-    $rootScope.errorMessage = true;
+    $scope.errorText = inputMessage
+    $scope.errorMessage = true;
     setTimeout(function() {
-      $rootScope.errorMessage = false;
-      $rootScope.$apply();
+      $scope.errorMessage = false;
+      $scope.$apply();
     }, 4000);
   }
 
@@ -177,11 +175,11 @@ app.run(function($rootScope) {
    *
    * Notes: N/A
    */
-   $rootScope.uploadFiles = function() {
-     if($rootScope.filelist.length > 0) {
-       $rootScope.uploading = true;
-       for(var i = 0; i < $rootScope.filelist.length; i++) {
-         $rootScope.fileState[i] = "uploading";
+   $scope.uploadFiles = function() {
+     if($scope.filelist.length > 0) {
+       $scope.uploading = true;
+       for(var i = 0; i < $scope.filelist.length; i++) {
+         $scope.fileState[i] = "uploading";
          setupAjaxRequest(i)
        }
      }
@@ -207,22 +205,22 @@ app.run(function($rootScope) {
     xhr = new XMLHttpRequest();
 
     //Setup formdata for file
-    formData.append('file[]', $rootScope.filelist[fileIndex]);
+    formData.append('file[]', $scope.filelist[fileIndex]);
 
     //Setup callback for request
     xhr.onload = function() {
       //Switch on status codes
       if(xhr.status === '200') {
-        $rootScope.fileState[fileIndex] = 'success';
+        $scope.fileState[fileIndex] = 'success';
       }
       else {
-        $rootScope.fileState[fileIndex] = 'failure';
+        $scope.fileState[fileIndex] = 'failure';
       }
 
-      if($rootScope.fileState.indexOf('uploading') < 0) {
-        $rootScope.uploading = false;
+      if($scope.fileState.indexOf('uploading') < 0) {
+        $scope.uploading = false;
       }
-      $rootScope.$apply();
+      $scope.$apply();
     };
 
     xhr.open('post', '/pdfFileUpload');
@@ -243,20 +241,17 @@ app.run(function($rootScope) {
   uploadWidgetInner.ondrop = function(e) {
     e.preventDefault();
     addFiles(e.dataTransfer.files)
-    $rootScope.draggedover = false;
-    $rootScope.$apply();
+    $scope.draggedover = false;
+    $scope.$apply();
   };
 
   uploadWidgetInner.ondragover = function() {
-    $rootScope.draggedover = true;
-    $rootScope.$apply();
+    $scope.draggedover = true;
+    $scope.$apply();
   };
 
   uploadWidgetInner.ondragleave = function() {
-    $rootScope.draggedover = false;
-    $rootScope.$apply();
+    $scope.draggedover = false;
+    $scope.$apply();
   };
-
-  //Finally, apply the scope and let the magic happen!
-  $rootScope.$apply();
 });
