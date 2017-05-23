@@ -208,15 +208,15 @@ span {
     font-weight: 200;
     font-size: 4em; }
 
-.student-name-table .student-table-header {
-  font-size: 20px;
-  font-weight: 400;
-  color: #7CD1FC; }
-
 .student-name-table .student-table-row {
   font-size: 20px;
   font-weight: 200;
   color: #ADADAD; }
+
+.student-table-header {
+  font-size: 20px;
+  font-weight: 400;
+  color: #7CD1FC; }
 
 .button, .button-bottom .button-logout {
   background-color: #FFFFFF;
@@ -308,6 +308,25 @@ span {
   -webkit-justify-content: flex-start;
   -ms-flex-pack: start;
   justify-content: flex-start; }
+  .student-selector .cell {
+    height: 100%;
+    padding: 10px 5px;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+  .student-selector .student-name-cell {
+    width: 60%;
+    border-right: 1px solid #979797; }
+  .student-selector .student-id-cell {
+    width: auto; }
+  .student-selector .student-table-header {
+    background-color: #F5F5F5;
+    border: 1px solid #979797;
+    border-bottom: 0;
+    width: 40%;
+    max-width: 450px;
+    min-width: 300px; }
   .student-selector input {
     left: 0;
     margin: 0 0 10px 0; }
@@ -315,6 +334,7 @@ span {
     list-style: none;
     border: 1px solid #979797;
     padding: 0;
+    margin: 0;
     width: 40%;
     max-width: 450px;
     min-width: 300px;
@@ -322,9 +342,6 @@ span {
     overflow-y: scroll; }
     .student-selector .student-name-table li:last-of-type {
       border-bottom: none; }
-    .student-selector .student-name-table .student-table-header {
-      background-color: #F5F5F5;
-      border-bottom: 1px solid #979797; }
     .student-selector .student-name-table .student-table-row {
       position: relative;
       background-color: #FFFFFF;
@@ -350,17 +367,6 @@ span {
       background-color: rgba(0, 137, 255, 0.2); }
     .student-selector .student-name-table .row-selected:hover ::after {
       background-color: rgba(0, 137, 255, 0.25); }
-    .student-selector .student-name-table .cell {
-      padding: 10px 5px;
-      display: inline-block;
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box; }
-    .student-selector .student-name-table .student-name-cell {
-      width: 60%;
-      border-right: 1px solid #979797; }
-    .student-selector .student-name-table .student-id-cell {
-      width: auto; }
   .student-selector .button, .student-selector .button-bottom .button-logout, .button-bottom .student-selector .button-logout {
     margin-top: 20px; }
 
@@ -374,3 +380,32 @@ span {
     box-sizing: border-box;
     height: 25%;
     overflow: hidden; }
+
+.content-wrapper {
+  transition: -webkit-transform 0.75s ease;
+  transition: transform 0.75s ease;
+  transition: transform 0.75s ease, -webkit-transform 0.75s ease; }
+
+.hidden-student-select {
+  -webkit-transform: translateY(-100vh);
+  -moz-transform: translateY(-100vh);
+  -ms-transform: translateY(-100vh);
+  -o-transform: translateY(-100vh);
+  transform: translateY(-100vh); }
+
+.student-planner-wrapper {
+  -webkit-transform: translateY(-100vh);
+  -moz-transform: translateY(-100vh);
+  -ms-transform: translateY(-100vh);
+  -o-transform: translateY(-100vh);
+  transform: translateY(-100vh); }
+
+.hidden-planner {
+  -webkit-transform: translateY(100vh);
+  -moz-transform: translateY(100vh);
+  -ms-transform: translateY(100vh);
+  -o-transform: translateY(100vh);
+  transform: translateY(100vh); }
+
+html {
+  overflow: hidden; }

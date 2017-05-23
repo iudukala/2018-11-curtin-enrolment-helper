@@ -1,5 +1,5 @@
 /*********************************/
-/*       ANGULAR APP CODE        */
+/*      ANGULAR APP SETUP        */
 /*********************************/
 var app = angular.module('plannerApp', [])
 .config(function($interpolateProvider) {
@@ -7,27 +7,35 @@ var app = angular.module('plannerApp', [])
 });
 //Factory for sharing student name with planner controller
 app.factory('StudentService', function() {
-  var selectedStudent = ''
+  var selectedStudent = {};
 
   return {
       getStudent: function () {
-          return selectedStudent
+          return selectedStudent;
       },
-      setStudent: function (id) {
-         selectedStudent = id;
+      setStudent: function (studentObj) {
+         selectedStudent = studentObj;
       }
   };
 });
-
-app.controller('studentSelectCtrl', function($scope, StudentService) {
+/*********************************/
+/*    ANGULAR APP CONTROLLER     */
+/*********************************/
+app.controller('studentSelectCtrl', function($scope, $rootScope, StudentService) {
   $scope.students = [];
-  $scope.selectedStudentID = '';
-  $scope.$watch('selectedStudentID', function (newValue, oldValue) {
+  $scope.selectedStudent = {};
+  $scope.$watch('selectedStudent', function (newValue, oldValue) {
       if (newValue !== oldValue) StudentService.setStudent(newValue);
   });
 
-  $scope.selectStudent = function(id) {
-    $scope.selectedStudentID = id;
+  $scope.selectStudent = function(id, name) {
+    $scope.selectedStudent = {name: name, id: id};
+  }
+
+  $scope.editStudentPlan = function() {
+    if(!angular.equals($scope.selectedStudent, {})) {
+      $rootScope.selectingStudent = false;
+    }
   }
 
   //INITIALIZATION OF DATA
@@ -42,4 +50,8 @@ app.controller('studentSelectCtrl', function($scope, StudentService) {
   angular.forEach(json, function (value, key) {
     $scope.students.push({'id': key, 'name': value});
   });
+});
+//Controls display of each page
+app.run(function($rootScope) {
+  $rootScope.selectingStudent = true;
 });

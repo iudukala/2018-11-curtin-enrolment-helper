@@ -4,6 +4,27 @@
   align-items: center
   justify-content: flex-start
 
+  .cell
+    height: 100%
+    padding: 10px 5px
+    display: inline-block
+    +box-sizing(border-box)
+
+  .student-name-cell
+    width: 60%
+    border-right: 1px solid #979797
+
+  .student-id-cell
+    width: auto
+
+  .student-table-header
+    background-color: #F5F5F5
+    border: 1px solid #979797
+    border-bottom: 0
+    width: 40%
+    max-width: 450px
+    min-width: 300px
+
   input
     left: 0
     margin: 0 0 10px 0
@@ -12,6 +33,7 @@
     list-style: none
     border: 1px solid #979797
     padding: 0
+    margin: 0
     width: 40%
     max-width: 450px
     min-width: 300px
@@ -20,10 +42,6 @@
 
     li:last-of-type
       border-bottom: none
-
-    .student-table-header
-      background-color: #F5F5F5
-      border-bottom: 1px solid #979797
 
     .student-table-row
       position: relative
@@ -56,19 +74,6 @@
       &:hover
         ::after
           background-color: rgba(0,137,255,0.25)
-
-
-    .cell
-      padding: 10px 5px
-      display: inline-block
-      +box-sizing(border-box)
-
-    .student-name-cell
-      width: 60%
-      border-right: 1px solid #979797
-
-    .student-id-cell
-      width: auto
 
   .button
     margin-top: 20px

@@ -1,12 +1,13 @@
 angular.module('plannerApp')
-.controller('plannerCtrl', function($scope, StudentService) {
-  $scope.theStudent = '';
+.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
+  //Keep track of student variable from other controller
+  $scope.theStudent = {};
   $scope.$watch(function () { return StudentService.getStudent(); }, function (newValue, oldValue) {
     if (newValue !== oldValue) $scope.theStudent = newValue;
-  });
 
-  var theButton = document.getElementById('edit-plan');
-  theButton.onclick = function () {
-    console.log($scope.theStudent);
+
+  $scope.backToStudents = function () {
+    $rootScope.selectingStudent = true;
   }
+  });
 });
