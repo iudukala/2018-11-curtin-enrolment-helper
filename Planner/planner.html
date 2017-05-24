@@ -17,12 +17,11 @@
   <div class="content-wrapper student-select-wrapper"
        ng-controller="studentSelectCtrl"
        ng-class="{ 'hidden-student-select': !selectingStudent }">
-    <!--Page title-->
+    <!--Student Selector Title-->
     <div class="header-wrapper">
       <h1>STUDENT SELECT</h1>
     </div>
 
-    <!--{% block body %}-->
     <!--Student selector-->
     <div class="student-selector">
       <input type="text" class="subtle-input" placeholder="Search..." ng-model="searchText">
@@ -31,8 +30,8 @@
         <div class="cell student-id-cell">Student ID</div>
       </div>
       <ul class="student-name-table">
-        <li class="student-table-row" ng-repeat="student in students | filter:searchText track by $index"
-            id="{[{ 'student-row-' + $index }]}"
+        <li class="student-table-row"
+            ng-repeat="student in students | filter:searchText"
             ng-class="{'row-selected': (selectedStudent.id === student.id)}"
             ng-click="selectStudent(student.id, student.name)">
           <div class="cell student-name-cell">{[{ student.name }]}</div>
@@ -49,22 +48,39 @@
         <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
       </div>
     </div>
-    <!--{% endblock %}-->
   </div>
   <div class="content-wrapper student-planner-wrapper"
        ng-controller="plannerCtrl"
-       ng-class="{ 'hidden-planner': selectingStudent}">
-    <!--Page title-->
+       ng-class="{ 'hidden-planner': selectingStudent }">
+
+    <!--Planner Title-->
     <div class="header-wrapper">
-      <h1>{[{ theStudent.name }]}</h1>
+      <h1>{[{ theStudent.name.toUpperCase() }]}</h1>
     </div>
+
+    <!--Planner Table-->
+    <div class="planner-widget-wrapper">
+      <span class="course-name-label">{[{ receivedJSON.course.name }]}</span>
+      <span ng-repeat="year in theJSON.template" ng-init="parentIndex = $index">
+        <span ng-repeat="sem in year">
+          <br>Year {[{ $parent.$index + 1 }]} Semester: {[{ $index + 1 }]}
+          <span ng-repeat="unit in sem">
+            <br>ID: {[{ unit.id }]}
+          </span><br>
+        </span>
+        <br>
+      </span>
+      <!--<div class="template-table">
+      </div>
+      <div class="planner-table">
+      </div>-->
+    </div>
+
     <div class="button-bottom">
       <a href="#"
          class="button-logout"
          ng-click="backToStudents()">&#60; STUDENT SELECT</a>
     </div>
   </div>
-    <!--{% block bottom%}-->
-    <!--{% endblock %}-->
 </body>
 </html>

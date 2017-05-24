@@ -47,7 +47,12 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, StudentService)
                 '16365481': 'Chung-Yen Lu',
                 '16102183': 'Chen Bi',
                 '17080170': 'Yoakim Persson',
-                '17898755': 'Thien Quang Trinh'
+                '17898755': 'Thien Quang Trinh',
+                '17160182': 'Scott Ryan Day',
+                '17420420': 'Ash Tulett',
+                '16685281': 'Tim Cochrane',
+                '16402918': 'Jordan Van-Elden',
+                '17281204': 'Aidan Noël Jolly'
               };
 
   //Append student JSON to array

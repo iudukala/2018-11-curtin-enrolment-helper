@@ -191,7 +191,8 @@ body {
   font-weight: 400; }
 
 span {
-  font-weight: 400; }
+  font-weight: 400;
+  color: #FFFFFF; }
 
 .header-wrapper {
   display: -webkit-flex;
@@ -349,7 +350,7 @@ span {
     width: 40%;
     max-width: 450px;
     min-width: 300px;
-    max-height: 50vh;
+    max-height: 40vh;
     overflow-y: scroll; }
     .student-selector .student-name-table li:last-of-type {
       border-bottom: none; }
@@ -381,6 +382,30 @@ span {
   .student-selector .button, .student-selector .button-bottom .button-logout, .button-bottom .student-selector .button-logout {
     margin-top: 20px; }
 
+.planner-widget-wrapper {
+  height: 80%;
+  width: 100%;
+  position: relative; }
+  .planner-widget-wrapper .course-name-label {
+    position: absolute;
+    right: 35%; }
+  .planner-widget-wrapper .template-table {
+    position: absolute;
+    top: 5%;
+    left: 10%;
+    height: 80%;
+    min-height: 200px;
+    width: 55%;
+    background-color: #FFFFFF; }
+  .planner-widget-wrapper .planner-table {
+    min-height: 200px;
+    width: 20%;
+    position: absolute;
+    top: 5%;
+    left: 70%;
+    height: 80%;
+    background-color: #FFFFFF; }
+
 .content-wrapper {
   background-color: #7CD1FC;
   height: 100vh;
@@ -396,7 +421,8 @@ span {
   transition: -webkit-transform 0.75s ease;
   transition: transform 0.75s ease;
   transition: transform 0.75s ease, -webkit-transform 0.75s ease;
-  position: relative; }
+  position: relative;
+  min-width: 1000px; }
 
 .hidden-student-select {
   -webkit-transform: translateY(-100vh);
