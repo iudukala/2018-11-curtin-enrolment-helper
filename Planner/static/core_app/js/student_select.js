@@ -30,13 +30,17 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, StudentService)
 
   $scope.selectStudent = function(id, name) {
     $scope.selectedStudent = {name: name, id: id};
-  }
+  };
 
-  $scope.editStudentPlan = function() {
-    if(!angular.equals($scope.selectedStudent, {})) {
+  $scope.studentIsEmpty = function() {
+    return angular.equals($scope.selectedStudent, {})
+  };
+
+  $scope.gotoPlanner = function() {
+    if(!$scope.studentIsEmpty()) {
       $rootScope.selectingStudent = false;
     }
-  }
+  };
 
   //INITIALIZATION OF DATA
   var json =  { '16171921': 'Campbell Pedersen',

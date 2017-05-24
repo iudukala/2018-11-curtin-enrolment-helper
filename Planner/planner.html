@@ -43,7 +43,8 @@
              class="button"
              value="EDIT PLAN"
              id="edit-plan"
-             ng-click="editStudentPlan()">
+             ng-class="{ 'button-disabled' : studentIsEmpty() }"
+             ng-click="!studentIsEmpty() && gotoPlanner()">
       <div class="button-bottom">
         <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
       </div>

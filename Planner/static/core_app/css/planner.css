@@ -226,6 +226,7 @@ span {
   font-size: 1em;
   padding: 7px 30px;
   margin: 5px 0;
+  outline: none;
   -webkit-border-radius: 1px;
   -moz-border-radius: 1px;
   -ms-border-radius: 1px;
@@ -234,6 +235,13 @@ span {
   .button:hover, .button-bottom .button-logout:hover {
     background-color: #E6E6E6;
     color: #3C91BC; }
+
+.button-disabled {
+  background-color: #DEDEDE;
+  color: #AAAAAA; }
+  .button-disabled:hover {
+    background-color: #DEDEDE;
+    color: #AAAAAA; }
 
 .button-bottom {
   display: -webkit-flex;

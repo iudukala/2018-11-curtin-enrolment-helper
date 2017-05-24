@@ -6,12 +6,21 @@
   font-size: 1em
   padding: 7px 30px
   margin: 5px 0
+  outline: none
   +border-radius(1px)
   transition: background-color .2s, color .2s
 
   &:hover
     background-color: #E6E6E6
     color: #3C91BC
+
+.button-disabled
+    background-color: #DEDEDE
+    color: #AAAAAA
+
+    &:hover
+      background-color: #DEDEDE
+      color: #AAAAAA
 
 .button-bottom
   display: flex
@@ -23,7 +32,7 @@
   padding-top: 10px
   a
     text-decoration: none
-    
+
   .button-logout
     @extend .button
     font-size: 2em
