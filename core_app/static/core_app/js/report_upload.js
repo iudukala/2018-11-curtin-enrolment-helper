@@ -223,7 +223,7 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
       $scope.$apply();
     };
 
-    xhr.open('post', '/pdfFileUpload');
+    xhr.open('POST', '/pdfFileUpload');
     xhr.send(formData);
   }
 

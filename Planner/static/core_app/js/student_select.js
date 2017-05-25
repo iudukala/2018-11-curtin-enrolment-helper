@@ -5,9 +5,21 @@ var app = angular.module('plannerApp', [])
 .config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 });
-//Factory for sharing student name with planner controller
+/*
+ * Name: StudentService factory
+ *
+ * Purpose: A service to pass the selected student object between the student
+ *          selection controller and the planner controller
+ *
+ * Params: none
+ *
+ * Return: An object with various functions to get the selected student object
+ *
+ * Notes: N/A
+ */
 app.factory('StudentService', function() {
   var selectedStudent = {};
+  var theJSON = {};
 
   return {
       getStudent: function () {
@@ -15,55 +27,314 @@ app.factory('StudentService', function() {
       },
       setStudent: function (studentObj) {
          selectedStudent = studentObj;
+      },
+      getJSON: function () {
+          return theJSON;
+      },
+      setJSON: function (jsonOBJ) {
+         theJSON = jsonOBJ;
       }
   };
 });
 /*********************************/
-/*    ANGULAR APP CONTROLLER     */
+/* STUDENT SELECTION CONTROLLER  */
 /*********************************/
-app.controller('studentSelectCtrl', function($scope, $rootScope, StudentService) {
+app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentService) {
+  //INITIALIZATION OF DATA
+  $scope.errorText = '';
+  $scope.errorMessage = false;
   $scope.students = [];
   $scope.selectedStudent = {};
+  $scope.theJSON = {};
+  $scope.gettingStudentTemplate = false;
+
+  /*
+   * Name: $watch.selectedStudent
+   *
+   * Purpose: Fires when the user selects a new student, and updates
+   *          the service to reflect the new changes
+   *
+   * Params: newValue and oldValue, pretty self-explanitory.
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
   $scope.$watch('selectedStudent', function (newValue, oldValue) {
-      if (newValue !== oldValue) StudentService.setStudent(newValue);
+      if (newValue !== oldValue) {
+        StudentService.setStudent(newValue);
+      }
   });
 
+  /*
+   * Name: $watch.selectedStudent
+   *
+   * Purpose: Fires when the user selects a new student, and updates
+   *          the service to reflect the new changes
+   *
+   * Params: newValue and oldValue, pretty self-explanitory.
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  $scope.$watch('theJSON', function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        StudentService.setJSON(newValue);
+      }
+  });
+
+  /*
+   * Name: showErrorMessage
+   *
+   * Purpose: Shows a brief error message on screen
+   *
+   * Params: inputMessage, the string to be shown
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function showErrorMessage(inputMessage) {
+    $scope.errorText = inputMessage
+    $scope.errorMessage = true;
+    setTimeout(function() {
+      $scope.errorMessage = false;
+      $scope.$apply();
+    }, 4000);
+  }
+
+  /*
+   * Name: getStudentList
+   *
+   * Purpose: Sets up an AJAX request to retrieve the list of students
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function getStudentList() {
+    //Uncomment when merging
+    //$http.get('/url').then(studentListHandler, studentSelectErrorHandler);
+    $rootScope.openSpinner('Loading student list...');
+    setTimeout(studentListHandler, 3000);
+  };
+  //Invoke this method while controller is loading
+  getStudentList();
+
+  /*
+   * Name: studentListHandler
+   *
+   * Purpose: Callback function for successful student list AJAX request
+   *
+   * Params: response, the http response
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function studentListHandler(/*response*/) {
+    //var json = response.data;
+
+    /*TEST DATA*/
+    json =  { '16171921': 'Campbell Pedersen',
+                 '16365481': 'Chung-Yen Lu',
+                 '16102183': 'Chen Bi',
+                 '17080170': 'Yoakim Persson',
+                 '17898755': 'Thien Quang Trinh',
+                 '17160182': 'Scott Ryan Day',
+                 '17420420': 'Ash Tulett',
+                 '16685281': 'Tim Cochrane',
+                 '16402918': 'Jordan Van-Elden',
+                 '17281204': 'Aidan Noël Jolly'
+               };
+    //Loop through the test data, add it to the array of keyvaluepairs
+    angular.forEach(json, function (value, key) {
+      $scope.students.push({'id': key, 'name': value});
+    });
+    $rootScope.closeSpinner();
+    $rootScope.$apply();
+  }
+
+  /*
+   * Name: studentListHttpErrorHandler
+   *
+   * Purpose: Callback function for failed AJAX request on student select page
+   *
+   * Params: response, the http error response
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function studentSelectErrorHandler(response) {
+      showErrorMessage('HTTP ERROR '+ response.status + ': ' + response.statusText);
+      $rootScope.closeSpinner();
+  };
+
+  /*
+   * Name: gotoPlanner
+   *
+   * Purpose: Sets up an AJAX request to get a students course template and
+   *          enrolment plan from the back-end.
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  $scope.gotoPlanner = function() {
+    if(!$scope.studentIsEmpty()) {
+      //Uncomment when merging
+      //$http.get('/url').then(templateHandler, studentSelectErrorHandler);
+      $rootScope.openSpinner('Fetching student template...');
+      templateHandler()
+    }
+  };
+
+  function templateHandler(/*response*/) {
+    var json = {};
+    //var json = response.data;
+    json = parsedJSON;
+    $scope.theJSON = json;
+    setTimeout(function() {
+      $rootScope.closeSpinner();
+      $rootScope.selectingStudent = false;
+      $rootScope.$apply();
+    }, 2000);
+  }
+
+  /*
+   * Name: selectStudent
+   *
+   * Purpose: Updates the scope to a newly selected student
+   *
+   * Params: id and name of the selected student
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
   $scope.selectStudent = function(id, name) {
     $scope.selectedStudent = {name: name, id: id};
   };
 
+  /*
+   * Name: studentIsEmpty
+   *
+   * Purpose: Checks if the current selected student is empty
+   *
+   * Params: none
+   *
+   * Return: true if student is empty, false if student has content
+   *
+   * Notes: N/A
+   */
   $scope.studentIsEmpty = function() {
     return angular.equals($scope.selectedStudent, {})
   };
-
-  $scope.gotoPlanner = function() {
-    if(!$scope.studentIsEmpty()) {
-      $rootScope.selectingStudent = false;
-    }
-  };
-
-  //INITIALIZATION OF DATA
-  var json =  { '16171921': 'Campbell Pedersen',
-                '16365481': 'Chung-Yen Lu',
-                '16102183': 'Chen Bi',
-                '17080170': 'Yoakim Persson',
-                '17898755': 'Thien Quang Trinh',
-                '17160182': 'Scott Ryan Day',
-                '17420420': 'Ash Tulett',
-                '16685281': 'Tim Cochrane',
-                '16402918': 'Jordan Van-Elden',
-                '17281204': 'Aidan Noël Jolly'
-              };
-
-  //Append student JSON to array
-  angular.forEach(json, function (value, key) {
-    $scope.students.push({'id': key, 'name': value});
-  });
 });
-//Controls display of each page
+
+//Method runs when angular app runs
 app.run(function($rootScope) {
+  //rootScope setup
   $rootScope.selectingStudent = true;
   $rootScope.$on('$viewContentLoaded', function(){
     $rootScope.loaded = true;
   });
+
+  //Spinner functions open and close the spinner
+  $rootScope.openSpinner = function(message) {
+    $rootScope.loading = true;
+    $rootScope.loadingMessage = message;
+  };
+  $rootScope.closeSpinner = function() {
+    $rootScope.loading = false;
+  }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***********************************************************************************************************/
+var parsedJSON = {
+  course: { name: 'Computer Science Stream', id: 'STRU-CMPSC' },
+  template: [//Array of years
+              [//Year 1
+                [//Sem 1 Unit Objects
+                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1002', name: 'Y1S1U2', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1003', name: 'Y1S1U3', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1004', name: 'Y1S1U4', credits: 25.0, status: 'PASS', attempts: 1},
+                ],
+                [//Sem 2 Unit Objects
+                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1007', name: 'Y1S2U3', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1008', name: 'Y1S2U4', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'COMP1009', name: 'Y1S2U5', credits: 12.5, status: 'PASS', attempts: 1}
+                ]
+              ],
+              [//Year 2
+                [//Sem 1 Unit Objects
+                  {id: 'COMP2001', name: 'Y2S1U1', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2002', name: 'Y2S1U2', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2003', name: 'Y2S1U3', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2004', name: 'Y2S1U4', credits: 25.0, status: 'PASS', attempts: 1},
+                ],
+                [//Sem 2 Unit Objects
+                  {id: 'COMP2005', name: 'Y2S2U1', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2006', name: 'Y2S2U2', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2007', name: 'Y2S2U3', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP2008', name: 'Y2S2U4', credits: 25.0, status: 'PASS', attempts: 1},
+                ]
+              ],
+              [//Year 3
+                [//Sem 1 Unit Objects
+                  {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0, status: 'PLN', attempts: 1},
+                  {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP3003', name: 'Y3S1U3', credits: 50.0, status: 'PLN', attempts: 0}
+                ],
+                [//Sem 2 Unit Objects
+                  {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP3007', name: 'Y3S2U3', credits: 50.0, status: 'PLN', attempts: 0}
+                ]
+              ]
+            ],
+  plan: [//Array of years
+          [//Year 1
+            [//Sem 1 Unit Objects
+              {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0},
+              {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0},
+              {id: 'COMP3003', name: 'Y3S1U3', credits: 25.0},
+              {id: 'COMP3004', name: 'Y3S1U4', credits: 25.0},
+            ],
+            [//Sem 2 Unit Objects
+              {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0},
+              {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0},
+              {id: 'COMP3007', name: 'Y3S2U3', credits: 25.0},
+              {id: 'COMP3008', name: 'Y3S2U4', credits: 25.0},
+            ]
+          ]
+        ]
+}

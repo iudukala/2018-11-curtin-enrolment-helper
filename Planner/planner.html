@@ -14,6 +14,12 @@
 </head>
 
 <body ng-app="plannerApp" ng-class="{'invisible': loaded}">
+  <div class="spinner-overlay" ng-class="{'spinner-overlay-disappeared' : !loading}">
+    <div class="spinner-prompt">
+      <div class="spinner-image"></div>
+      <span class="spinner-message">{[{ loadingMessage }]}</span>
+    </div>
+  </div>
   <div class="content-wrapper student-select-wrapper"
        ng-controller="studentSelectCtrl"
        ng-class="{ 'hidden-student-select': !selectingStudent }">
@@ -24,6 +30,7 @@
 
     <!--Student selector-->
     <div class="student-selector">
+      <span id="selector-error-text" ng-class="{'selector-error-text-invisible': !errorMessage}"> {[{errorText}]} </span>
       <input type="text" class="subtle-input" placeholder="Search..." ng-model="searchText">
       <div class="student-table-header">
         <div class="cell student-name-cell">Name</div>
@@ -42,7 +49,7 @@
              class="button"
              value="EDIT PLAN"
              id="edit-plan"
-             ng-class="{ 'button-disabled' : studentIsEmpty() }"
+             ng-class="{ 'button-disabled' : studentIsEmpty() || gettingStudentTemplate }"
              ng-click="!studentIsEmpty() && gotoPlanner()">
       <div class="button-bottom">
         <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
@@ -60,7 +67,7 @@
 
     <!--Planner Table-->
     <div class="planner-widget-wrapper">
-      <span class="course-name-label">{[{ receivedJSON.course.name }]}</span>
+      <span class="course-name-label">{[{ theJSON.course.name }]}</span>
       <div class="template-table" id="template-table">
         <ul class="template-year-list"> <!--List of years-->
           <li class="template-year-wrapper" ng-repeat="year in theJSON.template" ng-init="parentIndex = $index">
@@ -95,10 +102,3 @@
   </div>
 </body>
 </html>
-<!--
-<span ng-repeat="sem in year">
-  Year {[{ $parent.$index + 1 }]} Semester: {[{ $index + 1 }]}
-  <span ng-repeat="unit in sem">
-    ID: {[{ unit.id }]}
-  </span>
-</span>-->

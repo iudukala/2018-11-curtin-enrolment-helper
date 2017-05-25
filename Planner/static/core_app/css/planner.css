@@ -219,6 +219,9 @@ span {
   font-weight: 200;
   color: #ADADAD; }
 
+.spinner-message {
+  font-size: 2em; }
+
 .button, .button-bottom .button-logout {
   background-color: #FFFFFF;
   color: #7CD1FC;
@@ -320,6 +323,12 @@ span {
   -webkit-justify-content: flex-start;
   -ms-flex-pack: start;
   justify-content: flex-start; }
+  .student-selector #selector-error-text {
+    height: 25px;
+    color: #FF0000;
+    transition: opacity .2s; }
+  .student-selector .selector-error-text-invisible {
+    opacity: 0; }
   .student-selector .cell {
     height: 100%;
     padding: 10px 5px;
@@ -409,8 +418,6 @@ span {
         border-bottom: 1px solid black; }
         .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:first-child {
           border-top: 1px solid black; }
-        .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:last-child {
-          border: none; }
         .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list {
           display: -webkit-flex;
           display: -ms-flexbox;
@@ -421,16 +428,6 @@ span {
           -webkit-justify-content: flex-start;
           -ms-flex-pack: start;
           justify-content: flex-start; }
-          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-header-cell {
-            width: 12%;
-            color: #7CD1FC;
-            border-left: 1px solid black; }
-          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell {
-            width: 22%; }
-            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-id {
-              font-size: 1em; }
-            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-subtext {
-              font-size: 0.8em; }
           .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li {
             height: 80px;
             -webkit-box-sizing: border-box;
@@ -456,6 +453,18 @@ span {
               .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li div span {
                 font-weight: 200;
                 color: inherit; }
+          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-header-cell {
+            width: 12%;
+            background-color: #E8E8E8;
+            color: #7CD1FC;
+            border-left: 1px solid black;
+            border-right: 2px solid black; }
+          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell {
+            width: 22%; }
+            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-id {
+              font-size: 1em; }
+            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-subtext {
+              font-size: 0.8em; }
   .planner-widget-wrapper .planner-table {
     min-height: 200px;
     width: 20%;
@@ -464,6 +473,87 @@ span {
     left: 70%;
     height: 80%;
     background-color: #FFFFFF; }
+
+.spinner-overlay {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 10; }
+  .spinner-overlay .spinner-prompt {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    border-radius: 5px;
+    height: 250px;
+    min-width: 500px; }
+    .spinner-overlay .spinner-prompt .spinner-image {
+      height: 80px;
+      width: 80px;
+      border: 10px solid #AAAAAA;
+      border-top-color: white;
+      border-radius: 50%;
+      margin: 30px;
+      -webkit-animation: spinnerAnim 1.2s linear infinite;
+      animation: spinnerAnim 1.2s linear infinite; }
+
+@-webkit-keyframes spinnerAnim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@keyframes spinnerAnim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+.spinner-overlay-disappeared {
+  opacity: 0;
+  pointer-events: none; }
 
 .content-wrapper {
   background-color: #7CD1FC;

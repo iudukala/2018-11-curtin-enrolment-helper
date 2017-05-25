@@ -30,8 +30,6 @@
         border-bottom: 1px solid black
         &:first-child
           border-top: 1px solid black
-        &:last-child
-          border: none
 
         .template-sem-list
 
@@ -39,20 +37,6 @@
             display: flex
             align-items: flex-start
             justify-content: flex-start
-
-            .template-header-cell
-              width: 12%
-              color: #7CD1FC
-              border-left: 1px solid black
-
-            .template-unit-cell
-              width: 22%
-
-              .unit-id
-                font-size: 1em
-
-              .unit-subtext
-                font-size: 0.8em
 
             li
               height: 80px
@@ -71,6 +55,22 @@
                 span
                   font-weight: 200
                   color: inherit
+
+            .template-header-cell
+              width: 12%
+              background-color: #E8E8E8
+              color: #7CD1FC
+              border-left: 1px solid black
+              border-right: 2px solid black
+
+            .template-unit-cell
+              width: 22%
+
+              .unit-id
+                font-size: 1em
+
+              .unit-subtext
+                font-size: 0.8em
 
   .planner-table
     min-height: 200px
