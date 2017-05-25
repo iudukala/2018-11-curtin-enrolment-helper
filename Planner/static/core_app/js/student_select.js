@@ -139,21 +139,16 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
     //var json = response.data;
 
     /*TEST DATA*/
-    json =  { '16171921': 'Campbell Pedersen',
-                 '16365481': 'Chung-Yen Lu',
-                 '16102183': 'Chen Bi',
-                 '17080170': 'Yoakim Persson',
-                 '17898755': 'Thien Quang Trinh',
-                 '17160182': 'Scott Ryan Day',
-                 '17420420': 'Ash Tulett',
-                 '16685281': 'Tim Cochrane',
-                 '16402918': 'Jordan Van-Elden',
-                 '17281204': 'Aidan Noël Jolly'
-               };
-    //Loop through the test data, add it to the array of keyvaluepairs
-    angular.forEach(json, function (value, key) {
-      $scope.students.push({'id': key, 'name': value});
-    });
+    $scope.students =  [{ 'id': '16171921', 'name': 'Campbell Pedersen'},
+                        { 'id': '16365481', 'name': 'Chung-Yen Lu'},
+                        { 'id': '16102183', 'name': 'Chen Bi'},
+                        { 'id': '17080170', 'name': 'Yoakim Persson'},
+                        { 'id': '17898755', 'name': 'Thien Quang Trinh'},
+                        { 'id': '17160182', 'name': 'Scott Ryan Day'},
+                        { 'id': '17420420', 'name': 'Ash Tulett'},
+                        { 'id': '16685281', 'name': 'Tim Cochrane'},
+                        { 'id': '16402918', 'name': 'Jordan Van-Elden'},
+                        {'id': '17281204', 'name': 'Aidan Noël Jolly'}];
     $rootScope.closeSpinner();
     $rootScope.$apply();
   }
