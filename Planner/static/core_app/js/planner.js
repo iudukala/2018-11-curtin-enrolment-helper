@@ -3,6 +3,7 @@ angular.module('plannerApp')
   //Keep track of student variable from other controller via the StudentService factory
   $scope.theStudent = {};
   $scope.theJSON = parsedJSON;
+  $scope.tableWidth = document.getElementById('template-table').clientWidth;
   $scope.$watch(function () { return StudentService.getStudent(); }, function (newValue, oldValue) {
     if (newValue !== oldValue) $scope.theStudent = newValue;
   });
@@ -11,6 +12,31 @@ angular.module('plannerApp')
   $scope.backToStudents = function() {
     $rootScope.selectingStudent = true;
   }
+
+  $scope.cellStyle = function(status, credits) {
+    var style = {}
+    if(credits === 12.5) {
+      style['width'] = '11%';
+      style['font-size'] = '12px';
+    }
+    else if(credits === 50.0) {
+      style['width'] = '44%';
+    }
+    if(status === 'PASS') {
+      style['background-color'] = '#297E2B';
+      style['color'] = '#FFFFFF';
+    }
+    return style;
+  }
+
+  $scope.getUnitAttemptsText = function(attempts, status) {
+    text = '';
+    if(status !== 'PASS' && attempts !== 0) {
+      text = 'Attempts: ' + attempts;
+    }
+    return text;
+  }
+
 });
 
 
@@ -82,7 +108,7 @@ var receivedJSON = {
                     }
                   },
             },
-  plan: {}
+  plan: { }
 }
 ***********************************************************************************************************/
 var parsedJSON = {
@@ -93,13 +119,14 @@ var parsedJSON = {
                   {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP1002', name: 'Y1S1U2', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP1003', name: 'Y1S1U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1004', name: 'Y1S1U4', credits: 25.0, status: 'PASS', attempts: 1}
+                  {id: 'COMP1004', name: 'Y1S1U4', credits: 25.0, status: 'PASS', attempts: 1},
                 ],
                 [//Sem 2 Unit Objects
                   {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP1007', name: 'Y1S2U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1008', name: 'Y1S2U4', credits: 25.0, status: 'PASS', attempts: 1}
+                  {id: 'COMP1008', name: 'Y1S2U4', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'COMP1009', name: 'Y1S2U5', credits: 12.5, status: 'PASS', attempts: 1}
                 ]
               ],
               [//Year 2
@@ -107,27 +134,25 @@ var parsedJSON = {
                   {id: 'COMP2001', name: 'Y2S1U1', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP2002', name: 'Y2S1U2', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP2003', name: 'Y2S1U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2004', name: 'Y2S1U4', credits: 25.0, status: 'PASS', attempts: 1}
+                  {id: 'COMP2004', name: 'Y2S1U4', credits: 25.0, status: 'PASS', attempts: 1},
                 ],
                 [//Sem 2 Unit Objects
                   {id: 'COMP2005', name: 'Y2S2U1', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP2006', name: 'Y2S2U2', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP2007', name: 'Y2S2U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2008', name: 'Y2S2U4', credits: 25.0, status: 'PASS', attempts: 1}
+                  {id: 'COMP2008', name: 'Y2S2U4', credits: 25.0, status: 'PASS', attempts: 1},
                 ]
               ],
               [//Year 3
                 [//Sem 1 Unit Objects
-                  {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0, status: 'PLN', attempts: 1},
                   {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3003', name: 'Y3S1U3', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3004', name: 'Y3S1U4', credits: 25.0, status: 'PLN', attempts: 0}
+                  {id: 'COMP3003', name: 'Y3S1U3', credits: 50.0, status: 'PLN', attempts: 0}
                 ],
                 [//Sem 2 Unit Objects
                   {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3007', name: 'Y3S2U3', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3008', name: 'Y3S2U4', credits: 25.0, status: 'PLN', attempts: 0}
+                  {id: 'COMP3007', name: 'Y3S2U3', credits: 50.0, status: 'PLN', attempts: 0}
                 ]
               ]
             ],
@@ -137,13 +162,13 @@ var parsedJSON = {
               {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0},
               {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0},
               {id: 'COMP3003', name: 'Y3S1U3', credits: 25.0},
-              {id: 'COMP3004', name: 'Y3S1U4', credits: 25.0}
+              {id: 'COMP3004', name: 'Y3S1U4', credits: 25.0},
             ],
             [//Sem 2 Unit Objects
               {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0},
               {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0},
               {id: 'COMP3007', name: 'Y3S2U3', credits: 25.0},
-              {id: 'COMP3008', name: 'Y3S2U4', credits: 25.0}
+              {id: 'COMP3008', name: 'Y3S2U4', credits: 25.0},
             ]
           ]
         ]

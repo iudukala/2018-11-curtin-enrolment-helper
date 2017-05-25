@@ -63,4 +63,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, StudentService)
 //Controls display of each page
 app.run(function($rootScope) {
   $rootScope.selectingStudent = true;
+  $rootScope.$on('$viewContentLoaded', function(){
+    $rootScope.loaded = true;
+  });
 });

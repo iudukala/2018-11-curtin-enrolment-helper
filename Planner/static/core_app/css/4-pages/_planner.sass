@@ -1,7 +1,14 @@
 .content-wrapper
-  transition: transform 0.75s ease
+  +transition(transform 0.75s ease)
   position: relative
+  height: 100vh
   min-width: 1000px
+
+.invisible
+  visibility: hidden
+
+.student-select-wrapper
+  z-index: 2
 
 .hidden-student-select
   +transform(translateY(-100vh))

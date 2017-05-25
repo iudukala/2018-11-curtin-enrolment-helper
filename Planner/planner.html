@@ -13,7 +13,7 @@
     <!--{% endblock %}-->
 </head>
 
-<body ng-app="plannerApp">
+<body ng-app="plannerApp" ng-class="{'invisible': loaded}">
   <div class="content-wrapper student-select-wrapper"
        ng-controller="studentSelectCtrl"
        ng-class="{ 'hidden-student-select': !selectingStudent }">
@@ -61,19 +61,30 @@
     <!--Planner Table-->
     <div class="planner-widget-wrapper">
       <span class="course-name-label">{[{ receivedJSON.course.name }]}</span>
-      <span ng-repeat="year in theJSON.template" ng-init="parentIndex = $index">
-        <span ng-repeat="sem in year">
-          <br>Year {[{ $parent.$index + 1 }]} Semester: {[{ $index + 1 }]}
-          <span ng-repeat="unit in sem">
-            <br>ID: {[{ unit.id }]}
-          </span><br>
-        </span>
-        <br>
-      </span>
-      <!--<div class="template-table">
+      <div class="template-table" id="template-table">
+        <ul class="template-year-list"> <!--List of years-->
+          <li class="template-year-wrapper" ng-repeat="year in theJSON.template" ng-init="parentIndex = $index">
+            <ul class="template-sem-list"> <!--List of semesters-->
+              <li ng-repeat="sem in year">
+                <ul class="template-unit-list"><!--List of blocks per semester-->
+                  <li class="template-header-cell">
+                    <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
+                  </li>
+                  <li class="template-unit-cell" ng-style="cellStyle(unit.status, unit.credits)" ng-repeat="unit in sem">
+                    <div>
+                      <span class="unit-id" class="unit-id">{[{ unit.id }]}</span>
+                      <span class="unit-subtext">Credits: {[{ unit.credits | number : 1 }]}</span>
+                      <span class="unit-subtext">{[{ getUnitAttemptsText(unit.attempts, unit.status) }]}</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
       <div class="planner-table">
-      </div>-->
+      </div>
     </div>
 
     <div class="button-bottom">
@@ -84,3 +95,10 @@
   </div>
 </body>
 </html>
+<!--
+<span ng-repeat="sem in year">
+  Year {[{ $parent.$index + 1 }]} Semester: {[{ $index + 1 }]}
+  <span ng-repeat="unit in sem">
+    ID: {[{ unit.id }]}
+  </span>
+</span>-->

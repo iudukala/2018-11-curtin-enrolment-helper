@@ -209,15 +209,15 @@ span {
     font-weight: 200;
     font-size: 4em; }
 
-.student-name-table .student-table-row {
-  font-size: 20px;
-  font-weight: 200;
-  color: #ADADAD; }
-
 .student-table-header {
   font-size: 20px;
   font-weight: 400;
   color: #7CD1FC; }
+
+.student-name-table .student-table-row {
+  font-size: 20px;
+  font-weight: 200;
+  color: #ADADAD; }
 
 .button, .button-bottom .button-logout {
   background-color: #FFFFFF;
@@ -396,7 +396,66 @@ span {
     height: 80%;
     min-height: 200px;
     width: 55%;
-    background-color: #FFFFFF; }
+    background-color: #F5F5F5;
+    overflow: scroll;
+    border: 1px solid black; }
+    .planner-widget-wrapper .template-table ul {
+      margin: 0;
+      padding: 0;
+      list-style: none; }
+    .planner-widget-wrapper .template-table .template-year-list {
+      white-space: nowrap; }
+      .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper {
+        border-bottom: 1px solid black; }
+        .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:first-child {
+          border-top: 1px solid black; }
+        .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:last-child {
+          border: none; }
+        .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list {
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-align-items: flex-start;
+          -ms-flex-align: start;
+          align-items: flex-start;
+          -webkit-justify-content: flex-start;
+          -ms-flex-pack: start;
+          justify-content: flex-start; }
+          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-header-cell {
+            width: 12%;
+            color: #7CD1FC;
+            border-left: 1px solid black; }
+          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell {
+            width: 22%; }
+            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-id {
+              font-size: 1em; }
+            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-subtext {
+              font-size: 0.8em; }
+          .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li {
+            height: 80px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            display: inline-block;
+            border-bottom: 1px solid black;
+            border-right: 1px solid black; }
+            .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li div {
+              height: 100%;
+              display: -webkit-flex;
+              display: -ms-flexbox;
+              display: flex;
+              -webkit-flex-direction: column;
+              -ms-flex-direction: column;
+              flex-direction: column;
+              -webkit-align-items: center;
+              -ms-flex-align: center;
+              align-items: center;
+              -webkit-justify-content: center;
+              -ms-flex-pack: center;
+              justify-content: center; }
+              .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li div span {
+                font-weight: 200;
+                color: inherit; }
   .planner-widget-wrapper .planner-table {
     min-height: 200px;
     width: 20%;
@@ -418,11 +477,20 @@ span {
     overflow: hidden; }
 
 .content-wrapper {
+  -webkit-transition: -webkit-transform 0.75s ease;
+  -moz-transition: -moz-transform 0.75s ease;
   transition: -webkit-transform 0.75s ease;
   transition: transform 0.75s ease;
   transition: transform 0.75s ease, -webkit-transform 0.75s ease;
   position: relative;
+  height: 100vh;
   min-width: 1000px; }
+
+.invisible {
+  visibility: hidden; }
+
+.student-select-wrapper {
+  z-index: 2; }
 
 .hidden-student-select {
   -webkit-transform: translateY(-100vh);
