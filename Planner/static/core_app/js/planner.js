@@ -71,7 +71,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
 
   $scope.addSemHeader = function() {
     //TODO: Verify input to make sure semester is below 3
-    //      and year is below like 10 idk
+    //      and year is below like 6 idk
     var yearToInsert = $scope.semHeaderYearInput;
     var semToInsert = $scope.semHeaderSemInput;
     var thePlan = $scope.thePlan;
