@@ -101,7 +101,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
     setTimeout(function() {
       $scope.errorMessage = false;
       $scope.$apply();
-    }, 4000);
+    }, 0);
   }
 
   /*
@@ -119,7 +119,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
     //Uncomment when merging
     //$http.get('/url').then(studentListHandler, studentSelectErrorHandler);
     $rootScope.openSpinner('Loading student list...');
-    setTimeout(studentListHandler, 3000);
+    setTimeout(studentListHandler, 0);
   };
   //Invoke this method while controller is loading
   getStudentList();
@@ -148,7 +148,8 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
                         { 'id': '17420420', 'name': 'Ash Tulett'},
                         { 'id': '16685281', 'name': 'Tim Cochrane'},
                         { 'id': '16402918', 'name': 'Jordan Van-Elden'},
-                        {'id': '17281204', 'name': 'Aidan Noël Jolly'}];
+                        { 'id': '17281204', 'name': 'Aidan Noël Jolly'},
+                        { 'id': '69420420', 'name': 'Sam "Trek" Barker'}];
     $rootScope.closeSpinner();
     $rootScope.$apply();
   }
@@ -184,14 +185,24 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
   $scope.gotoPlanner = function() {
     if(!$scope.studentIsEmpty()) {
       //Uncomment when merging
-      //$http.get('/url').then(templateHandler, studentSelectErrorHandler);
+      //$http.get('/getStudentList').then(templateHandler, studentSelectErrorHandler);
       $rootScope.openSpinner('Fetching student template...');
-      templateHandler()
+      templateHandler(parsedJSON)
     }
   };
 
-  function templateHandler(/*response*/) {
-    var json = {};
+  /*
+   * Name: selectStudent
+   *
+   * Purpose: Updates the scope to a newly selected student
+   *
+   * Params: id and name of the selected student
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function templateHandler(response) {
     //var json = response.data;
     json = parsedJSON;
     $scope.theJSON = json;
@@ -325,10 +336,7 @@ var parsedJSON = {
               {id: 'COMP3004', name: 'Y3S1U4', credits: 25.0},
             ],
             [//Sem 2 Unit Objects
-              {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0},
-              {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0},
-              {id: 'COMP3007', name: 'Y3S2U3', credits: 25.0},
-              {id: 'COMP3008', name: 'Y3S2U4', credits: 25.0},
+
             ]
           ]
         ]

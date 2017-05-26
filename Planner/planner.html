@@ -65,19 +65,19 @@
       <h1>{[{ theStudent.name.toUpperCase() }]}</h1>
     </div>
 
-    <!--Planner Table-->
     <div class="planner-widget-wrapper">
       <span class="course-name-label">{[{ theJSON.course.name }]}</span>
+      <!--Template Table-->
       <div class="template-table" id="template-table">
         <ul class="template-year-list"> <!--List of years-->
-          <li class="template-year-wrapper" ng-repeat="year in theJSON.template" ng-init="parentIndex = $index">
+          <li class="template-year-wrapper" ng-repeat="year in theTemplate" ng-init="parentIndex = $index">
             <ul class="template-sem-list"> <!--List of semesters-->
               <li ng-repeat="sem in year">
                 <ul class="template-unit-list"><!--List of blocks per semester-->
                   <li class="template-header-cell">
                     <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
                   </li>
-                  <li class="template-unit-cell" ng-style="cellStyle(unit.status, unit.credits)" ng-repeat="unit in sem">
+                  <li class="template-unit-cell" ng-style="templateCellStyle(unit.status, unit.credits)" ng-repeat="unit in sem">
                     <div>
                       <span class="unit-id" class="unit-id">{[{ unit.id }]}</span>
                       <span class="unit-subtext">Credits: {[{ unit.credits | number : 1 }]}</span>
@@ -90,7 +90,29 @@
           </li>
         </ul>
       </div>
+
+      <!--Planner Table-->
       <div class="planner-table">
+        <div class="semester-heading-adder">
+          <label for=sem-header-year-input>Year:</label>
+          <input id="sem-header-year-input" type="text" ng-model="semHeaderYearInput">
+          <label for=sem-header-year-input>Semester:</label>
+          <input id="sem-header-sem-input" type="text" ng-model="semHeaderSemInput">
+          <div class="add-sem-header-button" ng-click="addSemHeader()">+</div>
+        </div>
+        <ul>
+          <li ng-repeat="year in thePlan">
+            <ul>
+              <li ng-repeat="sem in year">
+                <ul>
+                  <li ng-repeat="unit in sem">
+                    {[{ renderPlannerRow(unit) }]}
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
 
