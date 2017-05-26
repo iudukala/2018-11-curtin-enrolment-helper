@@ -11,14 +11,14 @@ class Course(models.Model):
 
 # Unit Table - Stores all the units that the department provides.
 class Unit(models.Model):
-    UnitID = models.CharField(max_length=100, primary_key=True)
+    UnitID = models.AutoField(primary_key=True)
     UnitCode = models.CharField(max_length=10)
     Name = models.CharField(max_length=100)
     Version = models.CharField(max_length=10)
     # Availability: 1 = Semester 1, 2 = Semester 2, 3 = Semester 1 & 2.
     Semester = models.IntegerField(validators=[1, 2, 3])
     Credits = models.DecimalField(decimal_places=1, max_digits=3, validators=[12.5, 25, 50])
-
+    Elective = models.BooleanField(default=False)
 
 # Equivalence Table - Keeps track of which unit is equivalent to which unit.
 class Equivalence(models.Model):
