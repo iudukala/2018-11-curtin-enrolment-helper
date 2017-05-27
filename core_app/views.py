@@ -37,7 +37,7 @@ def upload_file(request):
         valid, output_message = validator.pdf_is_valid()
         if valid:
             information_saver = StudentInformationSaver(validator.get_validated_information())
-            information_saver.set_student_unit()
+            information_saver.set_student_units()
             d = {'pdf_valid': 'True'}
             HARDCODED_JSON = json.dumps(d)
             return HttpResponse(HARDCODED_JSON, content_type='application/json')
@@ -72,11 +72,11 @@ def get_student_list(request):
         return HttpResponse(serializers_students, content_type='application/json')
 
 
-def generate_enrolment_plan(request):
-    if request.method == 'GET':
-
-        # recieve student ID
-        e_generator = Enrolment_Generator('17080170')
-        combine_JSON = e_generator.get_templates_and_plan()
-
-    return HttpResponse(combine_JSON, content_type='application/json')
+# def generate_enrolment_plan(request):
+#     if request.method == 'GET':
+#
+#         # recieve student ID
+#         e_generator = Enrolment_Generator('17080170')
+#         combine_JSON = e_generator.get_templates_and_plan()
+#
+#     return HttpResponse(combine_JSON, content_type='application/json')
