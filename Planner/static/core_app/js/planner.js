@@ -25,6 +25,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     angular.copy(StudentService.getJSON(), theJSON);
     //Handle new template
     $scope.theTemplate = theJSON.template;
+    $scope.theCourse = theJSON.course;
 
     //Handle new plan
     $scope.semColors = [];

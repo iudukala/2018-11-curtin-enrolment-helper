@@ -317,11 +317,6 @@ var parsedJSON = {
               {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0},
               {id: 'COMP3003', name: 'Y3S1U3', credits: 50.0}
             ],
-            [//Sem 2 Unit Objects
-              {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0},
-              {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0},
-              {id: 'COMP3007', name: 'Y3S2U3', credits: 50.0}
-            ]
           ]
         ]
 }
