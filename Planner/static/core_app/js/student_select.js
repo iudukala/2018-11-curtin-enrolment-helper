@@ -266,57 +266,68 @@ app.run(function($rootScope) {
 
 /***********************************************************************************************************/
 var parsedJSON = {
-  course: { name: 'Computer Science Stream', id: 'STRU-CMPSC' },
+  course: { name: 'Software Engineering (BEng)', id: '313605' },
   template: [//Array of years
               [//Year 1
                 [//Sem 1 Unit Objects
-                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1002', name: 'Y1S1U2', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1003', name: 'Y1S1U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1004', name: 'Y1S1U4', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'MATH2012', name: 'E. Maths 120', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'MCEN1000', name: 'E. Mech 100', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'INDE1000', name: 'EF: P&C 100', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1004', name: 'E. Prog 100', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 12.5, status: 'PASS', attempts: 1},
                 ],
                 [//Sem 2 Unit Objects
-                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1001', name: 'Y1S1U1', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1007', name: 'Y1S2U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP1008', name: 'Y1S2U4', credits: 12.5, status: 'PASS', attempts: 1},
-                  {id: 'COMP1009', name: 'Y1S2U5', credits: 12.5, status: 'PASS', attempts: 1}
+                  {id: 'MATH1003', name: 'E. Maths 140', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'INDE1001', name: 'EF: D&P 100', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'ELEN1000', name: 'E. Sys 100', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'MAEN1000', name: 'E. Mat 100', credits: 25.0, status: 'PASS', attempts: 1},
                 ]
               ],
               [//Year 2
                 [//Sem 1 Unit Objects
-                  {id: 'COMP2001', name: 'Y2S1U1', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2002', name: 'Y2S1U2', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2003', name: 'Y2S1U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2004', name: 'Y2S1U4', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'ISAD1000', name: 'SE 110', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1001', name: 'OOPD 100', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'STAT1002', name: 'SDA 101', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'PRJM2000', name: 'PSP', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 25.0, status: 'PASS', attempts: 1}
                 ],
                 [//Sem 2 Unit Objects
-                  {id: 'COMP2005', name: 'Y2S2U1', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2006', name: 'Y2S2U2', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2007', name: 'Y2S2U3', credits: 25.0, status: 'PASS', attempts: 1},
-                  {id: 'COMP2008', name: 'Y2S2U4', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1002', name: 'DSA', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'COMP1000', name: 'UCP 120', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'ISYS1001', name: 'DS 120', credits: 25.0, status: 'PASS', attempts: 1},
+                  {id: 'CMPE2002', name: 'RE', credits: 25.0, status: 'PASS', attempts: 1}
                 ]
               ],
               [//Year 3
                 [//Sem 1 Unit Objects
-                  {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0, status: 'PLN', attempts: 1},
-                  {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3003', name: 'Y3S1U3', credits: 50.0, status: 'PLN', attempts: 0}
+                  {id: 'COMP3001', name: 'DAA', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ISAD4002', name: 'SM 400', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'CNCO2000', name: 'CC', credits: 25.0, status: 'PLN', attempts: 0}
                 ],
                 [//Sem 2 Unit Objects
-                  {id: 'COMP3005', name: 'Y3S2U1', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3006', name: 'Y3S2U2', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'COMP3007', name: 'Y3S2U3', credits: 50.0, status: 'PLN', attempts: 0},
+                  {id: 'CMPE3008', name: 'SET', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ICTE3002', name: 'HCI 400', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP2004', name: 'CG 200', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP2003', name: 'OO SE', credits: 25.0, status: 'PLN', attempts: 0}
                 ]
-              ]
+              ],
+              [//Year 4
+                [//Sem 1 Unit Objects
+                  {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0},
+                  {id: 'ENEN2000', name: 'ESD 201', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ISAD4000', name: 'SEP A', credits: 50.0, status: 'PLN', attempts: 0},
+                ],
+                [//Sem 2 Unit Objects
+                  {id: 'MGMT3000', name: 'E Man', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'COMP3003', name: 'SE Concepts', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ISAD4001', name: 'SEP B', credits: 50.0, status: 'PLN', attempts: 0}
+                ]
+              ],
             ],
   plan: [//Array of years
           [//Year 1
-            [//Sem 1 Unit Objects
-              {id: 'COMP3001', name: 'Y3S1U1', credits: 25.0},
-              {id: 'COMP3002', name: 'Y3S1U2', credits: 25.0},
-              {id: 'COMP3003', name: 'Y3S1U3', credits: 50.0}
-            ],
           ]
         ]
 }

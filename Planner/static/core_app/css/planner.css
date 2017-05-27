@@ -418,6 +418,8 @@ span {
         border-bottom: 1px solid black; }
         .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:first-child {
           border-top: 1px solid black; }
+        .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper:last-child {
+          border-bottom: none; }
         .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list {
           display: -webkit-flex;
           display: -ms-flexbox;
@@ -457,6 +459,7 @@ span {
             width: 12%;
             background-color: #E8E8E8;
             color: #7CD1FC;
+            font-size: 1.2em;
             border-left: 1px solid black;
             border-right: 2px solid black; }
           .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell {

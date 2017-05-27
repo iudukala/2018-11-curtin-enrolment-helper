@@ -101,12 +101,10 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   }
 
   $scope.addSemHeader = function() {
-    //TODO: Verify input to make sure semester is below 3
-    //      and year is below like 6 idk
     var yearToInsert = $scope.semHeaderYearInput;
     var semToInsert = $scope.semHeaderSemInput;
     var thePlan = $scope.thePlan;
-    if(typeof yearToInsert === 'undefined' || typeof semToInsert === 'undefined' ||yearToInsert > 6 || semToInsert > 2) {
+    if(!validSemesterHeaderInput(yearToInsert, semToInsert) ) {
       //Show Error Message
     }
     else {
@@ -118,6 +116,11 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
         insertSemHeader(theUnits, yearToInsert-1, semToInsert-1);
       }
     }
+  }
+
+  function validSemesterHeaderInput(year, sem) {
+    return (typeof year !== 'undefined' && typeof sem !== 'undefined' &&
+             year > 0 && year < 7 && sem > 0 && sem < 3);
   }
 
   function insertSemHeader(array, yearIndex, semIndex) {
