@@ -78,11 +78,11 @@
                   <li class="template-header-cell">
                     <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
                   </li>
-                  <li class="template-unit-cell" ng-style="templateCellStyle(unit.status, unit.credits)" ng-repeat="unit in sem">
+                  <li class="template-unit-cell" ng-style="templateCellStyle(unit)" ng-repeat="unit in sem">
                     <div>
-                      <span class="unit-id" class="unit-id">{[{ unit.id }]}</span>
-                      <span class="unit-subtext">Credits: {[{ unit.credits | number : 1 }]}</span>
-                      <span class="unit-subtext">{[{ getUnitAttemptsText(unit.attempts, unit.status) }]}</span>
+                      <span class="unit-id" class="unit-id">{[{ unit.name }]}</span>
+                      <span class="unit-subtext">({[{ unit.id }]})</span>
+                      <span class="unit-subtext">Cred: {[{ unit.credits | number : 1 }]} {[{ getUnitAttemptsText(unit.attempts, unit.status) }]}</span>
                     </div>
                   </li>
                 </ul>

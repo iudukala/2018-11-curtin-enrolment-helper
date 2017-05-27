@@ -41,22 +41,42 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   });
 
   //Determines the style of the cell based on template/plan information
-  $scope.templateCellStyle = function(status, credits) {
+  $scope.templateCellStyle = function(unit) {
     var style = {}
     //Resize based on credits
-    if(credits === 12.5) {
+    if(unit.credits === 12.5) {
       style['width'] = '11%';
       style['font-size'] = '12px';
     }
-    else if(credits === 50.0) {
+    else if(unit.credits === 50.0) {
       style['width'] = '44%';
     }
     //Colour of fill/font based on template status/planned semester
-    if(status === 'PASS') {
+    if(unit.status === 'PASS') {
       style['background-color'] = '#297E2B';
       style['color'] = '#FFFFFF';
     }
+    else {
+      var colorStyle = findUnitStyleInPlan(unit);
+      style['background-color'] = colorStyle['background-color'];
+      style['color'] = colorStyle['color'];
+    }
     return style;
+  }
+
+  function findUnitStyleInPlan(unit) {
+    colorStyle = {};
+    angular.forEach($scope.thePlan, function(year, yearIndex) {
+      angular.forEach(year, function(sem, semIndex) {
+        angular.forEach(sem, function(planUnit) {
+          if(unit.id === planUnit.id) {
+            colorStyle['background-color'] = $scope.semColors[yearIndex][semIndex];
+            colorStyle['color'] = '#FFFFFF';
+          }
+        });
+      });
+    });
+    return colorStyle;
   }
 
   //Checks if row is header or unit and renders accordingly.
@@ -120,7 +140,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   $scope.getUnitAttemptsText = function(attempts, status) {
     text = '';
     if(status !== 'PASS' && attempts !== 0) {
-      text = 'Attempts: ' + attempts;
+      text = 'Att: ' + attempts;
     }
     return text;
   };
