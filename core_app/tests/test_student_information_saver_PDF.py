@@ -3,22 +3,15 @@ from django.db import IntegrityError, transaction
 from django.core.files import File
 from core_app.models import *
 from core_app.pdf_validator import PdfValidator
+from core_app.student_information_saver import StudentInformationSaver
 import unittest
 
-# Run tests with:
-# 'python manage test core_app.tests'
 
-# FIXME.
-# The same unit can have multiple versions.
-# Issues then on what version to create and cannot test that particular version of the unit exists
-#   in the database as cannot create BOTH versions of the unit.
-
-
-@unittest.skip("Skipping")
-# Renamed TestCase to reference test.TestCase to ensure not using unittest by accident.
-class PdfValidation(test.TestCase):
-
-    # Setting up a database with correct values for student 17080170 .
+# @unittest.skip("Skipping")
+class EnrolmentPlanCreationYoakim(test.TestCase):
+    """
+    YOAKIM'S PDF.
+    """
     @classmethod
     def setUpTestData(cls):
         """
@@ -31,8 +24,11 @@ class PdfValidation(test.TestCase):
         Yoakim's PDF.
         """
         # COURSES - Required as the Course is referenced when creating a Student object.
-        bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-        bachelor_of_engineering = Course.objects.create(CourseID='313683', Version='5', Name='Course1', TotalCredits=600)
+        cls.bachelor_of_engineering = Course.objects.create(CourseID='132010', Version='3', Name='Course1', TotalCredits=600)
+        # cls.test_bachelor_of_engineering = Course.objects.create(CourseID='132010', MidYearEntry=True, Version='3', Name='Course1', TotalCredits=600)
+        cls.bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
+
+        cls.test = Course.objects.get(CourseID='132010', MidYearEntry=False)
 
         database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
         database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
@@ -150,15 +146,47 @@ class PdfValidation(test.TestCase):
         database_objects.append(Unit(UnitCode='ELECTIVE3',  Version='2',  Credits=75.0, Semester=-1, Elective=True))
         database_objects.append(Unit(UnitCode='ELECTIVE4',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
 
+        # # Equivalence Table - Keeps track of which unit is equivalent to which unit.
+        # class Equivalence(models.Model):
+        #     class Meta:
+        #         unique_together = (('EquivID', 'UnitID'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='Unit', on_delete=models.CASCADE)
+        #     EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
+        #
+        #
+        # # Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
+        # #                      which when getting a particular unit it will give all records of that unit which gives a set of
+        # #                      options.
+        # class Prerequisite(models.Model):
+        #     class Meta:
+        #         unique_together = (('Option', 'UnitID'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
+        #     Option = models.IntegerField(primary_key=True)
+        #
+        #
+        # # Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
+        # #                 getting the option record will give all the units in the option.
+        # class Options(models.Model):
+        #     class Meta:
+        #         unique_together = (('UnitID', 'Option'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
+        #     Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
+
+        # PREREQUISITE
+        # cls.prerequisite1 = Prerequisite.objects.create(Options= cls.option1, UnitID= )
+
         # cls.filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-18402636-23_Mar_2017.pdf'
 
         # STUDENTS
-        database_objects.append(Student(StudentID='16171921', Name='Campell James Pedersen',
+        database_objects.append(Student(StudentID='17080170', Name='Yoakim Sadao Persson',
                                         CreditsCompleted='300', AcademicStatus='1',
-                                        CourseID=bachelor_of_engineering))
+                                        CourseID=cls.bachelor_of_science))
         database_objects.append(Student(StudentID='18402636', Name='Darryl Chng',
                                         CreditsCompleted='300', AcademicStatus='1',
-                                        CourseID=bachelor_of_science))
+                                        CourseID=cls.bachelor_of_science))
 
         # Actually populates the database.
         for entry in database_objects:
@@ -179,109 +207,36 @@ class PdfValidation(test.TestCase):
             # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
         ]
 
-        cls.validators = []
+        cls.information_savers = []
 
         for filename in cls.filenames:
             with open(filename, 'rb') as fp:
                 file = File(fp)
-                # cls.validator = PdfValidator(file)
-                # cls.validator.read_file()
                 validator = PdfValidator(file)
-                validator.read_file()
-                cls.validators.append(validator)
+                # validator.read_file()
+                if validator.pdf_is_valid():
+                    cls.information_savers.append(StudentInformationSaver(validator.get_validated_information()))
 
-    # PdfValidator.attributes testing.
-    def test_attributes(self):
-        for validator in self.validators:
-            validator.is_parsed_pdf_valid = True
-            validator.check_attributes()
-            self.assertIs(True, validator.is_parsed_pdf_valid)
+    def test_create_student(self):
+        for saver in self.information_savers:
+            print("test_create_student")
+            # Removed the created student.
+            # self.student.delete()
+            # self.student.StudentID = '12345678'
+            saver.error_detected = False
+            saver.create_student()
+            print(saver.output_message)
 
-    # PdfValidator.courses testing.
-    def test_courses(self):
-        for validator in self.validators:
-            validator.is_parsed_pdf_valid = True
-            validator.check_courses()
-            self.assertIs(True, validator.is_parsed_pdf_valid)
+    def test_ensure_course_order_is_correct(self):
+        for saver in self.information_savers:
+            student_major = list(saver.parsed_report['course'].items())[0][0]
+            print(saver.output_message)
+            self.assertTrue(student_major == self.bachelor_of_science.CourseID)
 
-    # # PdfValidator.units testing.
-    # def test_units(self):
-    #     for validator in self.validators:
-    #         validator.is_parsed_pdf_valid = True
-    #         validator.check_units()
-    #         self.assertIs(True, validator.is_parsed_pdf_valid), print(validator.output_message)
-
-    # @unittest.skip("Database not being modified correctly.")
-    # def test_changing_unit_name(self):
-    #     """
-    #     Unit should now be processed as a elective, but not return False.
-    #     """
-    #     for validator in self.validators:
-    #         print(self.unit1.UnitID)
-    #         self.unit1.UnitID = "Modified"
-    #         print(self.unit1.UnitID)
-    #         self.unit1.save()
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.refresh_from_db()
-    #         print(self.unit1.UnitID)
-    #         self.assertIs(True, self.validator.is_parsed_pdf_valid,
-    #                       "Should be True as an unidentified UnitID is determined to be a elective, "
-    #                       "not grounds for failure.")
-    #
-    # @unittest.skip("Database not being modified correctly.")
-    # def test_database_missing_unit(self):
-    #     # Deleting a Unit which has been done.
-    #
-    #     for validator in self.validators:
-    #         print(self.unit1.UnitID)
-    #         self.unit1.Credits = 50
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.save()
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.refresh_from_db()
-    #         print(self.unit1.UnitID)
-    #
-    #         self.validator.is_parsed_pdf_valid = True
-    #         self.validator.check_units()
-    #         # self.assertTrue(self.validator.get_is_parsed_pdf_valid)
-    #         self.assertIs(True, self.validator.is_parsed_pdf_valid,
-    #                       "Should be False due to mismatch in unit credit")
-
-    # PdfValidator.date testing.
-    def test_date(self):
-        for validator in self.validators:
-            validator.is_parsed_pdf_valid = True
-            validator.check_date()
-            self.assertIs(True, validator.is_parsed_pdf_valid)
-
-    def test_file(self):
-        """
-        Static method so the file object still exists.
-        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf 
-        parser again are required to create and send again.
-        """
-        for filename in self.filenames:
-            with open(filename, 'rb') as fp:
-                file = File(fp)
-                validator = PdfValidator(file)
-
-                result = validator.read_file()
-
-            assert result is True
-
-    def test_is_valid(self):
-        """
-        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf 
-        parser again are required to create and send again.
-        """
-        for filename in self.filenames:
-            with open(filename, 'rb') as fp:
-                file = File(fp)
-                validator = PdfValidator(file)
-
-                result, output_message = validator.pdf_is_valid()
-
-            if not result:
-                print(output_message)
-
-            assert result is True
+    def test_set_student_units(self):
+        for saver in self.information_savers:
+            print("test_set_student_units")
+            saver.error_detected = False
+            saver.set_student_units()
+            print(saver.output_message)
+            self.assertIs(False, saver.error_detected)

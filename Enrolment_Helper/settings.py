@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import sys
 # import logging
 # from Enrolment_Helper import core_app
 
@@ -91,34 +92,37 @@ WSGI_APPLICATION = 'Enrolment_Helper.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    # Old default SQLite database
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-
-    # Utilising the MySQL database
-
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Enrolment_Helper',
-        'USER': 'enrolment_helperuser',
-        'PASSWORD': 'user',
-        'HOST': 'localhost',
-        'PORT': '',
+# Testing takes place on a sqlite database. Significantly faster.
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            # 'NAME': os.path.join('db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'Enrolment_Helper',
+            'USER': 'enrolment_helperuser',
+            'PASSWORD': 'user',
+            'HOST': 'localhost',
+            'PORT': '',
+        },
+    }
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'Enrolment_Helper',
-    #     'USER': 'root',
-    #     'PASSWORD': '0204Billy()',
-    #     'HOST': 'localhost',
-    #     'PORT': '',
-    # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'Enrolment_Helper',
+#         'USER': 'enrolment_helperuser',
+#         'PASSWORD': 'user',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 
 # Password validation

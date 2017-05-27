@@ -5,6 +5,9 @@ from pdfminer.pdfpage import PDFPage
 from io import StringIO
 import re
 
+# Yoakim's added
+import collections
+
 # # # # # # # # # # # # # # # # #
 # REGULAR EXPRESSIONS (compiled)#
 # # # # # # # # # # # # # # # # #
@@ -343,7 +346,9 @@ def advance_line(lines, i, semHeaderPrev, semHeaderRecent, semHeaderRecentIdx):
 #
 # Notes:    None
 def extract_course_details(lines, report_dict, i):
-    courseDetails = {}
+    # courseDetails = {}
+    # MODIFIED to use a OrderedDict() rather then dict
+    courseDetails = collections.OrderedDict()
     ignoredVersions = set()
     semHeader = True
     while i < len(lines) - 1 and semHeader:  # Loop through and extract course details
@@ -413,7 +418,6 @@ def parse_progress_report(fp):
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
-    # fp.close()
     return report_dict
 
 

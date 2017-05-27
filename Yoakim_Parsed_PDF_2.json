@@ -13,7 +13,10 @@
         '313391': {'ver': '3', 'credits': '12.5'}
     }, 
     'course': {
-        '311148': '5', 'MJRU-COMPT': '1', '313799': '2', 'STRU-SWENG': '1'
+        '311148': '5',
+        'MJRU-COMPT': '1',
+        '313799': '2',
+        'STRU-SWENG': '1'
     }, 
     'units': {
         '312649': {'ver': '4', 'credits': '12.5', 'attempt': 1, 'status': 'WD'}, 

@@ -1,90 +1,130 @@
-# TESTING
 from django.db import models
-from django.core.files.storage import FileSystemStorage
+from fernet_fields import *
 
-fs = FileSystemStorage(location='/Users/Eugene/SEP1_Project/2017-11.3-enrolment-helper/core_app/storage')
 
+# Course Table - Stores all the course that the department provides.
 class Course(models.Model):
-    CourseID = models.CharField(max_length=10, primary_key=True)
+    class Meta:
+        unique_together = (('CourseID', 'MidYearEntry'),)
+
+    CourseID = models.CharField(max_length=10)
     Name = models.CharField(max_length=100)
     Version = models.CharField(max_length=10)
     TotalCredits = models.IntegerField(validators=[600])
+    MidYearEntry = models.BooleanField(default=False)
 
+
+# Unit Table - Stores all the units that the department provides.
 class Unit(models.Model):
-    UnitID = models.CharField(max_length=100, primary_key=True)
+    class Meta:
+        unique_together = (('UnitCode', 'Version', 'Credits'),)
+
     UnitCode = models.CharField(max_length=10)
     Name = models.CharField(max_length=100)
     Version = models.CharField(max_length=10)
-    # 1=semster_1, 2=semester_2 and 3=semester(1 and 2)
-    Semester = models.IntegerField(validators=[1, 2, 3])
+    # Default Semester is undefined.
+    # Availability: 1 = Semester 1, 2 = Semester 2, 3 = Semester 1 & 2. Unspecified: -1
+    Semester = models.IntegerField(default=-1, validators=[-1, 1, 2, 3])
     Credits = models.DecimalField(decimal_places=1, max_digits=3, validators=[12.5, 25, 50])
+    Elective = models.BooleanField(default=False)
 
+
+# Equivalence Table - Keeps track of which unit is equivalent to which unit.
 class Equivalence(models.Model):
     class Meta:
-        unique_together = (('EquivaID', 'UnitID'),)
-    EquivaID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
+        unique_together = (('EquivID', 'UnitID'),)
+
     UnitID = models.ForeignKey(Unit, related_name='Unit', on_delete=models.CASCADE)
+    EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
 
-class Prerequiste(models.Model):
+
+# Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
+#                      which when getting a particular unit it will give all records of that unit which gives a set of
+#                      options.
+class Prerequisite(models.Model):
     class Meta:
-        unique_together = (('PreUnitID', 'UnitID'),)
-    PreUnitID = models.ForeignKey(Unit, related_name='PreUnit', on_delete=models.CASCADE)
+        unique_together = (('Option', 'UnitID'),)
+
     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
-    # And is false, and Or is true
-    AndOr = models.BooleanField(default=False)
+    Option = models.IntegerField(primary_key=True)
 
-# Credential for representing authenticated login info
-class Credential(models.Model):
-    StaffID = models.CharField(max_length=7, primary_key=True)
-    Name = models.CharField(max_length=100)
-    Password = models.CharField(max_length=100)
 
-# Student for representing student information.
+# Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
+#                 getting the option record will give all the units in the option.
+class Options(models.Model):
+    class Meta:
+        unique_together = (('UnitID', 'Option'),)
+
+    UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
+    Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
+
+
+# Credential Table - Stores access information to eTracker.
+# class Credential(models.Model):
+#      StaffID = models.CharField(max_length=7, primary_key=True)
+#      Name = models.CharField(max_length=100)
+#      Password = models.CharField(max_length=100)
+
+
+# Custom Encrypted decimalField
+class EncryptedBooleanField(EncryptedField, models.BooleanField):
+    pass
+
+
+# Student Table - Stores essential information of student.
 class Student(models.Model):
     StudentID = models.IntegerField(primary_key=True)
-    Name = models.CharField(max_length=100)
-    CreditsCompleted = models.IntegerField()
+    Name = EncryptedCharField(max_length=100)
+
+    CreditsCompleted = models.DecimalField(decimal_places=1, max_digits=4)
+
     # 1 - good standing, 0 - conditional and -1 - terminated
     AcademicStatus = models.IntegerField(validators=[-1, 0, 1])
     CourseID = models.ForeignKey(Course)
 
+
+# StudentUnit Table - Keeps track of which unit within the student plan.
 class StudentUnit(models.Model):
     class Meta:
         unique_together = (('StudentID', 'UnitID'),)
+
     StudentID = models.ForeignKey(Student, on_delete=models.PROTECT)
     UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
 
-    Attempts = models.IntegerField()
-    # True is pass but False is failed
-    Status = models.BooleanField(default=False)
-    PrerequisteAchieved = models.BooleanField(default=False)
+    Attempts = EncryptedIntegerField()
 
-    # def _str__(self):
-    #     # return StudentID + " " + UnitID
-    #     return "{} {}".format(self.StudentID, self.UnitID)
+    # 1 = Not Done, 2 = passed, 3 = failed
+    Status = EncryptedIntegerField(default=1, validators=[1, 2, 3])
 
-#
+    # PrerequisiteAchieved = models.BooleanField(default=False)
+    PrerequisiteAchieved = EncryptedBooleanField(default=False)
+
+    # Year = models.IntegerField(default=-1)
+    Year = EncryptedIntegerField(default=-1)
+
+    # Semester = models.IntegerField(default=-1, validators=[1, 2])
+    Semester = EncryptedIntegerField(default=-1, validators=[1, 2])
+
+
+# CourseTemplate Table - Table can be a representation of an AND's table. Each course has a couple of option records,
+#                        which can be used to find which the list of units in that course.
 class CourseTemplate(models.Model):
     class Meta:
-        unique_together = (('CourseID', 'UnitID'),)
+        unique_together = (('CourseID', 'Option'),)
 
-    #
+    Option = models.IntegerField(primary_key=True)
     CourseID = models.ForeignKey(Course, on_delete=models.CASCADE)
-    UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
 
-    #
-    CourseUnitID = models.IntegerField(primary_key=True)
 
-    #
+# CourseTemplateOptions Table - Table can be a representation of an OR's table. Each option has a unit linked to it.
+#                               A list of unit for that option will be given when an option is queried.
+class CourseTemplateOptions(models.Model):
+    class Meta:
+        unique_together = (('UnitID', 'Option'),)
+
+    Option = models.ForeignKey(CourseTemplate, on_delete=models.CASCADE)
+    UnitID = models.ForeignKey(Unit, on_delete=models.CASCADE)
     Year = models.IntegerField(validators=[1, 2, 3, 4])
     Semester = models.IntegerField(validators=[1, 2])
 
 
-#Class UploadedFile supports for UploadedFileForm in forms.py and allow us to access to FileField pointer
-# class UploadedFile(models.Model):
-#     title = models.CharField(max_length=255, unique=True)
-#     parsed_file = models.FileField()
-#
-#     def __unicode__(self):
-#         return self.title
-#
