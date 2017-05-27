@@ -8,6 +8,7 @@
     {% load staticfiles %}-->
     <link rel="stylesheet" href="static/core_app/css/planner.css"/>
     <script src="static/core_app/js/angular.min.js"></script>
+    <script src="static/core_app/js/colors.js"></script>
     <script src="static/core_app/js/student_select.js"></script>
     <script src="static/core_app/js/planner.js"></script>
     <!--{% endblock %}-->
@@ -66,7 +67,7 @@
     </div>
 
     <div class="planner-widget-wrapper">
-      <span class="course-name-label">{[{ theJSON.course.name }]}</span>
+      <span class="course-name-label">{[{ theCourse.name }]}</span>
       <!--Template Table-->
       <div class="template-table" id="template-table">
         <ul class="template-year-list"> <!--List of years-->
@@ -94,18 +95,25 @@
       <!--Planner Table-->
       <div class="planner-table">
         <div class="semester-heading-adder">
-          <label for=sem-header-year-input>Year:</label>
-          <input id="sem-header-year-input" maxlength="1" type="text" ng-model="semHeaderYearInput">
-          <label for=sem-header-year-input>Semester:</label>
-          <input id="sem-header-sem-input" maxlength="1" type="text" ng-model="semHeaderSemInput">
-          <div class="add-sem-header-button" ng-click="addSemHeader()">+</div>
+          <div>
+            <label for=sem-header-year-input>Year:</label>
+            <input id="sem-header-year-input" maxlength="1" type="text" ng-model="semHeaderYearInput">
+          </div>
+            <div>
+            <label for=sem-header-year-input>Semester:</label>
+            <input id="sem-header-sem-input" maxlength="1" type="text" ng-model="semHeaderSemInput">
+          </div>
+          <input type="button" value="ADD" class="button add-sem-header-button" ng-click="addSemHeader()">
         </div>
-        <ul>
+        <ul class="planner-list">
           <li ng-repeat="year in thePlan">
             <ul>
               <li ng-repeat="sem in year">
-                <ul>
-                  <li ng-repeat="unit in sem">
+                <ul class="planner-unit-list">
+                  <li class="planner-row"
+                      ng-repeat="unit in sem"
+                      ng-style="stylePlannerRow(unit, $parent.$parent.$index, $parent.$index)"
+                      ng-class="{ 'planner-row-header': unit.type === 'heading', 'planner-row-unit': unit.type !== 'heading' }">
                     {[{ renderPlannerRow(unit) }]}
                   </li>
                 </ul>

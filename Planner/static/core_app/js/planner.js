@@ -5,9 +5,11 @@ var app = angular.module('plannerApp');
 app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   //Keep track of student variable from other controller via the StudentService factory
   $scope.theStudent = {};
+  $scope.theCourse = {};
   $scope.theTemplate = {};
   $scope.originalPlan = {};
   $scope.thePlan = {};
+  $scope.semColors = [];
   $scope.tableWidth = document.getElementById('template-table').clientWidth;
 
   //Watcher for new selected student.
@@ -18,25 +20,24 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   });
 
   //Watched for newly retrieved template + plan
-  $scope.$watch(function () { return StudentService.getJSON(); }, function (newValue, oldValue) {
-    if (newValue !== oldValue) {
-      //Handle new template
-      $scope.theTemplate = newValue.template;
+  $scope.$watch(function () { return StudentService.getChangedJSON(); }, function (newValue, oldValue) {
+    var theJSON = {};
+    angular.copy(StudentService.getJSON(), theJSON);
+    //Handle new template
+    $scope.theTemplate = theJSON.template;
 
-      //Handle new plan
-      thePlan = newValue.plan;
-      angular.forEach(thePlan, function(year, yearIndex) {
-        angular.forEach(year, function(sem, semIndex) {
-          if(sem.length !== 0) {
-            sem.unshift({'type': 'heading',
-                         'year': (yearIndex + 1),
-                         'semester': (semIndex + 1)});
-          };
-        });
+    //Handle new plan
+    $scope.semColors = [];
+    thePlan = theJSON.plan;
+    angular.forEach(thePlan, function(year, yearIndex) {
+      angular.forEach(year, function(sem, semIndex) {
+        if(sem.length !== 0) {
+          insertSemHeader(sem, yearIndex, semIndex);
+        };
       });
-      $scope.originalPlan = thePlan;
-      $scope.thePlan = thePlan;
-    }
+    });
+    $scope.originalPlan = thePlan;
+    $scope.thePlan = thePlan;
   });
 
   //Determines the style of the cell based on template/plan information
@@ -58,16 +59,25 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return style;
   }
 
+  //Checks if row is header or unit and renders accordingly.
   $scope.renderPlannerRow = function(row) {
     rendered = ''
     if(angular.equals(row.type, 'heading')) {
       rendered = 'Year ' + row.year + ', Semester ' + row.semester;
     }
     else {
-      rendered = row.id
+      rendered = row.name + ' - ' + row.credits + ' credits'
     }
     return rendered;
   };
+
+  $scope.stylePlannerRow = function(unitObj, yearIndex, semIndex) {
+    style = {};
+    if(unitObj.type === 'heading') {
+      style['background-color'] = $scope.semColors[yearIndex][semIndex];
+    }
+    return style;
+  }
 
   $scope.addSemHeader = function() {
     //TODO: Verify input to make sure semester is below 3
@@ -75,16 +85,27 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     var yearToInsert = $scope.semHeaderYearInput;
     var semToInsert = $scope.semHeaderSemInput;
     var thePlan = $scope.thePlan;
-
-    thePlan = arrayInsertAndNullify(thePlan, yearToInsert-1);
-    thePlan[yearToInsert - 1] = arrayInsertAndNullify(thePlan[yearToInsert - 1], semToInsert - 1);
-
-    var theUnits = thePlan[yearToInsert - 1][semToInsert - 1];
-    if(theUnits.length === 0) {
-      theUnits.unshift({'type': 'heading',
-                        'year': ($scope.semHeaderYearInput),
-                        'semester': ($scope.semHeaderSemInput)});
+    if(typeof yearToInsert === 'undefined' || typeof semToInsert === 'undefined' ||yearToInsert > 6 || semToInsert > 2) {
+      //Show Error Message
     }
+    else {
+      thePlan = arrayInsertAndNullify(thePlan, yearToInsert-1);
+      thePlan[yearToInsert - 1] = arrayInsertAndNullify(thePlan[yearToInsert - 1], semToInsert - 1);
+
+      var theUnits = thePlan[yearToInsert - 1][semToInsert - 1];
+      if(theUnits.length === 0) {
+        insertSemHeader(theUnits, yearToInsert-1, semToInsert-1);
+      }
+    }
+  }
+
+  function insertSemHeader(array, yearIndex, semIndex) {
+    array.unshift({'type': 'heading',
+                 'year': (yearIndex + 1),
+                 'semester': (semIndex + 1)});
+    arrayInsertAndNullify($scope.semColors, yearIndex);
+    arrayInsertAndNullify($scope.semColors[yearIndex], semIndex);
+    $scope.semColors[yearIndex][semIndex] = genRandomColor($scope.semColors);
   }
 
   function arrayInsertAndNullify(array, index) {

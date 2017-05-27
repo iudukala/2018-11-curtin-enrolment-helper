@@ -20,19 +20,24 @@ var app = angular.module('plannerApp', [])
 app.factory('StudentService', function() {
   var selectedStudent = {};
   var theJSON = {};
+  var changedJSON = true;
 
   return {
       getStudent: function () {
-          return selectedStudent;
+        return selectedStudent;
       },
       setStudent: function (studentObj) {
-         selectedStudent = studentObj;
+        selectedStudent = studentObj;
       },
       getJSON: function () {
-          return theJSON;
+        return theJSON;
       },
       setJSON: function (jsonOBJ) {
-         theJSON = jsonOBJ;
+        theJSON = jsonOBJ;
+        changedJSON = !changedJSON;
+      },
+      getChangedJSON: function() {
+        return changedJSON;
       }
   };
 });
@@ -45,7 +50,6 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
   $scope.errorMessage = false;
   $scope.students = [];
   $scope.selectedStudent = {};
-  $scope.theJSON = {};
   $scope.gettingStudentTemplate = false;
 
   /*
@@ -61,27 +65,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    * Notes: N/A
    */
   $scope.$watch('selectedStudent', function (newValue, oldValue) {
-      if (newValue !== oldValue) {
-        StudentService.setStudent(newValue);
-      }
-  });
-
-  /*
-   * Name: $watch.selectedStudent
-   *
-   * Purpose: Fires when the user selects a new student, and updates
-   *          the service to reflect the new changes
-   *
-   * Params: newValue and oldValue, pretty self-explanitory.
-   *
-   * Return: none
-   *
-   * Notes: N/A
-   */
-  $scope.$watch('theJSON', function (newValue, oldValue) {
-      if (newValue !== oldValue) {
-        StudentService.setJSON(newValue);
-      }
+    StudentService.setStudent(newValue);
   });
 
   /*
@@ -101,7 +85,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
     setTimeout(function() {
       $scope.errorMessage = false;
       $scope.$apply();
-    }, 0);
+    }, 4000);
   }
 
   /*
@@ -119,7 +103,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
     //Uncomment when merging
     //$http.get('/url').then(studentListHandler, studentSelectErrorHandler);
     $rootScope.openSpinner('Loading student list...');
-    setTimeout(studentListHandler, 0);
+    setTimeout(studentListHandler, 1000);
   };
   //Invoke this method while controller is loading
   getStudentList();
@@ -204,13 +188,12 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   function templateHandler(response) {
     //var json = response.data;
-    json = parsedJSON;
-    $scope.theJSON = json;
+    StudentService.setJSON(parsedJSON);
     setTimeout(function() {
       $rootScope.closeSpinner();
       $rootScope.selectingStudent = false;
       $rootScope.$apply();
-    }, 2000);
+    }, 3000);
   }
 
   /*
