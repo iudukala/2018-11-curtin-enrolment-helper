@@ -45,7 +45,7 @@ class PdfValidator:
         # Do not run other checks if file reading fails.
         if self.read_file():
             self.check_attributes()
-            self.check_courses()
+            # self.check_courses()
             self.check_date()
 
         return self.is_parsed_pdf_valid, self.output_message
@@ -68,14 +68,14 @@ class PdfValidator:
                 self.output_message += "All required attribute keys are not in the parsed information\n"
                 self.is_parsed_pdf_valid = False
 
-    def check_courses(self):
-        # # Testing whether the course exists.
-        for courseID, courseVersion in self.json_parsed_file['course'].items():
-            if not Course.objects.filter(CourseID=courseID, Version=courseVersion).exists():
-                self.is_parsed_pdf_valid = False
-                new_message = 'Courses: ' + str(courseID) + ', Version: ' + str(courseVersion) + \
-                              ' Does not exist in the database.\n'
-                self.output_message += new_message
+    # def check_courses(self):
+    #     # # Testing whether the course exists.
+    #     for courseID, courseVersion in self.json_parsed_file['course'].items():
+    #         if not Course.objects.filter(CourseID=courseID, Version=courseVersion).exists():
+    #             self.is_parsed_pdf_valid = False
+    #             new_message = 'Courses: ' + str(courseID) + ', Version: ' + str(courseVersion) + \
+    #                           ' Does not exist in the database.\n'
+    #             self.output_message += new_message
 
     def check_date(self):
         parse_date = datetime.datetime.strptime(self.json_parsed_file['date'], "%d %b %Y")

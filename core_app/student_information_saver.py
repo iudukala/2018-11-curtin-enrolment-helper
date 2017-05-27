@@ -18,37 +18,30 @@ class StudentInformationSaver:
         self.completed_units = {}
         self.error_detected = False
         self.output_message = \
-            '\n\nLogged information while saving parsed information:\n---------------------------------------------\n'
+            '\n\nLogged information while saving parsed information:\n---------------------------------------------\n' \
+            'Student: {}, {}\n'.format(self.parsed_report['id'], self.parsed_report['name'])
 
     def set_student_units(self):
         if Student.objects.all().filter(StudentID=self.parsed_report['id']).exists():
-            student = Student.objects.get(StudentID=self.parsed_report['id'])
+            this_student = Student.objects.get(StudentID=self.parsed_report['id'])
 
         else:
             self.output_message += "Creating new student for {}\n.".format(self.parsed_report['id'])
-            student = self.create_student()
-
-        print(self.parsed_report)
+            this_student = self.create_student()
 
         self.create_required_units(self.parsed_report['planned'])
         self.create_required_units(self.parsed_report['automatic'])
         self.create_required_units(self.parsed_report['units'])
 
-        self.process_automatic_units(student)
-        self.process_units(student)
-        self.process_planned_units(student)
-
-        # print("\nFinal database\n")
-        # print(Student.objects.filter(StudentID=self.parsed_report['id']).values())
-        # print("\n")
-        # print(StudentUnit.objects.filter(StudentID=self.parsed_report['id']).values())
+        self.process_automatic_units(this_student)
+        self.process_units(this_student)
+        self.process_planned_units(this_student)
 
     def create_student(self):
         """
         Create a student object using the parsed PDF information.
         :return: 
         """
-        self.output_message += "Creating Student {}\n".format(self.parsed_report['id'])
         s_name = self.parsed_report['name'].split(" ")
         # Removes name title.
         joined_name = " ".join(s_name[1:])
@@ -58,9 +51,9 @@ class StudentInformationSaver:
             # Determine student course
             # While the object retrieved from the parer is a dict, the course information is created with
             # collections.OrderedDict() Ensuring that the first parsed course in the course Major.
-            student_major_course = list(self.parsed_report['course'].items())[0][0]
-            print(student_major_course)
-            new_student_course = Course.objects.get(CourseID=student_major_course)
+            student_major_course_info = list(self.parsed_report['course'].items())[0]
+            new_student_course = Course.objects.get(CourseID=student_major_course_info[0],
+                                                    Version=student_major_course_info[1])
 
             # Determine completed credits, and set completed units.
             completed_credits, self.completed_units = self.calculate_completed_credits()
@@ -79,7 +72,7 @@ class StudentInformationSaver:
         except ObjectDoesNotExist:
             self.error_detected = True
             self.output_message += \
-                "Unexpected error detected while retrieving course information: {}\n"\
+                "Unexpected error while creating student detected retrieving course information: {}\n"\
                 .format(self.parsed_report['course'][0])
 
         return Student.objects.get(StudentID=self.parsed_report['id'])
@@ -129,7 +122,8 @@ class StudentInformationSaver:
                     .format(unit_code,  unit_info['ver'], unit_info['credits'])
 
                 Unit.objects.create(
-                    UnitCode=unit_code, Credits=Decimal(unit_info['credits']), Version=unit_info['ver'], Elective=True)
+                    UnitCode=unit_code, Credits=Decimal(unit_info['credits']), Version=unit_info['ver'], Elective=True,
+                    Semester=3)
 
     def process_automatic_units(self, student_object):
         """
@@ -158,10 +152,6 @@ class StudentInformationSaver:
 
             except MultipleObjectsReturned:
                 self.output_message += "Multiple unit: {} detected in database.\n".format(unit_code)
-
-        # print(".process_automatic_units()")
-        # print(StudentUnit.objects.all().values())
-        # print("--------------------------")
 
     def process_units(self, student_object):
         """
@@ -198,11 +188,6 @@ class StudentInformationSaver:
             except MultipleObjectsReturned:
                 self.output_message += "Multiple unit: {} detected in database.\n".format(unit_code)
 
-        # print("--------------------------")
-        # print(".process_units()")
-        # print(StudentUnit.objects.all().values())
-        # print("--------------------------")
-
     def process_planned_units(self, student_object):
         """
         Cannot assume that prerequisites have been met form these units.
@@ -226,12 +211,12 @@ class StudentInformationSaver:
                                             Version=unit_info['ver'])
 
                 # UNTIL_WORKED_OUT_ELECTIVES.
-                prerequisites_achieved = self.determine_prerequisite(unit)
+                prerequisites_achieved = self.determine_prerequisite(student_object, unit)
 
                 previous_attempt = 0
                 # Need previous unit attempts.
                 if StudentUnit.objects.filter(StudentID=student_object, UnitID=unit).exists():
-                    potential_previous_student_unit = StudentUnit.objects.filter(StudentID=student_object, UnitID=unit)
+                    potential_previous_student_unit = StudentUnit.objects.get(StudentID=student_object, UnitID=unit)
                     previous_attempt = potential_previous_student_unit.Attempts
 
                 self.create_update_student_unit(student_object, unit, previous_attempt, unit_status,
@@ -240,41 +225,58 @@ class StudentInformationSaver:
             except MultipleObjectsReturned:
                 self.output_message += "Multiple unit: {} detected in database.\n".format(unit_code)
 
-                # print("--------------------------")
-        # print(".process_planned_units()")
-        # print(StudentUnit.objects.all().values())
-        # print("--------------------------")
-
-    def determine_prerequisite(self, unit):
+    def determine_prerequisite(self, student_object, unit):
         """
-        Method for determining whether a planned unit has achieved its prerequisites. 
-        :param unit_code, unit: 
-        :return: True if prerequisite is achieved, False otherwise.
+
+        :param student_object:
+        :param unit:
+        :return:
         """
-        prerequisite_achieved = False
+        prerequisite_achieved = True
 
-        if self.completed_units == {}:
-            # Add passed units from 'units' section.
-            for unitCode, unit_info in self.parsed_report['units'].items():
-                if unitCode not in self.completed_units and unit_info['status'] == 'PASS':
-                    self.completed_units[unit.unitCode] = unit.unit_info
-
-            # Add all units from the 'automatic' section.
-            for unitCode, unit_info in self.parsed_report['automatic'].items():
-                if unitCode not in self.completed_units:
-                    self.completed_units[unit.unitCode] = unit.unit_info
-
+        # No need to process electives.
         if "ELECTIVE" in unit.UnitCode:
-            prerequisite_achieved = True
+            pass
 
         else:
-            unit_prerequisite = Prerequisite.objects.all().filter(UnitID=unit)
-            if not unit_prerequisite.exists():
-                # No prerequisites exists for this unit, therefore achieves prerequisites.
-                prerequisite_achieved = True
+            #     # COMP3007 - Machine Percpective. Version: 1, Credit: 25
+            #     # Requires - COMP1002 Version: 1, Credit: 25
+            #     #            COMP1000 Version: 1, Credit: 25
+            #     # unit = Unit.objects.get(UnitCode='COMP3007', Version='1', Credits=25)
+            #
+            #     # Visual idea
+            #     #    Prerequisite   Options
+            #     #         OR         AND         OR
+            #     # (unitid or unitid) and (unitid or unit)
 
-            else:
-                unit_prerequisite = Prerequisite.objects.get(UnitID=unit)
+            prerequisite_list = Prerequisite.objects.filter(UnitID=unit)
+
+            # Loop though prerequisites.
+            for prerequisite_object in prerequisite_list:
+
+                # if Options.objects.filter(Option=Options.objects.get(unit_and_list.Option)).exists():
+                if Options.objects.filter(Option=prerequisite_object).exists():
+                    or_achieved = False
+                    # Should contain the Options available
+                    option_list = Options.objects.filter(Option=prerequisite_object)
+
+                    for option_object in option_list:
+                        print("{}".format(option_object.UnitID.UnitCode))
+                        if StudentUnit.objects.filter(StudentID=student_object, UnitID=option_object.UnitID).exists():
+                            student_unit = StudentUnit.objects.get(StudentID=student_object,
+                                                                   UnitID=option_object.UnitID)
+                            if student_unit.Status == '2':
+                                or_achieved = True
+                                continue
+                                # # If the student has passed no need to check the other 'OR' units.
+                                # if student_unit.Status == '2':
+                                #     or_achieved = True
+                                #     continue
+
+                    # if or_achieved is false here the prerequisite have not been met.
+                    if not or_achieved:
+                        prerequisite_achieved = False
+                        continue
 
         return prerequisite_achieved
 
@@ -283,45 +285,39 @@ class StudentInformationSaver:
 
         # Check if the StudentUnit already exists within the database, creates one if it does not.
         if StudentUnit.objects.filter(StudentID=student_object, UnitID=unit_object).exists():
-            student_unit_object = StudentUnit.objects.get(StudentID=student_object, UnitID=unit_object)
+            existing_student_unit_object = StudentUnit.objects.get(StudentID=student_object, UnitID=unit_object)
 
-            student_unit_object = StudentUnit(Attempts=attempts, Status=status,
-                                              PrerequisiteAchieved=prerequisite_achieved)
-            student_unit_object.save()
+            existing_student_unit_object.Attempts = attempts
+            existing_student_unit_object.Status = status
+            existing_student_unit_object.PrerequisiteAchieved = prerequisite_achieved
+
+            existing_student_unit_object.save()
 
         else:
             student_unit_object = StudentUnit(StudentID=student_object, UnitID=unit_object, Attempts=attempts,
                                               Status=status, PrerequisiteAchieved=prerequisite_achieved)
             student_unit_object.save()
 
-    def process_elective(self, student_object, unit_code, unit_info):
+    @staticmethod
+    def process_elective(student_object, unit_code, unit_info):
         """
         HARDCODED FUNCTION!!! Relies on the database already containing the ELECTIVE1, etc units with correct fields.
         The function called if the unit is an ELECTIVE 
         :return: the ELECTIVE unit to be created for StudentUnit.
         """
-        self.output_message += "ELECTIVE unit detected: {}\n".format(unit_code)
+        # self.output_message += "ELECTIVE unit detected: {}\n".format(unit_code)
         return_unit = None
 
         elective_unit_version_one = Unit.objects.get(UnitCode=unit_code, Version='1',
                                                      Credits=Decimal(unit_info['credits']))
         elective_unit_version_two = Unit.objects.get(UnitCode=unit_code, Version='2',
                                                      Credits=Decimal(unit_info['credits']))
-        # object, created = StudentUnit.objects.get_or_create(
-        #     StudentUnit=student_object,
-        #     UnitID=elective_unit_version_one
-        # )
-        if not StudentUnit.objects.get(StudentID=student_object, UnitID=elective_unit_version_one).exists():
+
+        if not StudentUnit.objects.filter(StudentID=student_object, UnitID=elective_unit_version_one).exists():
             return_unit = elective_unit_version_one
 
-        elif not StudentUnit.objects.get(StudentID=student_object, UnitID=elective_unit_version_two).exists():
+        elif not StudentUnit.objects.filter(StudentID=student_object, UnitID=elective_unit_version_two).exists():
             return_unit = elective_unit_version_two
 
         return return_unit
-
-        # print("--------------------------")
-        # print(".process_automatic_units()")
-        # print(StudentUnit.objects.all().values())
-        # print("--------------------------")
-
 

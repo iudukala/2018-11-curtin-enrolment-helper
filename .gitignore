@@ -9,6 +9,8 @@
 Session.vim
 *.json
 .idea
+db.sqlite3
+
 
 /*****OSX Gitignore*****/
 *.DS_Store

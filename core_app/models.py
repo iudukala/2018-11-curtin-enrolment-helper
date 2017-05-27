@@ -5,13 +5,12 @@ from fernet_fields import *
 # Course Table - Stores all the course that the department provides.
 class Course(models.Model):
     class Meta:
-        unique_together = (('CourseID', 'MidYearEntry'),)
+        unique_together = (('CourseID', 'Version'),)
 
     CourseID = models.CharField(max_length=10)
     Name = models.CharField(max_length=100)
     Version = models.CharField(max_length=10)
     TotalCredits = models.IntegerField(validators=[600])
-    MidYearEntry = models.BooleanField(default=False)
 
 
 # Unit Table - Stores all the units that the department provides.
@@ -24,7 +23,8 @@ class Unit(models.Model):
     Version = models.CharField(max_length=10)
     # Default Semester is undefined.
     # Availability: 1 = Semester 1, 2 = Semester 2, 3 = Semester 1 & 2. Unspecified: -1
-    Semester = models.IntegerField(default=-1, validators=[-1, 1, 2, 3])
+        # Semester = models.IntegerField(default=-1, validators=[-1, 1, 2, 3])
+    Semester = models.IntegerField(validators=[1, 2, 3])
     Credits = models.DecimalField(decimal_places=1, max_digits=3, validators=[12.5, 25, 50])
     Elective = models.BooleanField(default=False)
 
@@ -81,6 +81,7 @@ class Student(models.Model):
     # 1 - good standing, 0 - conditional and -1 - terminated
     AcademicStatus = models.IntegerField(validators=[-1, 0, 1])
     CourseID = models.ForeignKey(Course)
+    MidYearEntry = models.BooleanField(default=False)
 
 
 # StudentUnit Table - Keeps track of which unit within the student plan.
@@ -100,20 +101,23 @@ class StudentUnit(models.Model):
     PrerequisiteAchieved = EncryptedBooleanField(default=False)
 
     # Year = models.IntegerField(default=-1)
-    Year = EncryptedIntegerField(default=-1)
+        # Year = EncryptedIntegerField(default=-1)
+    Year = EncryptedIntegerField(default=-1, validators=[-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
     # Semester = models.IntegerField(default=-1, validators=[1, 2])
-    Semester = EncryptedIntegerField(default=-1, validators=[1, 2])
+        # Semester = EncryptedIntegerField(default=-1, validators=[1, 2])
+    Semester = EncryptedIntegerField(default=-1, validators=[-1, 1, 2])
 
 
 # CourseTemplate Table - Table can be a representation of an AND's table. Each course has a couple of option records,
 #                        which can be used to find which the list of units in that course.
 class CourseTemplate(models.Model):
     class Meta:
-        unique_together = (('CourseID', 'Option'),)
+        unique_together = (('CourseID', 'Option', 'MidYearEntry'),)
 
     Option = models.IntegerField(primary_key=True)
     CourseID = models.ForeignKey(Course, on_delete=models.CASCADE)
+    MidYearEntry = models.BooleanField(default=False)
 
 
 # CourseTemplateOptions Table - Table can be a representation of an OR's table. Each option has a unit linked to it.

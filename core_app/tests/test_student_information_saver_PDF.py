@@ -24,16 +24,61 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
         Yoakim's PDF.
         """
         # COURSES - Required as the Course is referenced when creating a Student object.
-        cls.bachelor_of_engineering = Course.objects.create(CourseID='132010', Version='3', Name='Course1', TotalCredits=600)
-        # cls.test_bachelor_of_engineering = Course.objects.create(CourseID='132010', MidYearEntry=True, Version='3', Name='Course1', TotalCredits=600)
+        # All courses for the PDF which were used.
+        cls.bachelor_of_engineering = Course.objects.create(CourseID='307808', Version='2', Name='Course1', TotalCredits=600)
         cls.bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-
-        cls.test = Course.objects.get(CourseID='132010', MidYearEntry=False)
+        Course.objects.create(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='313312', Version='1', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='311148', Version='5', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600)
 
         database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
         database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
         database_objects.append(Course(CourseID='313799',     Version='2', Name='Course3', TotalCredits=600))
         database_objects.append(Course(CourseID='STRU-SWENG', Version='1', Name='Course4', TotalCredits=600))
+
+        # # Equivalence Table - Keeps track of which unit is equivalent to which unit.
+        # class Equivalence(models.Model):
+        #     class Meta:
+        #         unique_together = (('EquivID', 'UnitID'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='Unit', on_delete=models.CASCADE)
+        #     EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
+        #
+        #
+        # # Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
+        # #                      which when getting a particular unit it will give all records of that unit which gives a set of
+        # #                      options.
+        # class Prerequisite(models.Model):
+        #     class Meta:
+        #         unique_together = (('Option', 'UnitID'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
+        #     Option = models.IntegerField(primary_key=True)
+        #
+        #
+        # # Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
+        # #                 getting the option record will give all the units in the option.
+        # class Options(models.Model):
+        #     class Meta:
+        #         unique_together = (('UnitID', 'Option'),)
+        #
+        #     UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
+        #     Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
+
+        # Prerequisite Testing
+        # COMP1000 and COMP1003
+        prerequisite_unit_1 = Unit.objects.create(UnitCode='COMP1000',    Version='1', Credits=25, Semester=1)
+        prerequisite_unit_2 = Unit.objects.create(UnitCode='COMP1003',    Version='1', Credits=25, Semester=1)
+        unit_with_prerequisite = Unit.objects.create(UnitCode='COMP3007', Version='1', Credits=25, Semester=1)
+
+        # Prerequisite Option is a primary integer related to a set of Units (OR relationship)
+        # I believe that the Option field is unnecessary.
+        prerequisite1_for_comp3007 = Prerequisite.objects.create(UnitID=unit_with_prerequisite, Option=1)
+        prerequisite2_for_comp3007 = Prerequisite.objects.create(UnitID=unit_with_prerequisite, Option=2)
+
+        option1 = Options.objects.create(UnitID=prerequisite_unit_1, Option=prerequisite1_for_comp3007)
+        option2 = Options.objects.create(UnitID=prerequisite_unit_2, Option=prerequisite2_for_comp3007)
 
         # UNITS
         database_objects.append(Unit(UnitCode='312649',    Version='4',  Credits=25, Semester=1))
@@ -146,40 +191,6 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
         database_objects.append(Unit(UnitCode='ELECTIVE3',  Version='2',  Credits=75.0, Semester=-1, Elective=True))
         database_objects.append(Unit(UnitCode='ELECTIVE4',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
 
-        # # Equivalence Table - Keeps track of which unit is equivalent to which unit.
-        # class Equivalence(models.Model):
-        #     class Meta:
-        #         unique_together = (('EquivID', 'UnitID'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='Unit', on_delete=models.CASCADE)
-        #     EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
-        #
-        #
-        # # Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
-        # #                      which when getting a particular unit it will give all records of that unit which gives a set of
-        # #                      options.
-        # class Prerequisite(models.Model):
-        #     class Meta:
-        #         unique_together = (('Option', 'UnitID'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
-        #     Option = models.IntegerField(primary_key=True)
-        #
-        #
-        # # Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
-        # #                 getting the option record will give all the units in the option.
-        # class Options(models.Model):
-        #     class Meta:
-        #         unique_together = (('UnitID', 'Option'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
-        #     Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
-
-        # PREREQUISITE
-        # cls.prerequisite1 = Prerequisite.objects.create(Options= cls.option1, UnitID= )
-
-        # cls.filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-18402636-23_Mar_2017.pdf'
-
         # STUDENTS
         database_objects.append(Student(StudentID='17080170', Name='Yoakim Sadao Persson',
                                         CreditsCompleted='300', AcademicStatus='1',
@@ -213,13 +224,11 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
             with open(filename, 'rb') as fp:
                 file = File(fp)
                 validator = PdfValidator(file)
-                # validator.read_file()
                 if validator.pdf_is_valid():
                     cls.information_savers.append(StudentInformationSaver(validator.get_validated_information()))
 
     def test_create_student(self):
         for saver in self.information_savers:
-            print("test_create_student")
             # Removed the created student.
             # self.student.delete()
             # self.student.StudentID = '12345678'
@@ -227,15 +236,14 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
             saver.create_student()
             print(saver.output_message)
 
-    def test_ensure_course_order_is_correct(self):
-        for saver in self.information_savers:
-            student_major = list(saver.parsed_report['course'].items())[0][0]
-            print(saver.output_message)
-            self.assertTrue(student_major == self.bachelor_of_science.CourseID)
+    # def test_ensure_course_order_is_correct(self):
+    #     for saver in self.information_savers:
+    #         student_major = list(saver.parsed_report['course'].items())[0][0]
+    #         print(saver.output_message)
+    #         self.assertTrue(student_major == self.bachelor_of_science.CourseID)
 
     def test_set_student_units(self):
         for saver in self.information_savers:
-            print("test_set_student_units")
             saver.error_detected = False
             saver.set_student_units()
             print(saver.output_message)
