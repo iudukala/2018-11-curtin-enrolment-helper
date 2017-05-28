@@ -1,12 +1,12 @@
-var colors = ['#DC143C', '#FF7700', '#FFCC00', '#9933FF', '#0066CC',
-              '#FF00FF', '#4B0082', '#A0522D', '#FFC0CB', '#C9CBFF',
-              '#98FB98', '#000080']
+var colors = ['#E86830', '#C71F16', '#C7166F', '#8930E8', '#F49CC8', '#3080E8',
+              '#30C9E8', '#30E8BD', '#E8E230', '#E8B730', '#C67D53', '#A5E830']
 
 function genRandomColor(colorArray) {
+  color = '';
   do {
       color = colors[Math.floor(Math.random() * colors.length)];
   }
-  while(array2DContains(colorArray, color));
+  while(array2DContains(colorArray, color) && colorArray.length < colors.length);
   return color;
 }
 

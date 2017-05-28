@@ -70,8 +70,9 @@
       <span class="course-name-label">{[{ theCourse.name }]}</span>
       <span class="selected-semester-label"
             ng-class="{ 'invisible': (selectedYearIndex < 0 || selectedSemIndex < 0) }">
-            Selected: Year {[{ selectedYearIndex + 1 }]}
-            Semester {[{ selectedSemIndex + 1 }]}</span>
+            Selected: <span class="selected-semester-color" ng-style="styleSemColor()">
+      </span>
+      </span>
       <span class="planner-error-text"
             ng-class="{ 'error-text-invisible': errorMessage === false }">{[{ errorText }]}</span>
       <!--Template Table-->
@@ -84,7 +85,7 @@
                   <li class="template-header-cell">
                     <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
                   </li>
-                  <li class="template-unit-cell" ng-style="templateCellStyle(unit)"
+                  <li class="template-unit-cell" ng-style="styleTemplateCell(unit)"
                       ng-repeat="unit in sem"
                       ng-click="addUnitToPlan(unit)">
                     <div>
@@ -125,7 +126,7 @@
                     <span>{[{ renderPlannerRow(unit) }]}</span>
                     <div class="planner-row-icon-field">
                       <input class="planner-trash-icon"
-                             type="image" src="static/core_app/img/trash-icon.svg"
+                             type="image" src="static/core_app/img/trash-icon-black.svg"
                              ng-click="plannerTrashClick(unit, $parent.$parent.$index, $parent.$index)">
                        <input class="planner-bucket-icon"
                               type="image" src="static/core_app/img/bucket-icon.svg"

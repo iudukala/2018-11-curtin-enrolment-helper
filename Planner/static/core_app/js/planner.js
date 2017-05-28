@@ -68,7 +68,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
 
 
   /*
-   * Name: templateCellStyle
+   * Name: styleTemplateCell
    *
    * Purpose: Determines the stylings of each template cell in
    *          the template table.
@@ -79,7 +79,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
    *
    * Notes: N/A
    */
-  $scope.templateCellStyle = function(unit) {
+  $scope.styleTemplateCell = function(unit) {
     var style = {}
     //Resize based on credits
     if(unit.credits === 12.5) {
@@ -167,9 +167,30 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
    * Notes: Called by renderPlannerRow
    */
   $scope.stylePlannerRow = function(rowObj, yearIndex, semIndex) {
-    style = {};
+    var style = {};
     if(rowObj.type === 'heading') {
       style['background-color'] = $scope.semColors[yearIndex][semIndex];
+    }
+    return style;
+  }
+
+  /*
+   * Name: styleSemColor
+   *
+   * Purpose: Determines the styling of the selected sem square
+   *
+   * Params: none.
+   *
+   * Return: A JSON object, in line with the HTML styling specification.
+   *
+   * Notes: Set as the ng-style of selected-semester-color
+   */
+  $scope.styleSemColor = function() {
+    var style = {}
+    var selectedYear = $scope.selectedYearIndex;
+    var selectedSem = $scope.selectedSemIndex;
+    if(selectedYear > -1 && selectedSem > -1) {
+      style = {'background-color': $scope.semColors[selectedYear][selectedSem]};
     }
     return style;
   }
