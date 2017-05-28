@@ -153,14 +153,38 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return rendered;
   };
 
-  $scope.stylePlannerRow = function(unitObj, yearIndex, semIndex) {
+  /*
+   * Name: stylePlannerRow
+   *
+   * Purpose: Determines the styling of a planner row, based on the row object
+   *
+   * Params: rowObj, the row object
+   *         yearIndex, the year the row is in
+   *         semeIndex, the semester the row is in
+   *
+   * Return: A JSON object, in line with the HTML styling specification.
+   *
+   * Notes: Called by renderPlannerRow
+   */
+  $scope.stylePlannerRow = function(rowObj, yearIndex, semIndex) {
     style = {};
-    if(unitObj.type === 'heading') {
+    if(rowObj.type === 'heading') {
       style['background-color'] = $scope.semColors[yearIndex][semIndex];
     }
     return style;
   }
 
+  /*
+   * Name: addSemHeader
+   *
+   * Purpose: Adds a semester header to the planner table
+   *
+   * Params: N/A
+   *
+   * Return: none.
+   *
+   * Notes: add-sem-header-button has this method as its ng-click attribute
+   */
   $scope.addSemHeader = function() {
     var yearToInsert = $scope.semHeaderYearInput;
     var semToInsert = $scope.semHeaderSemInput;
@@ -176,23 +200,65 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
       if(theUnits.length === 0) {
         insertSemHeader(theUnits, yearToInsert-1, semToInsert-1);
       }
+      else {
+        showErrorMessage("Semester already exists.")
+      }
     }
   }
 
+  /*
+   * Name: validSemesterHeaderInput
+   *
+   * Purpose: Checks if a year and semester input by the user is valid or not
+   *
+   * Params: year, the year input
+   *         sem, the semester input
+   *
+   * Return: boolean, true if input is valid.
+   *
+   * Notes: called by addSemHeader
+   */
   function validSemesterHeaderInput(year, sem) {
     return (typeof year !== 'undefined' && typeof sem !== 'undefined' &&
              year > 0 && year < 7 && sem > 0 && sem < 3);
   }
 
+  /*
+   * Name: insertSemHeader
+   *
+   * Purpose: Inserts a semester header into the plan
+   *
+   * Params: array, the plan array
+   *         yearIndex, the year index to insert the header
+   *         semIndex, the semester index to insert the header
+   *
+   * Return: boolean, true if input is valid.
+   *
+   * Notes: N/A
+   */
   function insertSemHeader(array, yearIndex, semIndex) {
     array.unshift({'type': 'heading',
-                 'year': (yearIndex + 1),
-                 'semester': (semIndex + 1)});
+                   'id': 'HEADING',
+                   'year': (yearIndex + 1),
+                   'semester': (semIndex + 1)});
     arrayInsertAndNullify($scope.semColors, yearIndex);
     arrayInsertAndNullify($scope.semColors[yearIndex], semIndex);
     $scope.semColors[yearIndex][semIndex] = genRandomColor($scope.semColors);
   }
 
+  /*
+   * Name: arrayInsertAndNullify
+   *
+   * Purpose: Takes an array, and inserts empty array indexes
+   *          into it until the specified index is readched
+   *
+   * Params: array, the array to be filled
+   *         index, the index to fill until
+   *
+   * Return: boolean, true if input is valid.
+   *
+   * Notes: N/A
+   */
   function arrayInsertAndNullify(array, index) {
     for(var i = 0; i < index + 1; i++) {
       if(typeof array[i] === 'undefined') {
@@ -202,32 +268,41 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return array;
   }
 
-  $scope.plannerTrashClick = function(unit, yearIndex, semIndex) {
-    //If heading, remove all units.
-    if(unit.type === 'heading') {
+  /*
+   * Name: plannerTrashClick
+   *
+   * Purpose: Deletes a unit/semester from the enrolment plan
+   *
+   * Params: row, the row object representing the planner row to delete
+   *         yearIndex, the year the specified row is in
+   *         semIndex, the semester the specified row is in
+   *
+   * Return: boolean, true if input is valid.
+   *
+   * Notes: Set as the ng-click directive of each trash icon in the planner list
+   */
+  $scope.plannerTrashClick = function(row, yearIndex, semIndex) {
+    //If heading, remove all units from that semester, and the header.
+    if(row.type === 'heading') {
       removePlanSem(yearIndex, semIndex);
     }
     //If unit, remove only that unit.
     else {
-      removePlanUnit(unit.id);
+      removePlanUnit(row.id);
     }
   }
 
-  $scope.addUnitToPlan = function(unit) {
-    selectedYear = $scope.selectedYearIndex;
-    selectedSem = $scope.selectedSemIndex
-    if(unit.status === 'PASS') {
-      showErrorMessage("Error: Unit selected already passed.")
-    }
-    else if(selectedYear < 0 || selectedSem < 0) {
-      showErrorMessage("Error: Please select a semester to assign this unit to.")
-    }
-    else {
-      removePlanUnit(unit.id);
-      $scope.thePlan[selectedYear][selectedSem].push(unit);
-    }
-  }
-
+  /*
+   * Name: removePlanSem
+   *
+   * Purpose: Removes an entire semester from the plan
+   *
+   * Params: yearIndex and semIndex, the indexes of the semester to remove
+   *
+   * Return: none.
+   *
+   * Notes: Called by plannerTrashClick
+   */
   function removePlanSem(yearIndex, semIndex) {
     $scope.thePlan[yearIndex][semIndex] = [];
     $scope.semColors[yearIndex][semIndex] = '';
@@ -235,6 +310,17 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     $scope.selectedSemIndex = -1;
   }
 
+  /*
+   * Name: removePlanUnit
+   *
+   * Purpose: Removes all instances of a single unit from the plan
+   *
+   * Params: unitID, the unit ID of the unit to remove
+   *
+   * Return: none.
+   *
+   * Notes: Called by plannerTrashClick
+   */
   function removePlanUnit(unitID) {
     angular.forEach($scope.thePlan, function(year, yearIndex) {
         angular.forEach(year, function(sem, semIndex) {
@@ -247,11 +333,60 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     });
   }
 
+  /*
+   * Name: addUnitToPlan
+   *
+   * Purpose: Adds a unit to to the plan
+   *
+   * Params: unit, the unit object to add to the plan
+   *
+   * Return: none.
+   *
+   * Notes: Set as the ng-click directive of each cell in the template
+   */
+  $scope.addUnitToPlan = function(unit) {
+    selectedYear = $scope.selectedYearIndex;
+    selectedSem = $scope.selectedSemIndex
+    if(unit.status === 'PASS') {
+      showErrorMessage("Unit selected has already been passed.")
+    }
+    else if(selectedYear < 0 || selectedSem < 0) {
+      showErrorMessage("Please select a semester to assign this unit to.")
+    }
+    else {
+      removePlanUnit(unit.id);
+      $scope.thePlan[selectedYear][selectedSem].push(unit);
+    }
+  }
+
+  /*
+   * Name: plannerBucketClick
+   *
+   * Purpose: Selects a new year/semester to paintbucket
+   *
+   * Params: yearIndex, semIndex, the year/semester selected
+   *
+   * Return: none.
+   *
+   * Notes: Set as the ng-click directive of the paintbucket icon
+   */
   $scope.plannerBucketClick = function(yearIndex, semIndex) {
     $scope.selectedYearIndex = yearIndex;
     $scope.selectedSemIndex = semIndex;
   }
 
+  /*
+   * Name: getUnitAttemptsText
+   *
+   * Purpose: Determines the text to be shown in each template cell's attempts span
+   *
+   * Params: attempts, the number of attempts a unit has had
+   *         status: the status of said unit
+   *
+   * Return: a string, the text to be shown
+   *
+   * Notes: Binded to each template cell's attempts span
+   */
   $scope.getUnitAttemptsText = function(attempts, status) {
     text = '';
     if(status !== 'PASS' && attempts !== 0) {
@@ -260,12 +395,32 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return text;
   };
 
-  //Back button
+  /*
+   * Name: backToStudents
+   *
+   * Purpose: Takes the user back to the student select page
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
   $scope.backToStudents = function() {
     $rootScope.selectingStudent = true;
   }
 
-  //Error message
+  /*
+   * Name: showErrorMessage
+   *
+   * Purpose: Shows an error message on the planner's screen
+   *
+   * Params: inputMessage, the string to display
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
   function showErrorMessage(inputMessage) {
     $scope.errorText = inputMessage
     $scope.errorMessage = true;
