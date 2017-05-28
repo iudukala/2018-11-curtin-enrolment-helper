@@ -417,6 +417,7 @@ span {
     line-height: 18px; }
     .planner-widget-wrapper .selected-semester-label .selected-semester-color {
       display: inline-block;
+      border-radius: 50%;
       vertical-align: middle;
       line-height: normal;
       margin-left: 5px;
@@ -432,6 +433,29 @@ span {
     left: 10%; }
   .planner-widget-wrapper .error-text-invisible {
     opacity: 0; }
+  .planner-widget-wrapper .planner-func-button-wrapper {
+    position: absolute;
+    top: 85%;
+    left: 67%;
+    height: 10%;
+    width: 26%;
+    height: 17%;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    padding: 5px 0; }
+    .planner-widget-wrapper .planner-func-button-wrapper input {
+      padding: 5px 20px;
+      margin: 0 5px; }
   .planner-widget-wrapper .template-table {
     position: absolute;
     top: 5%;
@@ -727,7 +751,8 @@ span {
   -moz-transform: translateY(-100vh);
   -ms-transform: translateY(-100vh);
   -o-transform: translateY(-100vh);
-  transform: translateY(-100vh); }
+  transform: translateY(-100vh);
+  padding-bottom: 7%; }
 
 .hidden-planner {
   -webkit-transform: translateY(100vh);

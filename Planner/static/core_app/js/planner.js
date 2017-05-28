@@ -45,7 +45,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
    */
   $scope.$watch(function () { return StudentService.getChangedJSON(); }, function (newValue, oldValue) {
     var theJSON = {};
-    angular.copy(StudentService.getJSON(), theJSON);
+    theJSON = StudentService.getJSON();
     //Handle new template
     $scope.theTemplate = theJSON.template;
     $scope.theCourse = theJSON.course;
@@ -62,7 +62,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
         };
       });
     });
-    $scope.originalPlan = thePlan;
+    $scope.originalPlan = angular.copy(thePlan);
     $scope.thePlan = thePlan;
   });
 
@@ -327,8 +327,10 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   function removePlanSem(yearIndex, semIndex) {
     $scope.thePlan[yearIndex][semIndex] = [];
     $scope.semColors[yearIndex][semIndex] = '';
-    $scope.selectedYearIndex = -1;
-    $scope.selectedSemIndex = -1;
+    if(yearIndex === $scope.selectedYearIndex && semIndex === $scope.selectedSemIndex) {
+      $scope.selectedYearIndex = -1;
+      $scope.selectedSemIndex = -1;
+    }
   }
 
   /*
@@ -429,6 +431,21 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
    */
   $scope.backToStudents = function() {
     $rootScope.selectingStudent = true;
+  }
+
+  $scope.resetPlan = function() {
+    //Reset plan object
+    $scope.thePlan = angular.copy($scope.originalPlan);
+    //Assign new colours to each header
+    angular.forEach($scope.thePlan, function(year, yearIndex) {
+        angular.forEach(year, function(sem, semIndex) {
+          angular.forEach(sem, function(planunit, unitIndex) {
+            if(planunit.type === 'heading' && !$scope.semColors[yearIndex][semIndex]) {
+              $scope.semColors[yearIndex][semIndex] = genRandomColor($scope.semColors);
+            }
+          });
+        });
+    });
   }
 
   /*
