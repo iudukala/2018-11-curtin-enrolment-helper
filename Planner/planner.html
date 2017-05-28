@@ -69,7 +69,11 @@
     <div class="planner-widget-wrapper">
       <span class="course-name-label">{[{ theCourse.name }]}</span>
       <span class="selected-semester-label"
-            ng-class="{ 'invisible': (selectedYearIndex < 0 || selectedSemIndex < 0) }">Selected: Year {[{ selectedYearIndex + 1 }]} Semester {[{ selectedSemIndex + 1 }]}</span>
+            ng-class="{ 'invisible': (selectedYearIndex < 0 || selectedSemIndex < 0) }">
+            Selected: Year {[{ selectedYearIndex + 1 }]}
+            Semester {[{ selectedSemIndex + 1 }]}</span>
+      <span class="planner-error-text"
+            ng-class="{ 'error-text-invisible': errorMessage === false }">{[{ errorText }]}</span>
       <!--Template Table-->
       <div class="template-table" id="template-table">
         <ul class="template-year-list"> <!--List of years-->

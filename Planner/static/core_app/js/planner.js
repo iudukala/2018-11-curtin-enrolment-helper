@@ -109,7 +109,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     var semToInsert = $scope.semHeaderSemInput;
     var thePlan = $scope.thePlan;
     if(!validSemesterHeaderInput(yearToInsert, semToInsert) ) {
-      //Show Error Message
+      showErrorMessage("Error: Invalid semester header input.")
     }
     else {
       thePlan = arrayInsertAndNullify(thePlan, yearToInsert-1);
@@ -160,10 +160,10 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     selectedYear = $scope.selectedYearIndex;
     selectedSem = $scope.selectedSemIndex
     if(unit.status === 'PASS') {
-      //Show Error message
+      showErrorMessage("Error: Unit selected already passed.")
     }
     else if(selectedYear < 0 || selectedSem < 0) {
-      //Show Error message
+      showErrorMessage("Error: Please select a semester to assign this unit to.")
     }
     else {
       removePlanUnit(unit.id);
@@ -206,5 +206,15 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   //Back button
   $scope.backToStudents = function() {
     $rootScope.selectingStudent = true;
+  }
+
+  //Error message
+  function showErrorMessage(inputMessage) {
+    $scope.errorText = inputMessage
+    $scope.errorMessage = true;
+    setTimeout(function() {
+      $scope.errorMessage = false;
+      $scope.$apply();
+    }, 4000);
   }
 });
