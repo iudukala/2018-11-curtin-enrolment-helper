@@ -9,8 +9,8 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   $scope.theTemplate = {};
   $scope.originalPlan = {};
   $scope.thePlan = {};
-  //$scope.selectedYearIndex;
-  //$scope.selectedSemIndex;
+  $scope.selectedYearIndex = -1;
+  $scope.selectedSemIndex = -1;
   $scope.semColors = [];
   $scope.tableWidth = document.getElementById('template-table').clientWidth;
 
@@ -28,6 +28,8 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     //Handle new template
     $scope.theTemplate = theJSON.template;
     $scope.theCourse = theJSON.course;
+    $scope.selectedYearIndex = -1;
+    $scope.selectedSemIndex = -1;
 
     //Handle new plan
     $scope.semColors = [];
@@ -60,14 +62,14 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
       style['color'] = '#FFFFFF';
     }
     else {
-      var colorStyle = findUnitStyleInPlan(unit);
+      var colorStyle = findTemplateUnitColor(unit);
       style['background-color'] = colorStyle['background-color'];
       style['color'] = colorStyle['color'];
     }
     return style;
   }
 
-  function findUnitStyleInPlan(unit) {
+  function findTemplateUnitColor(unit) {
     colorStyle = {};
     angular.forEach($scope.thePlan, function(year, yearIndex) {
       angular.forEach(year, function(sem, semIndex) {
@@ -155,18 +157,25 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   }
 
   $scope.addUnitToPlan = function(unit) {
+    selectedYear = $scope.selectedYearIndex;
+    selectedSem = $scope.selectedSemIndex
     if(unit.status === 'PASS') {
+      //Show Error message
+    }
+    else if(selectedYear < 0 || selectedSem < 0) {
       //Show Error message
     }
     else {
       removePlanUnit(unit.id);
-      $scope.thePlan[$scope.selectedYearIndex][$scope.selectedSemIndex].push(unit);
+      $scope.thePlan[selectedYear][selectedSem].push(unit);
     }
   }
 
   function removePlanSem(yearIndex, semIndex) {
     $scope.thePlan[yearIndex][semIndex] = [];
     $scope.semColors[yearIndex][semIndex] = '';
+    $scope.selectedYearIndex = -1;
+    $scope.selectedSemIndex = -1;
   }
 
   function removePlanUnit(unitID) {

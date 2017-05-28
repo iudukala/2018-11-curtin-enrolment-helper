@@ -400,6 +400,11 @@ span {
     font-size: 1.2em;
     position: absolute;
     right: 35%; }
+  .planner-widget-wrapper .selected-semester-label {
+    font-weight: 200;
+    font-size: 1.2em;
+    position: absolute;
+    right: 10%; }
   .planner-widget-wrapper .template-table {
     position: absolute;
     top: 5%;
@@ -441,6 +446,7 @@ span {
             border-bottom: 1px solid black;
             border-right: 1px solid black; }
             .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li div {
+              overflow: hidden;
               height: 100%;
               display: -webkit-flex;
               display: -ms-flexbox;
@@ -455,6 +461,9 @@ span {
               -ms-flex-pack: center;
               justify-content: center; }
               .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list li div span {
+                width: 100%;
+                text-align: center;
+                white-space: normal;
                 font-weight: 200;
                 color: inherit; }
           .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-header-cell {
@@ -481,7 +490,7 @@ span {
     top: 5%;
     left: 70%;
     height: 80%;
-    background-color: #F5F5F5;
+    background-color: #FFFFFF;
     border: 1px solid black; }
     .planner-widget-wrapper .planner-table .semester-heading-adder {
       display: -webkit-flex;
@@ -569,7 +578,7 @@ span {
               width: 100%;
               background-color: inherit;
               z-index: 5;
-              opacity: 0.4;
+              opacity: 0.5;
               pointer-events: none; }
 
 .spinner-overlay {
@@ -703,3 +712,6 @@ span {
 
 html {
   overflow-Y: hidden; }
+
+::-webkit-scrollbar {
+  display: none; }
