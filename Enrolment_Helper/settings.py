@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'core_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
    # 'core_app.apps.CoreAppConfig',
-    'core_app',
 ]
 
 MIDDLEWARE = [
@@ -83,13 +83,21 @@ DATABASES = {
     # }
 
     # Utilising the MySQL database
+    #'default': {
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'NAME': 'Enrolment_Helper',
+    #    'USER': 'enrolment_helperuser',
+    #    'PASSWORD': 'user',
+    #    'HOST': 'localhost',
+    #    'PORT': '',
+    #}
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Enrolment_Helper',
-        'USER': 'enrolment_helperuser',
-        'PASSWORD': 'user',
+        'NAME': 'test_enrolment_helper',
+        'USER': 'root',
+        'PASSWORD': '77497',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '3306',
     }
 }
 
