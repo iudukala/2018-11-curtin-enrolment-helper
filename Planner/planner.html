@@ -78,7 +78,9 @@
                   <li class="template-header-cell">
                     <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
                   </li>
-                  <li class="template-unit-cell" ng-style="templateCellStyle(unit)" ng-repeat="unit in sem">
+                  <li class="template-unit-cell" ng-style="templateCellStyle(unit)"
+                      ng-repeat="unit in sem"
+                      ng-click="addUnitToPlan(unit)">
                     <div>
                       <span class="unit-id" class="unit-id">{[{ unit.name }]}</span>
                       <span class="unit-subtext">({[{ unit.id }]})</span>
@@ -103,7 +105,7 @@
             <label for=sem-header-year-input>Semester:</label>
             <input id="sem-header-sem-input" maxlength="1" type="text" ng-model="semHeaderSemInput">
           </div>
-          <input type="button" value="ADD" class="button add-sem-header-button" ng-click="addSemHeader()">
+          <input type="button" value="ADD" class="button reverse-button add-sem-header-button" ng-click="addSemHeader()">
         </div>
         <ul class="planner-list">
           <li ng-repeat="year in thePlan">
@@ -114,7 +116,16 @@
                       ng-repeat="unit in sem"
                       ng-style="stylePlannerRow(unit, $parent.$parent.$index, $parent.$index)"
                       ng-class="{ 'planner-row-header': unit.type === 'heading', 'planner-row-unit': unit.type !== 'heading' }">
-                    {[{ renderPlannerRow(unit) }]}
+                    <span>{[{ renderPlannerRow(unit) }]}</span>
+                    <div class="planner-row-icon-field">
+                      <input class="planner-trash-icon"
+                             type="image" src="static/core_app/img/trash-icon.svg"
+                             ng-click="plannerTrashClick(unit, $parent.$parent.$index, $parent.$index)">
+                       <input class="planner-bucket-icon"
+                              type="image" src="static/core_app/img/bucket-icon.svg"
+                              ng-click="plannerBucketClick($parent.$parent.$index, $parent.$index)">
+                      <div class="icon-overlay"></div>
+                    </div>
                   </li>
                 </ul>
               </li>

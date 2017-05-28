@@ -301,7 +301,7 @@ var parsedJSON = {
               [//Year 3
                 [//Sem 1 Unit Objects
                   {id: 'COMP3001', name: 'DAA', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE1', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'ISAD4002', name: 'SM 400', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'CNCO2000', name: 'CC', credits: 25.0, status: 'PLN', attempts: 0}
                 ],
@@ -315,7 +315,7 @@ var parsedJSON = {
               [//Year 4
                 [//Sem 1 Unit Objects
                   {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5, status: 'PLN', attempts: 0},
-                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE2', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0},
                   {id: 'ENEN2000', name: 'ESD 201', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'ISAD4000', name: 'SEP A', credits: 50.0, status: 'PLN', attempts: 0},
                 ],
@@ -328,6 +328,31 @@ var parsedJSON = {
             ],
   plan: [//Array of years
           [//Year 1
+            [//Sem 1 Unit Objects
+              {id: 'COMP3001', name: 'DAA', credits: 25.0},
+              {id: 'ELECTIVE1', name: 'ELECTIVE1', credits: 25.0},
+              {id: 'ISAD4002', name: 'SM 400', credits: 25.0},
+              {id: 'CNCO2000', name: 'CC', credits: 25.0}
+            ],
+            [//Sem 2 Unit Objects
+              {id: 'CMPE3008', name: 'SET', credits: 25.0},
+              {id: 'ICTE3002', name: 'HCI 400', credits: 25.0},
+              {id: 'COMP2004', name: 'CG 200', credits: 25.0},
+              {id: 'COMP2003', name: 'OO SE', credits: 25.0}
+            ]
+          ],
+          [//Year 2
+            [//Sem 1 Unit Objects
+              {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5},
+              {id: 'ELECTIVE2', name: 'ELECTIVE2', credits: 12.5},
+              {id: 'ENEN2000', name: 'ESD 201', credits: 25.0},
+              {id: 'ISAD4000', name: 'SEP A', credits: 50.0}
+            ],
+            [//Sem 2 Unit Objects
+              {id: 'MGMT3000', name: 'E Man', credits: 25.0},
+              {id: 'COMP3003', name: 'SE Concepts', credits: 25.0},
+              {id: 'ISAD4001', name: 'SEP B', credits: 50.0}
+            ]
           ]
         ]
 }

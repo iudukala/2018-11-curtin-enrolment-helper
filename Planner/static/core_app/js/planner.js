@@ -9,6 +9,8 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   $scope.theTemplate = {};
   $scope.originalPlan = {};
   $scope.thePlan = {};
+  //$scope.selectedYearIndex;
+  //$scope.selectedSemIndex;
   $scope.semColors = [];
   $scope.tableWidth = document.getElementById('template-table').clientWidth;
 
@@ -139,6 +141,49 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
       }
     }
     return array;
+  }
+
+  $scope.plannerTrashClick = function(unit, yearIndex, semIndex) {
+    //If heading, remove all units.
+    if(unit.type === 'heading') {
+      removePlanSem(yearIndex, semIndex);
+    }
+    //If unit, remove only that unit.
+    else {
+      removePlanUnit(unit.id);
+    }
+  }
+
+  $scope.addUnitToPlan = function(unit) {
+    if(unit.status === 'PASS') {
+      //Show Error message
+    }
+    else {
+      removePlanUnit(unit.id);
+      $scope.thePlan[$scope.selectedYearIndex][$scope.selectedSemIndex].push(unit);
+    }
+  }
+
+  function removePlanSem(yearIndex, semIndex) {
+    $scope.thePlan[yearIndex][semIndex] = [];
+    $scope.semColors[yearIndex][semIndex] = '';
+  }
+
+  function removePlanUnit(unitID) {
+    angular.forEach($scope.thePlan, function(year, yearIndex) {
+        angular.forEach(year, function(sem, semIndex) {
+          angular.forEach(sem, function(planunit, unitIndex) {
+            if(unitID === planunit.id) {
+              $scope.thePlan[yearIndex][semIndex].splice(unitIndex, 1);
+            }
+          });
+        });
+    });
+  }
+
+  $scope.plannerBucketClick = function(yearIndex, semIndex) {
+    $scope.selectedYearIndex = yearIndex;
+    $scope.selectedSemIndex = semIndex;
   }
 
   $scope.getUnitAttemptsText = function(attempts, status) {
