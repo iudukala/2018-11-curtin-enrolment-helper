@@ -22,7 +22,9 @@ def course_progress(request):
             courses = form_course(student)
             all_course_temp = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
             templates= form_templates(all_course_temp, student_id)
-            all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID).order_by('Year', 'Semester')
+            # need student instance
+            all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
+
             plans = form_plans(all_plan)
             resp = return_resp(courses, templates, plans)
         except Student.DoesNotExist:
@@ -52,7 +54,7 @@ def return_resp(courses, templates, plans):
 # templates = [[[{id:<>, name:<>, credits:<>,status:<>, attempts:<>}]]] and plans same as templates
 ######################################################################################################
 def form_course(student):
-    course_id = student.CourseID
+    course_id = student.CourseID.CourseID
     student_course = Course.objects.get(CourseID=course_id)
     courses = {'name' : student_course.Name, 'id' : course_id}
 
@@ -60,12 +62,25 @@ def form_course(student):
 
 def form_templates(all_course_temp, student_id):
     templates = []
+
     for temp in all_course_temp:
-        course_options = CourseTemplateOptions.objects.all().filter(option=temp.Option).order_by('Year', 'Semester')
+        course_options = CourseTemplateOptions.objects.all().filter(Option=temp.Option).order_by('Year', 'Semester')
         for opt in course_options:
-            single_unit = Unit.object.get(pk=opt.UnitID)
-            student_unit = StudentUnit.object.get(StudentID=student_id, UnitID=opt.UnitID)
-            unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts}
+            semester = []
+            year = []
+            #if 'ELECTIVE' in opt.UnitID.unitCode
+                # Search for a unit in StudentUnits which has;
+                #   - The elective flag set to True
+                #   - The same amount of credits as opt.UnitID.Credits
+                #   - Isnt in the 'excluded array'
+                # Add that unit object to 'excluded'
+            single_unit = Unit.objects.get(UnitID=opt.UnitID.UnitID)    #  !!!!!!!!!! unit id changed , actually this is passed an object rathera than ID
+            student = Student.objects.get(pk=student_id)
+            try:
+                student_unit = StudentUnit.objects.get(StudentID=student, UnitID=opt.UnitID)
+                unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts}
+            except StudentUnit.DoesNotExist:
+                unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : 1, 'attempts' : 0}
             semester.append(unit)
             year.append(semester)
             templates.append(year)
@@ -74,10 +89,18 @@ def form_templates(all_course_temp, student_id):
 
 def form_plans(all_plans):
     plans = []
+
     for pl in all_plans:
-        single_unit = Unit.object.get(pk=pl.UnitID)
-        unit = {'id':single_unit.UnitID, 'credits':single_unit.Credits
-        # if unit can not be found out
+        semester = []
+        year = []
+        # credit version unit id
+        single_unit = Unit.objects.get(UnitID=pl.UnitID.UnitID) # !!!!!! issue
+        unit = {'id':single_unit.UnitID, 'credits':single_unit.Credits}
+
+        # make sure would not get wrong index
+        # last_item_index = len(semseter) - 1
+        # if
+
         semester.append(unit)
         year.append(semester)
         plans.append(year)
