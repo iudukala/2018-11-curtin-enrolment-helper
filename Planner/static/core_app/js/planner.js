@@ -3,7 +3,6 @@ var app = angular.module('plannerApp');
 /*      PLANNER CONTROLLER       */
 /*********************************/
 app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
-  //Keep track of student variable from other controller via the StudentService factory
   $scope.theStudent = {};
   $scope.theCourse = {};
   $scope.theTemplate = {};
@@ -12,16 +11,38 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
   $scope.selectedYearIndex = -1;
   $scope.selectedSemIndex = -1;
   $scope.semColors = [];
-  $scope.tableWidth = document.getElementById('template-table').clientWidth;
 
-  //Watcher for new selected student.
+  /*
+   * Name: $watch getStudent
+   *
+   * Purpose: Fires when the user selects a new student, on the
+   *          student select page, and updates the scope to reflect this.
+   *
+   * Params: newValue and Oldvalue, pretty self explanitory.
+   *
+   * Return: none.
+   *
+   * Notes: N/A.
+   */
   $scope.$watch(function () { return StudentService.getStudent(); }, function (newValue, oldValue) {
     if (newValue !== oldValue) {
       $scope.theStudent = newValue;
     }
   });
 
-  //Watched for newly retrieved template + plan
+
+  /*
+   * Name: $watch getChangedJSON
+   *
+   * Purpose: Watches for when a new student is selected and
+   *          a new JSON is requested.
+   *
+   * Params: newValue and oldValue, the new and old template + plan objects.
+   *
+   * Return: none.
+   *
+   * Notes: N/A.
+   */
   $scope.$watch(function () { return StudentService.getChangedJSON(); }, function (newValue, oldValue) {
     var theJSON = {};
     angular.copy(StudentService.getJSON(), theJSON);
@@ -45,7 +66,19 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     $scope.thePlan = thePlan;
   });
 
-  //Determines the style of the cell based on template/plan information
+
+  /*
+   * Name: templateCellStyle
+   *
+   * Purpose: Determines the stylings of each template cell in
+   *          the template table.
+   *
+   * Params: unit, the unit object associated with that template cell.
+   *
+   * Return: A JSON object, in line with the HTML styling specification.
+   *
+   * Notes: N/A
+   */
   $scope.templateCellStyle = function(unit) {
     var style = {}
     //Resize based on credits
@@ -69,6 +102,19 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return style;
   }
 
+
+  /*
+  * Name: findTemplateUnitColor
+  *
+  * Purpose: Finds the specific colour that a template cell should be.
+  *          This is determined by unit status and the student plan displayed.
+  *
+  * Params: unit, the unit object of the template cell being styled.
+  *
+  * Return: a JSON in line with the HTML styling specification.
+  *
+  * Notes: Called by templateCellStyle.
+  */
   function findTemplateUnitColor(unit) {
     colorStyle = {};
     angular.forEach($scope.thePlan, function(year, yearIndex) {
@@ -84,7 +130,18 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     return colorStyle;
   }
 
-  //Checks if row is header or unit and renders accordingly.
+/*
+ * Name: renderPlannerRow
+ *
+ * Purpose: Determines the text that is displayed in a particular
+ *          planner table row.
+ *
+ * Params: row, the row object associated with that row.
+ *
+ * Return: A string, the text to be displayed in the planner cell.
+ *
+ * Notes: N/A
+ */
   $scope.renderPlannerRow = function(row) {
     rendered = ''
     if(angular.equals(row.type, 'heading')) {

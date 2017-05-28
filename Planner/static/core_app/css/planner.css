@@ -337,7 +337,7 @@ span {
     -moz-box-sizing: border-box;
     box-sizing: border-box; }
   .student-selector .student-name-cell {
-    width: 60%;
+    width: 260px;
     border-right: 1px solid #979797; }
   .student-selector .student-id-cell {
     width: auto; }
@@ -421,7 +421,7 @@ span {
     min-height: 200px;
     width: 55%;
     background-color: #F5F5F5;
-    overflow: scroll;
+    overflow-y: scroll;
     border: 1px solid black; }
     .planner-widget-wrapper .template-table ul {
       margin: 0;
@@ -534,7 +534,6 @@ span {
         margin: 0;
         float: right; }
     .planner-widget-wrapper .planner-table ul {
-      overflow-y: scroll;
       display: block;
       list-style: none;
       margin: 0;
@@ -719,7 +718,4 @@ span {
   transform: translateY(100vh); }
 
 html {
-  overflow-Y: hidden; }
-
-::-webkit-scrollbar {
-  display: none; }
+  overflow-y: hidden; }
