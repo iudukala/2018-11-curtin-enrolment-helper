@@ -2,7 +2,7 @@ var app = angular.module('plannerApp');
 /*********************************/
 /*      PLANNER CONTROLLER       */
 /*********************************/
-app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
+app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService) {
   $scope.theStudent = {};
   $scope.theCourse = {};
   $scope.theTemplate = {};
@@ -457,6 +457,164 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
           });
         });
     });
+    $scope.selectedYearIndex = -1;
+    $scope.selectedSemIndex = -1;
+  }
+
+  /*
+   * Name: emailPlan
+   *
+   * Purpose: emails the stored plan in the database to
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: Set as the ng-click attribute of the email plan button
+   */
+  $scope.emailPlan = function() {
+    $rootScope.openSpinner('Emailing plan to student...');
+    $http.post('/emailPlan').then(emailSuccess, plannerErrorHandler);
+  }
+
+  /*
+   * Name: emailSuccess
+   *
+   * Purpose: called when the stored enrolment plan is emailed to a user successfully
+   *
+   * Params: response, the retrieved HTTP response from the server
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function emailSuccess(response) {
+    showSuccessMessage("Email sent successfully.");
+    $rootScope.closeSpinner();
+  }
+
+  /*
+   * Name: savePlan
+   *
+   * Purpose: attempts to save the current enrolment plan into the database
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: Set as the ng-click attribute of the save plan button
+   */
+  $scope.savePlan = function() {
+    $rootScope.openSpinner('Saving plan data...');
+    var savedPlan = angular.copy($scope.thePlan);
+    cleanupPlan(savedPlan);
+
+    //$http.post('/emailPlan', savedPlan)
+    //.then(saveSuccess, plannerErrorHandler);
+  }
+
+  /*
+   * Name: cleanupPlan
+   *
+   * Purpose: cleans the plan to send to the database by clearing all
+   *          semester headings out of each semester, and deletes
+   *          redundant years
+   *
+   * Params: dirtyPlan, a reference to the plan to be cleaned
+   *
+   * Return: none
+   *
+   * Notes: Called by savePlan
+   */
+  function cleanupPlan(dirtyPlan) {
+    //Remove semester headings
+    angular.forEach(dirtyPlan, function(year, yearIndex) {
+        angular.forEach(year, function(sem, semIndex) {
+          if(sem.length > 0 && sem[0].type === 'heading') {
+            sem.shift();
+          }
+        });
+    });
+
+    //Remove redundant years
+    var i = dirtyPlan.length - 1;
+    while(isEmptyYear(dirtyPlan[i])) {
+      dirtyPlan.splice(i, 1);
+      i--;
+    }
+  }
+
+  /*
+   * Name: isEmptyYear
+   *
+   * Purpose: checks a specific plan year's array to see if its empty
+   *
+   * Params: year, a single year's array
+   *
+   * Return: boolean, true if the year is empty
+   *
+   * Notes: Called by savePlan
+   */
+  function isEmptyYear(year) {
+    var empty = true;
+    angular.forEach(year, function(sem) {
+      if(sem.length !== 0) {
+        empty = false;
+      }
+    });
+    return empty;
+  }
+
+  /*
+   * Name: saveSuccess
+   *
+   * Purpose: called when the stored enrolment plan is saved to the database successfully.
+   *
+   * Params: response, the retrieved HTTP response from the server
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function saveSuccess(response) {
+    showSuccessMessage("Plan saved successfully.");
+    $rootScope.closeSpinner();
+  }
+
+  /*
+   * Name: plannerErrorHandler
+   *
+   * Purpose: called when a HTTP error response is received from the server.
+   *
+   * Params: response, the retrieved HTTP response from the server
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function plannerErrorHandler(response) {
+      showErrorMessage('HTTP ERROR '+ response.status + ': ' + response.statusText);
+      $rootScope.closeSpinner();
+  };
+
+  /*
+   * Name: showSuccessMessage
+   *
+   * Purpose: Shows an success message on the planner's screen
+   *
+   * Params: inputMessage, the string to display
+   *
+   * Return: none
+   *
+   * Notes: N/A
+   */
+  function showSuccessMessage(inputMessage) {
+    $scope.successText = inputMessage
+    $scope.successMessage = true;
+    setTimeout(function() {
+      $scope.successMessage = false;
+      $scope.$apply();
+    }, 3000);
   }
 
   /*
@@ -476,6 +634,6 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     setTimeout(function() {
       $scope.errorMessage = false;
       $scope.$apply();
-    }, 4000);
+    }, 3000);
   }
 });

@@ -431,6 +431,16 @@ span {
     transition: opacity .2s;
     position: absolute;
     left: 10%; }
+  .planner-widget-wrapper .planner-success-text {
+    margin-top: 10px;
+    font-size: 1.4em;
+    color: #008000;
+    transition: opacity .2s;
+    position: absolute;
+    top: 85%;
+    left: 10%;
+    width: 55%;
+    text-align: center; }
   .planner-widget-wrapper .error-text-invisible {
     opacity: 0; }
   .planner-widget-wrapper .planner-func-button-wrapper {

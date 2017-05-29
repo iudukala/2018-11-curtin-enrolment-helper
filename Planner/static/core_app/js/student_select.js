@@ -100,9 +100,10 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    * Notes: N/A
    */
   function getStudentList() {
-    //Uncomment when merging
-    //$http.get('/url').then(studentListHandler, studentSelectErrorHandler);
     $rootScope.openSpinner('Loading student list...');
+    //Uncomment when merging
+    //$http.get('/getStudentList').then(studentListHandler, studentSelectErrorHandler);
+
     setTimeout(studentListHandler, 1000);
   };
   //Invoke this method while controller is loading
@@ -119,21 +120,12 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    *
    * Notes: N/A
    */
-  function studentListHandler(/*response*/) {
+  function studentListHandler(response) {
     //var json = response.data;
+    var json = testStudents;
 
     /*TEST DATA*/
-    $scope.students =  [{ 'id': '16171921', 'name': 'Campbell Pedersen'},
-                        { 'id': '16365481', 'name': 'Chung-Yen Lu'},
-                        { 'id': '16102183', 'name': 'Chen Bi'},
-                        { 'id': '17080170', 'name': 'Yoakim Persson'},
-                        { 'id': '17898755', 'name': 'Thien Quang Trinh'},
-                        { 'id': '17160182', 'name': 'Scott Ryan Day'},
-                        { 'id': '17420420', 'name': 'Ash Tulett'},
-                        { 'id': '16685281', 'name': 'Tim Cochrane'},
-                        { 'id': '16402918', 'name': 'Jordan Van-Elden'},
-                        { 'id': '17281204', 'name': 'Aidan Noël Jolly'},
-                        { 'id': '69420420', 'name': 'Sam "Trek" Barker'}];
+    $scope.students = json;
     $rootScope.closeSpinner();
     $rootScope.$apply();
   }
@@ -168,10 +160,11 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   $scope.gotoPlanner = function() {
     if(!$scope.studentIsEmpty()) {
-      //Uncomment when merging
-      //$http.get('/getStudentList').then(templateHandler, studentSelectErrorHandler);
-      $rootScope.openSpinner('Fetching student template...');
-      templateHandler(parsedJSON)
+      $rootScope.openSpinner('Fetching student data...');
+      var studentInput = { id: $scope.selectedStudent.id };
+      //$http.post('/getStudentTemplate', studentInput)
+      //.then(templateHandler, studentSelectErrorHandler);
+      templateHandler(parsedJSON);
     }
   };
 
@@ -187,8 +180,11 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    * Notes: N/A
    */
   function templateHandler(response) {
-    //var json = response.data;
-    StudentService.setJSON(parsedJSON);
+    //StudentService.setJSON(response.data);
+    //$rootScope.closeSpinner();
+    //$rootScope.selectingStudent = false;
+
+    StudentService.setJSON(response);
     setTimeout(function() {
       $rootScope.closeSpinner();
       $rootScope.selectingStudent = false;
@@ -265,6 +261,18 @@ app.run(function($rootScope) {
 
 
 /***********************************************************************************************************/
+var testStudents = [{ 'id': '16171921', 'name': 'Campbell Pedersen'},
+                    { 'id': '16365481', 'name': 'Chung-Yen Lu'},
+                    { 'id': '16102183', 'name': 'Chen Bi'},
+                    { 'id': '17080170', 'name': 'Yoakim Persson'},
+                    { 'id': '17898755', 'name': 'Thien Quang Trinh'},
+                    { 'id': '17160182', 'name': 'Scott Ryan Day'},
+                    { 'id': '17420420', 'name': 'Ash Tulett'},
+                    { 'id': '16685281', 'name': 'Tim Cochrane'},
+                    { 'id': '16402918', 'name': 'Jordan Van-Elden'},
+                    { 'id': '17281204', 'name': 'Aidan Noël Jolly'},
+                    { 'id': '17295891', 'name': 'Sam Barker'}];
+
 var parsedJSON = {
   course: { name: 'Software Engineering (BEng)', id: '313605' },
   template: [//Array of years
@@ -274,7 +282,7 @@ var parsedJSON = {
                   {id: 'MCEN1000', name: 'E. Mech 100', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'INDE1000', name: 'EF: P&C 100', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'COMP1004', name: 'E. Prog 100', credits: 12.5, status: 'PASS', attempts: 1},
-                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 12.5, status: 'PASS', attempts: 1},
+                  {id: 'ELECTIVE1', name: 'ELECTIVE', credits: 12.5, status: 'PASS', attempts: 1},
                 ],
                 [//Sem 2 Unit Objects
                   {id: 'MATH1003', name: 'E. Maths 140', credits: 25.0, status: 'PASS', attempts: 1},
@@ -289,7 +297,7 @@ var parsedJSON = {
                   {id: 'COMP1001', name: 'OOPD 100', credits: 25.0, status: 'PASS', attempts: 1},
                   {id: 'STAT1002', name: 'SDA 101', credits: 12.5, status: 'PASS', attempts: 1},
                   {id: 'PRJM2000', name: 'PSP', credits: 12.5, status: 'PASS', attempts: 1},
-                  {id: 'ELECTIVE', name: 'ELECTIVE', credits: 25.0, status: 'PASS', attempts: 1}
+                  {id: 'ELECTIVE2', name: 'ELECTIVE', credits: 25.0, status: 'PASS', attempts: 1}
                 ],
                 [//Sem 2 Unit Objects
                   {id: 'COMP1002', name: 'DSA', credits: 25.0, status: 'PASS', attempts: 1},
@@ -301,7 +309,7 @@ var parsedJSON = {
               [//Year 3
                 [//Sem 1 Unit Objects
                   {id: 'COMP3001', name: 'DAA', credits: 25.0, status: 'PLN', attempts: 0},
-                  {id: 'ELECTIVE1', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE3', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'ISAD4002', name: 'SM 400', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'CNCO2000', name: 'CC', credits: 25.0, status: 'PLN', attempts: 0}
                 ],
@@ -315,7 +323,7 @@ var parsedJSON = {
               [//Year 4
                 [//Sem 1 Unit Objects
                   {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5, status: 'PLN', attempts: 0},
-                  {id: 'ELECTIVE2', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0},
+                  {id: 'ELECTIVE4', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0},
                   {id: 'ENEN2000', name: 'ESD 201', credits: 25.0, status: 'PLN', attempts: 0},
                   {id: 'ISAD4000', name: 'SEP A', credits: 50.0, status: 'PLN', attempts: 0},
                 ],
@@ -330,7 +338,7 @@ var parsedJSON = {
           [//Year 1
             [//Sem 1 Unit Objects
               {id: 'COMP3001', name: 'DAA', credits: 25.0},
-              {id: 'ELECTIVE1', name: 'ELECTIVE1', credits: 25.0},
+              {id: 'ELECTIVE3', name: 'ELECTIVE1', credits: 25.0},
               {id: 'ISAD4002', name: 'SM 400', credits: 25.0},
               {id: 'CNCO2000', name: 'CC', credits: 25.0}
             ],
@@ -344,7 +352,7 @@ var parsedJSON = {
           [//Year 2
             [//Sem 1 Unit Objects
               {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5},
-              {id: 'ELECTIVE2', name: 'ELECTIVE2', credits: 12.5},
+              {id: 'ELECTIVE4', name: 'ELECTIVE2', credits: 12.5},
               {id: 'ENEN2000', name: 'ESD 201', credits: 25.0},
               {id: 'ISAD4000', name: 'SEP A', credits: 50.0}
             ],

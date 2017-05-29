@@ -75,6 +75,8 @@
       </span>
       <span class="planner-error-text"
             ng-class="{ 'error-text-invisible': errorMessage === false }">{[{ errorText }]}</span>
+      <span class="planner-success-text"
+            ng-class="{ 'error-text-invisible': successMessage === false }">{[{ successText }]}</span>
       <!--Template Table-->
       <div class="template-table" id="template-table">
         <ul class="template-year-list"> <!--List of years-->
@@ -143,8 +145,8 @@
       <!--Functionality Buttons-->
       <div class="planner-func-button-wrapper">
         <input type="button" class="button" value="RESET PLAN" ng-click="resetPlan()">
-        <input type="button" class="button" value="SAVE PLAN">
-        <input type="button" class="button" value="EMAIL PLAN">
+        <input type="button" class="button" value="SAVE PLAN" ng-click="savePlan()">
+        <input type="button" class="button" value="EMAIL PLAN" ng-click="emailPlan()">
       </div>
     </div>
 
