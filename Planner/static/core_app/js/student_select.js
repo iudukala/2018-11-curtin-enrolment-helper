@@ -106,8 +106,6 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
 
     setTimeout(studentListHandler, 1000);
   };
-  //Invoke this method while controller is loading
-  getStudentList();
 
   /*
    * Name: studentListHandler
@@ -221,6 +219,9 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
   $scope.studentIsEmpty = function() {
     return angular.equals($scope.selectedStudent, {})
   };
+
+  //Invoke this method when the controller is fully loaded
+  getStudentList();
 });
 
 //Method runs when angular app runs
