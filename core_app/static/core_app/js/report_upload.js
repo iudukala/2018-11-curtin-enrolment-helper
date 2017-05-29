@@ -175,18 +175,20 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
    *
    * Notes: N/A
    */
-   $scope.uploadFiles = function() {
-     if($scope.filelist.length > 0) {
-       $scope.uploading = true;
-       for(var i = 0; i < $scope.filelist.length; i++) {
-         $scope.fileState[i] = "uploading";
-         setupAjaxRequest(i)
-       }
-     }
-     else {
-       showErrorMessage("Please input files before uploading.")
-     }
-   }
+  $scope.uploadFiles = function() {
+    if($scope.filelist.length > 0 && !$scope.uploading) {
+      $scope.uploading = true;
+      for(var i = 0; i < $scope.filelist.length; i++) {
+        $scope.fileState[i] = "uploading";
+        setupAjaxRequest(i);
+      }
+    }
+    else {
+      if(!$scope.uploading) {
+        showErrorMessage("Please input files before uploading.");
+      }
+    }
+  }
 
   /*
    * Name: setupAjaxRequest
@@ -209,18 +211,20 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
 
     //Setup callback for request
     xhr.onload = function() {
-      //Switch on status codes
-      if(xhr.status === '200') {
-        $scope.fileState[fileIndex] = 'success';
-      }
-      else {
-        $scope.fileState[fileIndex] = 'failure';
-      }
+      setTimeout( function() {
+        //Switch on status codes
+        if(xhr.status === '200') {
+          $scope.fileState[fileIndex] = 'success';
+        }
+        else {
+          $scope.fileState[fileIndex] = 'failure';
+        }
 
-      if($scope.fileState.indexOf('uploading') < 0) {
-        $scope.uploading = false;
-      }
-      $scope.$apply();
+        if($scope.fileState.indexOf('uploading') < 0) {
+          $scope.uploading = false;
+        }
+        $scope.$apply();
+      }, 3000)
     };
 
     xhr.open('POST', '/pdfFileUpload');
