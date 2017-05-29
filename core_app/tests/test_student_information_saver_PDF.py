@@ -8,7 +8,7 @@ import unittest
 
 
 # @unittest.skip("Skipping")
-class EnrolmentPlanCreationYoakim(test.TestCase):
+class TestEnrolmentPlanCreation(test.TestCase):
     """
     YOAKIM'S PDF.
     """
@@ -19,6 +19,15 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
         :return: 
         """
         database_objects = []
+        cls.information_savers = []
+        cls.filenames = [
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
+        ]
 
         """
         Yoakim's PDF.
@@ -27,44 +36,22 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
         # All courses for the PDF which were used.
         cls.bachelor_of_engineering = Course.objects.create(CourseID='307808', Version='2', Name='Course1', TotalCredits=600)
         cls.bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='313312', Version='1', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='311148', Version='5', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600)
+        database_objects.append(Course(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600))
+        database_objects.append(Course(CourseID='313312', Version='1', Name='Course1', TotalCredits=600))
+        database_objects.append(Course(CourseID='311148', Version='5', Name='Course1', TotalCredits=600))
+        database_objects.append(Course(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600))
+        database_objects.append(Course(CourseID='313605', Version='1', Name='Software Engineering Major (BEng)',
+                                       TotalCredits=600))
+        # Course.objects.create(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600)
+        # Course.objects.create(CourseID='313312', Version='1', Name='Course1', TotalCredits=600)
+        # Course.objects.create(CourseID='311148', Version='5', Name='Course1', TotalCredits=600)
+        # Course.objects.create(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600)
+        # Course.objects.create(CourseID='313605', Version='1', Name='Software Engineering Major (BEng)', TotalCredits=600)
 
         database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
         database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
         database_objects.append(Course(CourseID='313799',     Version='2', Name='Course3', TotalCredits=600))
         database_objects.append(Course(CourseID='STRU-SWENG', Version='1', Name='Course4', TotalCredits=600))
-
-        # # Equivalence Table - Keeps track of which unit is equivalent to which unit.
-        # class Equivalence(models.Model):
-        #     class Meta:
-        #         unique_together = (('EquivID', 'UnitID'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='Unit', on_delete=models.CASCADE)
-        #     EquivID = models.ForeignKey(Unit, related_name='EquivalentUnit', on_delete=models.CASCADE)
-        #
-        #
-        # # Prerequisite Table - This table can be a representation of an AND's table. This table stores units to an option,
-        # #                      which when getting a particular unit it will give all records of that unit which gives a set of
-        # #                      options.
-        # class Prerequisite(models.Model):
-        #     class Meta:
-        #         unique_together = (('Option', 'UnitID'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='ThisUnit', on_delete=models.CASCADE)
-        #     Option = models.IntegerField(primary_key=True)
-        #
-        #
-        # # Options Table - This table can be a representation of an OR's table. This table stores units to an option, which when
-        # #                 getting the option record will give all the units in the option.
-        # class Options(models.Model):
-        #     class Meta:
-        #         unique_together = (('UnitID', 'Option'),)
-        #
-        #     UnitID = models.ForeignKey(Unit, related_name='OptUnit', on_delete=models.CASCADE)
-        #     Option = models.ForeignKey(Prerequisite, related_name='Opt', on_delete=models.CASCADE)
 
         # Prerequisite Testing
         # COMP1000 and COMP1003
@@ -208,17 +195,6 @@ class EnrolmentPlanCreationYoakim(test.TestCase):
             except IntegrityError:
                 # Object has already been created.
                 pass
-
-        cls.filenames = [
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf'
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
-        ]
-
-        cls.information_savers = []
 
         for filename in cls.filenames:
             with open(filename, 'rb') as fp:

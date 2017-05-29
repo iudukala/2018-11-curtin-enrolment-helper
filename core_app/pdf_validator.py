@@ -23,7 +23,8 @@ class PdfValidator:
         """
         try:
             self.json_parsed_file = parse_progress_report(self.in_file)
-            self.output_message += '------------- id: {} ------------------\n'.format(self.json_parsed_file['id'])
+            self.output_message += 'Student: {}, {}\n'.format(self.json_parsed_file['id'],
+                                                              self.json_parsed_file['name'])
             return True
 
         except IOError:
@@ -39,13 +40,13 @@ class PdfValidator:
     # The function that Eugene will call to check pdf validity
     def pdf_is_valid(self):
         """
-        @Params: None
-        @Return: Boolean: is_parsed_pdf_valid, String: output_message
+        Function that runs all the validators on the parsed PDF file.
+        :return:
         """
         # Do not run other checks if file reading fails.
         if self.read_file():
             self.check_attributes()
-            # self.check_courses()
+            self.check_courses()
             self.check_date()
 
         return self.is_parsed_pdf_valid, self.output_message
@@ -68,16 +69,24 @@ class PdfValidator:
                 self.output_message += "All required attribute keys are not in the parsed information\n"
                 self.is_parsed_pdf_valid = False
 
-    # def check_courses(self):
-    #     # # Testing whether the course exists.
-    #     for courseID, courseVersion in self.json_parsed_file['course'].items():
-    #         if not Course.objects.filter(CourseID=courseID, Version=courseVersion).exists():
-    #             self.is_parsed_pdf_valid = False
-    #             new_message = 'Courses: ' + str(courseID) + ', Version: ' + str(courseVersion) + \
-    #                           ' Does not exist in the database.\n'
-    #             self.output_message += new_message
+    def check_courses(self):
+        """
+        Check that the major course for the student exists within the database.
+        :return:
+        """
+        course_id = list(self.json_parsed_file['course'].items())[0][0]
+        version = list(self.json_parsed_file['course'].items())[0][1]
+        if not Course.objects.filter(CourseID=course_id, Version=version).exists():
+            self.is_parsed_pdf_valid = False
+            new_message = 'Courses: ' + str(course_id) + ', Version: ' + str(version) + \
+                          ' Does not exist in the database.\n'
+            self.output_message += new_message
 
     def check_date(self):
+        """
+        Checks that the date in the parsed report is valid. (in the past).
+        :return:
+        """
         parse_date = datetime.datetime.strptime(self.json_parsed_file['date'], "%d %b %Y")
         current_day = datetime.datetime.now()
 

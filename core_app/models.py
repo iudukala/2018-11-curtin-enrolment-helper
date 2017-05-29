@@ -10,7 +10,7 @@ class Course(models.Model):
     CourseID = models.CharField(max_length=10)
     Name = models.CharField(max_length=100)
     Version = models.CharField(max_length=10)
-    TotalCredits = models.IntegerField(validators=[600])
+    TotalCredits = models.IntegerField(validators=[600, 800, 1000])
 
 
 # Unit Table - Stores all the units that the department provides.
@@ -75,9 +75,7 @@ class EncryptedBooleanField(EncryptedField, models.BooleanField):
 class Student(models.Model):
     StudentID = models.IntegerField(primary_key=True)
     Name = EncryptedCharField(max_length=100)
-
     CreditsCompleted = models.DecimalField(decimal_places=1, max_digits=4)
-
     # 1 - good standing, 0 - conditional and -1 - terminated
     AcademicStatus = models.IntegerField(validators=[-1, 0, 1])
     CourseID = models.ForeignKey(Course)
@@ -91,22 +89,12 @@ class StudentUnit(models.Model):
 
     StudentID = models.ForeignKey(Student, on_delete=models.PROTECT)
     UnitID = models.ForeignKey(Unit, on_delete=models.PROTECT)
-
     Attempts = EncryptedIntegerField()
-
     # 1 = Not Done, 2 = passed, 3 = failed
     Status = EncryptedIntegerField(default=1, validators=[1, 2, 3])
-
-    # PrerequisiteAchieved = models.BooleanField(default=False)
     PrerequisiteAchieved = EncryptedBooleanField(default=False)
-
-    # Year = models.IntegerField(default=-1)
-        # Year = EncryptedIntegerField(default=-1)
-    Year = EncryptedIntegerField(default=-1, validators=[-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-
-    # Semester = models.IntegerField(default=-1, validators=[1, 2])
-        # Semester = EncryptedIntegerField(default=-1, validators=[1, 2])
-    Semester = EncryptedIntegerField(default=-1, validators=[-1, 1, 2])
+    Year = models.IntegerField(default=-1, validators=[-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    Semester = models.IntegerField(default=-1, validators=[1, 2])
 
 
 # CourseTemplate Table - Table can be a representation of an AND's table. Each course has a couple of option records,

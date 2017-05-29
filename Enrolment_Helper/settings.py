@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
-# import logging
-# from Enrolment_Helper import core_app
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -98,13 +96,15 @@ if 'test' in sys.argv:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-            # 'NAME': os.path.join('db.sqlite3'),
         }
     }
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
+            # 'OPTIONS': {
+            #     'read_default_file': os.path.join(BASE_DIR, '../my.cnf'),
+            # },
             'NAME': 'Enrolment_Helper',
             'USER': 'enrolment_helperuser',
             'PASSWORD': 'user',
@@ -112,6 +112,10 @@ else:
             'PORT': '',
         },
     }
+
+# f = open(os.path.join(BASE_DIR, '../my.cnf'))
+# output = f.read()
+# print(output)
 
 # DATABASES = {
 #     'default': {
@@ -121,6 +125,14 @@ else:
 #         'PASSWORD': 'user',
 #         'HOST': 'localhost',
 #         'PORT': '',
+#
+#         'OPTIONS': {
+#             'ssl': {
+#                 'ca': '../../ca.pem',
+#                 'cert': '../../client-cert.pem',
+#                 'key': '../../client-key.pem'
+#             }
+#         }
 #     }
 # }
 
@@ -169,7 +181,6 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            # 'format': '%(asctime)s - %(levelname)s - %(funcName) - %(message)s'
             'format': '%(asctime)s - %(levelname)s - %(message)s'
             },
         },

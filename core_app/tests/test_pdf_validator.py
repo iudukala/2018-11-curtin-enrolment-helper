@@ -14,9 +14,9 @@ import unittest
 #   in the database as cannot create BOTH versions of the unit.
 
 
-@unittest.skip("Skipping")
+# @unittest.skip("Skipping")
 # Renamed TestCase to reference test.TestCase to ensure not using unittest by accident.
-class PdfValidation(test.TestCase):
+class TestPdfValidation(test.TestCase):
 
     # Setting up a database with correct values for student 17080170 .
     @classmethod
@@ -26,13 +26,47 @@ class PdfValidation(test.TestCase):
         :return: 
         """
         database_objects = []
+        cls.validators = []
+        cls.filenames = [
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf'
+            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
+            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
+            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
+            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
+        ]
 
         """
         Yoakim's PDF.
         """
         # COURSES - Required as the Course is referenced when creating a Student object.
+        # bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
+        # bachelor_of_engineering = Course.objects.create(CourseID='313683', Version='5', Name='Course1',
+        #                                                 TotalCredits=600)
+
+        bachelor_of_engineering = Course.objects.create(CourseID='307808', Version='2', Name='Course1', TotalCredits=600)
         bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-        bachelor_of_engineering = Course.objects.create(CourseID='313683', Version='5', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='313312', Version='1', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='311148', Version='5', Name='Course1', TotalCredits=600)
+        Course.objects.create(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600)
+
+        # Campbell
+        Course.objects.create(CourseID='313605', Version='1', Name='Software Engineering Major (BEng)',
+                              TotalCredits=600)
+
+        # Derrick
+        Course.objects.create(CourseID='313313', Version='1', Name='Computer Science Major (Extended) (BScComp)',
+                              TotalCredits=600)
+
+        # Chien-Fei Lin
+        Course.objects.create(CourseID='313313', Version='2', Name='Computer Science Major (Extended) (BScComp)',
+                              TotalCredits=600)
+
+        database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
+        database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
+        database_objects.append(Course(CourseID='313799',     Version='2', Name='Course3', TotalCredits=600))
+        database_objects.append(Course(CourseID='STRU-SWENG', Version='1', Name='Course4', TotalCredits=600))
 
         database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
         database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
@@ -170,17 +204,6 @@ class PdfValidation(test.TestCase):
                 # Object has already been created.
                 pass
 
-        cls.filenames = [
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf'
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
-        ]
-
-        cls.validators = []
-
         for filename in cls.filenames:
             with open(filename, 'rb') as fp:
                 file = File(fp)
@@ -203,49 +226,6 @@ class PdfValidation(test.TestCase):
             validator.is_parsed_pdf_valid = True
             validator.check_courses()
             self.assertIs(True, validator.is_parsed_pdf_valid)
-
-    # # PdfValidator.units testing.
-    # def test_units(self):
-    #     for validator in self.validators:
-    #         validator.is_parsed_pdf_valid = True
-    #         validator.check_units()
-    #         self.assertIs(True, validator.is_parsed_pdf_valid), print(validator.output_message)
-
-    # @unittest.skip("Database not being modified correctly.")
-    # def test_changing_unit_name(self):
-    #     """
-    #     Unit should now be processed as a elective, but not return False.
-    #     """
-    #     for validator in self.validators:
-    #         print(self.unit1.UnitID)
-    #         self.unit1.UnitID = "Modified"
-    #         print(self.unit1.UnitID)
-    #         self.unit1.save()
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.refresh_from_db()
-    #         print(self.unit1.UnitID)
-    #         self.assertIs(True, self.validator.is_parsed_pdf_valid,
-    #                       "Should be True as an unidentified UnitID is determined to be a elective, "
-    #                       "not grounds for failure.")
-    #
-    # @unittest.skip("Database not being modified correctly.")
-    # def test_database_missing_unit(self):
-    #     # Deleting a Unit which has been done.
-    #
-    #     for validator in self.validators:
-    #         print(self.unit1.UnitID)
-    #         self.unit1.Credits = 50
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.save()
-    #         print(self.unit1.UnitID)
-    #         # self.unit1.refresh_from_db()
-    #         print(self.unit1.UnitID)
-    #
-    #         self.validator.is_parsed_pdf_valid = True
-    #         self.validator.check_units()
-    #         # self.assertTrue(self.validator.get_is_parsed_pdf_valid)
-    #         self.assertIs(True, self.validator.is_parsed_pdf_valid,
-    #                       "Should be False due to mismatch in unit credit")
 
     # PdfValidator.date testing.
     def test_date(self):
