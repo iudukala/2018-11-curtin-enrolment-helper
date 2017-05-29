@@ -211,20 +211,18 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
 
     //Setup callback for request
     xhr.onload = function() {
-      setTimeout( function() {
-        //Switch on status codes
-        if(xhr.status === '200') {
-          $scope.fileState[fileIndex] = 'success';
-        }
-        else {
-          $scope.fileState[fileIndex] = 'failure';
-        }
+      //Switch on status codes
+      if(xhr.status === '200') {
+        $scope.fileState[fileIndex] = 'success';
+      }
+      else {
+        $scope.fileState[fileIndex] = 'failure';
+      }
 
-        if($scope.fileState.indexOf('uploading') < 0) {
-          $scope.uploading = false;
-        }
-        $scope.$apply();
-      }, 3000)
+      if($scope.fileState.indexOf('uploading') < 0) {
+        $scope.uploading = false;
+      }
+      $scope.$apply();
     };
 
     xhr.open('POST', '/pdfFileUpload');
