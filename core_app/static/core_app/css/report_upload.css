@@ -187,20 +187,40 @@ body {
   width: 100vw; }
 
 body {
-  font-family: "Roboto Condensed", sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   font-weight: 400; }
 
 span {
-  font-weight: 400; }
+  font-weight: 400;
+  color: #FFFFFF; }
 
 .header-wrapper {
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
   justify-content: center; }
   .header-wrapper h1 {
     color: #FFFFFF;
     font-weight: 200;
     font-size: 4em; }
+
+.student-table-header {
+  font-size: 20px;
+  font-weight: 400;
+  color: #7CD1FC; }
+
+.student-name-table .student-table-row {
+  font-size: 20px;
+  font-weight: 200;
+  color: #ADADAD; }
+
+.spinner-message {
+  font-size: 2em; }
 
 .button, .button-bottom .button-logout {
   background-color: #FFFFFF;
@@ -210,22 +230,39 @@ span {
   font-size: 1em;
   padding: 7px 30px;
   margin: 5px 0;
+  outline: none;
   -webkit-border-radius: 1px;
   -moz-border-radius: 1px;
   -ms-border-radius: 1px;
   border-radius: 1px;
-  transition: background-color 0.2s, color 0.2s; }
+  transition: background-color .2s, color .2s; }
   .button:hover, .button-bottom .button-logout:hover {
     background-color: #E6E6E6;
     color: #3C91BC; }
 
+.button-disabled {
+  background-color: #DEDEDE;
+  color: #AAAAAA; }
+  .button-disabled:hover {
+    background-color: #DEDEDE;
+    color: #AAAAAA; }
+
 .button-bottom {
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: left;
+  -ms-flex-align: left;
   align-items: left;
   position: absolute;
   bottom: 0;
+  left: 0;
   padding-top: 10px; }
+  .button-bottom a {
+    text-decoration: none; }
   .button-bottom .button-logout {
     font-size: 2em;
     background-color: transparent;
@@ -234,8 +271,14 @@ span {
 
 .button-center {
   box-sizing: border-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center; }
 
 .reverse-button {
@@ -248,14 +291,22 @@ span {
 .upload-wrapper {
   width: 100%;
   height: 75%;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
   justify-content: center; }
   .upload-wrapper #error-text {
     height: 25px;
     color: #FF0000;
-    transition: opacity 0.2s; }
+    transition: opacity .2s; }
   .upload-wrapper .error-text-invisible {
     opacity: 0; }
   .upload-wrapper .error-text-visible {
@@ -266,12 +317,16 @@ span {
     height: 80%;
     width: 50%;
     padding: 5px;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
     align-items: flex-start;
     min-width: 500px;
     background-color: #F5F5F5;
     border: 2px solid #CAEDFF;
-    transition: width 0.5s; }
+    transition: width .5s; }
     .upload-wrapper .upload-outer .file-list {
       height: 100%;
       width: 0;
@@ -279,12 +334,18 @@ span {
       margin: 0;
       padding: 0;
       list-style: none;
-      transition: width 0.5s;
+      transition: width .5s;
       overflow-x: hidden;
       overflow-y: scroll; }
       .upload-wrapper .upload-outer .file-list li {
+        display: -webkit-flex;
+        display: -ms-flexbox;
         display: flex;
+        -webkit-align-items: center;
+        -ms-flex-align: center;
         align-items: center;
+        -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
         justify-content: space-between;
         overflow: hidden;
         padding: 10px;
@@ -326,7 +387,23 @@ span {
           background-color: #F5F5F5;
           border: none; }
         .upload-wrapper .upload-outer .file-list li .loading-icon {
+          -webkit-animation: spinnerAnim 1.2s linear infinite;
           animation: spinnerAnim 1.2s linear infinite; }
+
+@-webkit-keyframes spinnerAnim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(-360deg);
+    -moz-transform: rotate(-360deg);
+    -ms-transform: rotate(-360deg);
+    -o-transform: rotate(-360deg);
+    transform: rotate(-360deg); } }
+
 @keyframes spinnerAnim {
   0% {
     -webkit-transform: rotate(0deg);
@@ -346,7 +423,7 @@ span {
         box-sizing: border-box;
         background-color: rgba(50, 205, 50, 0.5);
         border-bottom-color: limegreen; }
-        .upload-wrapper .upload-outer .file-list .file-item-success span, .upload-wrapper .upload-outer .file-list .file-item-success p {
+        .upload-wrapper .upload-outer .file-list .file-item-success .file-item-info span, .upload-wrapper .upload-outer .file-list .file-item-success .file-item-info p {
           color: #FFFFFF; }
       .upload-wrapper .upload-outer .file-list .file-item-failure {
         -webkit-box-sizing: border-box;
@@ -354,7 +431,7 @@ span {
         box-sizing: border-box;
         background-color: rgba(255, 0, 0, 0.5);
         border-bottom-color: red; }
-        .upload-wrapper .upload-outer .file-list .file-item-failure span, .upload-wrapper .upload-outer .file-list .file-item-failure p {
+        .upload-wrapper .upload-outer .file-list .file-item-failure .file-item-info span, .upload-wrapper .upload-outer .file-list .file-item-failure .file-item-info p {
           color: #FFFFFF; }
     .upload-wrapper .upload-outer .file-list-filled {
       width: 50%;
@@ -370,13 +447,21 @@ span {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
       display: inline-flex;
+      -webkit-flex-direction: column;
+      -ms-flex-direction: column;
       flex-direction: column;
+      -webkit-align-items: center;
+      -ms-flex-align: center;
       align-items: center;
+      -webkit-justify-content: center;
+      -ms-flex-pack: center;
       justify-content: center;
       border: 6px dashed #CAEDFF;
       background-color: #FFFFFF;
-      transition: width 0.5s, opacity 0.3s, color 0.3s, background-color 0.3s;
+      transition: width .5s, opacity .3s, color .3s, background-color .3s;
       overflow: hidden; }
       .upload-wrapper .upload-outer .upload-inner h2, .upload-wrapper .upload-outer .upload-inner h4 {
         margin: 0;
@@ -403,8 +488,12 @@ span {
   height: 100vh;
   width: 100vw;
   padding-bottom: 5%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box; }
   .content-wrapper .header-wrapper {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 25%;
     overflow: hidden; }
