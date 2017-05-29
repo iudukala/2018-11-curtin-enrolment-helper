@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <title>eTracker - Planner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--{% block link %}
-    {% load staticfiles %}-->
-    <link rel="stylesheet" href="static/core_app/css/planner.css"/>
-    <script src="static/core_app/js/angular.min.js"></script>
-    <script src="static/core_app/js/colors.js"></script>
-    <script src="static/core_app/js/student_select.js"></script>
-    <script src="static/core_app/js/planner.js"></script>
-    <!--{% endblock %}-->
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'core_app/css/planner.css' %}"/>
+    <script src="{% static '/core_app/js/angular.min.js' %}"></script>
+    <script src="{% static 'core_app/js/colors.js' %}"></script>
+    <script src="{% static 'core_app/js/student_select.js' %}"></script>
+    <script src="{% static 'core_app/js/planner.js' %}"></script>
 </head>
 
 <body ng-app="plannerApp" ng-class="{'invisible': loaded}">
@@ -128,10 +126,10 @@
                     <span>{[{ renderPlannerRow(unit) }]}</span>
                     <div class="planner-row-icon-field">
                       <input class="planner-trash-icon"
-                             type="image" src="static/core_app/img/trash-icon-black.svg"
+                             type="image" src="{% static 'core_app/img/trash-icon-black.svg' %}"
                              ng-click="plannerTrashClick(unit, $parent.$parent.$index, $parent.$index)">
                        <input class="planner-bucket-icon"
-                              type="image" src="static/core_app/img/bucket-icon.svg"
+                              type="image" src="{% static '/core_app/img/bucket-icon.svg' %}"
                               ng-click="plannerBucketClick($parent.$parent.$index, $parent.$index)">
                       <div class="icon-overlay"></div>
                     </div>

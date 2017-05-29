@@ -35,3 +35,6 @@ def report_upload(request):
 
 def home(request):
     return render(request, 'core_app/home.html')
+
+def planner(request):
+    return render(request, 'core_app/planner.html');
