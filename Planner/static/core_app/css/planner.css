@@ -529,7 +529,7 @@ span {
             width: 22%;
             transition: opacity 0.1s ease; }
             .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell:hover {
-              opacity: 0.7; }
+              opacity: 0.6; }
             .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-id {
               font-size: 1em; }
             .planner-widget-wrapper .template-table .template-year-list .template-year-wrapper .template-sem-list .template-unit-list .template-unit-cell .unit-subtext {

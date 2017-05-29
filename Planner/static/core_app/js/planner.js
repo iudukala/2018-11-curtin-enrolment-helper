@@ -45,7 +45,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
    */
   $scope.$watch(function () { return StudentService.getChangedJSON(); }, function (newValue, oldValue) {
     var theJSON = {};
-    theJSON = StudentService.getJSON();
+    theJSON = angular.copy(StudentService.getJSON());
     //Handle new template
     $scope.theTemplate = theJSON.template;
     $scope.theCourse = theJSON.course;
@@ -63,7 +63,7 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
       });
     });
     $scope.originalPlan = angular.copy(thePlan);
-    $scope.thePlan = thePlan;
+    $scope.thePlan = angular.copy(thePlan);
   });
 
 
@@ -433,6 +433,17 @@ app.controller('plannerCtrl', function($scope, $rootScope, StudentService) {
     $rootScope.selectingStudent = true;
   }
 
+  /*
+   * Name: resetPlan
+   *
+   * Purpose: Resets the displayed plan to the original plan saved in the database.
+   *
+   * Params: none
+   *
+   * Return: none
+   *
+   * Notes: Set as the ng-click attribute of the reset plan button
+   */
   $scope.resetPlan = function() {
     //Reset plan object
     $scope.thePlan = angular.copy($scope.originalPlan);
