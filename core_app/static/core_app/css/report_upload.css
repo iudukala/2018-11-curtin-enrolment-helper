@@ -294,15 +294,17 @@ span {
           border-top: none; }
         .upload-wrapper .upload-outer .file-list li:last-of-type {
           border-bottom: none; }
-        .upload-wrapper .upload-outer .file-list li span {
-          font-size: 18px;
-          color: #ADADAD;
-          height: auto; }
-        .upload-wrapper .upload-outer .file-list li p {
-          color: #ADADAD;
-          margin: 0;
-          font-size: 12px;
-          font-weight: 200px; }
+        .upload-wrapper .upload-outer .file-list li .file-item-info {
+          width: 90%; }
+          .upload-wrapper .upload-outer .file-list li .file-item-info span {
+            font-size: 18px;
+            color: #ADADAD;
+            height: auto; }
+          .upload-wrapper .upload-outer .file-list li .file-item-info p {
+            color: #ADADAD;
+            margin: 0;
+            font-size: 12px;
+            font-weight: 200px; }
         .upload-wrapper .upload-outer .file-list li .visible-element {
           display: inline; }
         .upload-wrapper .upload-outer .file-list li .invisible-element {
@@ -406,5 +408,3 @@ span {
     box-sizing: border-box;
     height: 25%;
     overflow: hidden; }
-
-/*# sourceMappingURL=report_upload.css.map */

@@ -1,0 +1,24 @@
+.content-wrapper
+  +transition(transform 0.75s ease)
+  position: relative
+  height: 100vh
+  min-width: 1000px
+
+.invisible
+  visibility: hidden
+
+.student-select-wrapper
+  z-index: 2
+
+.hidden-student-select
+  +transform(translateY(-100vh))
+
+.student-planner-wrapper
+  +transform(translateY(-100vh))
+  padding-bottom: 7%
+
+.hidden-planner
+  +transform(translateY(100vh))
+
+html
+  overflow-y: hidden

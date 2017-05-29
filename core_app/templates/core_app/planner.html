@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>eTracker - Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'core_app/css/planner.css' %}"/>
+    <script src="{% static '/core_app/js/angular.min.js' %}"></script>
+    <script src="{% static 'core_app/js/colors.js' %}"></script>
+    <script src="{% static 'core_app/js/student_select.js' %}"></script>
+    <script src="{% static 'core_app/js/planner.js' %}"></script>
+</head>
+
+<body ng-app="plannerApp" ng-class="{'invisible': loaded}">
+  <div class="spinner-overlay" ng-class="{'spinner-overlay-disappeared' : !loading}">
+    <div class="spinner-prompt">
+      <div class="spinner-image"></div>
+      <span class="spinner-message">{[{ loadingMessage }]}</span>
+    </div>
+  </div>
+  <div class="content-wrapper student-select-wrapper"
+       ng-controller="studentSelectCtrl"
+       ng-class="{ 'hidden-student-select': !selectingStudent }">
+    <!--Student Selector Title-->
+    <div class="header-wrapper">
+      <h1>STUDENT SELECT</h1>
+    </div>
+
+    <!--Student selector-->
+    <div class="student-selector">
+      <span id="selector-error-text" ng-class="{'selector-error-text-invisible': !errorMessage}"> {[{errorText}]} </span>
+      <input type="text" class="subtle-input" placeholder="Search..." ng-model="searchText">
+      <div class="student-table-header">
+        <div class="cell student-name-cell">Name</div>
+        <div class="cell student-id-cell">Student ID</div>
+      </div>
+      <ul class="student-name-table">
+        <li class="student-table-row"
+            ng-repeat="student in students | filter:searchText"
+            ng-class="{'row-selected': (selectedStudent.id === student.id)}"
+            ng-click="selectStudent(student.id, student.name)">
+          <div class="cell student-name-cell">{[{ student.name }]}</div>
+          <div class="cell student-id-cell">{[{ student.id }]}</div>
+        </li>
+      </ul>
+      <input type="button"
+             class="button"
+             value="EDIT PLAN"
+             id="edit-plan"
+             ng-class="{ 'button-disabled' : studentIsEmpty() || gettingStudentTemplate }"
+             ng-click="!studentIsEmpty() && gotoPlanner()">
+      <div class="button-bottom">
+        <a href="{% url 'core_app:home' %}" class="button-logout">&#60; HOME</a>
+      </div>
+    </div>
+  </div>
+  <div class="content-wrapper student-planner-wrapper"
+       ng-controller="plannerCtrl"
+       ng-class="{ 'hidden-planner': selectingStudent }">
+
+    <!--Planner Title-->
+    <div class="header-wrapper">
+      <h1>{[{ theStudent.name.toUpperCase() }]}</h1>
+    </div>
+
+    <div class="planner-widget-wrapper">
+      <span class="course-name-label">{[{ theCourse.name }]}</span>
+      <span class="selected-semester-label"
+            ng-class="{ 'invisible': (selectedYearIndex < 0 || selectedSemIndex < 0) }">
+            Selected: <span class="selected-semester-color" ng-style="styleSemColor()">
+      </span>
+      </span>
+      <span class="planner-error-text"
+            ng-class="{ 'error-text-invisible': errorMessage === false }">{[{ errorText }]}</span>
+      <span class="planner-success-text"
+            ng-class="{ 'error-text-invisible': successMessage === false }">{[{ successText }]}</span>
+      <!--Template Table-->
+      <div class="template-table" id="template-table">
+        <ul class="template-year-list"> <!--List of years-->
+          <li class="template-year-wrapper" ng-repeat="year in theTemplate" ng-init="parentIndex = $index">
+            <ul class="template-sem-list"> <!--List of semesters-->
+              <li ng-repeat="sem in year">
+                <ul class="template-unit-list"><!--List of blocks per semester-->
+                  <li class="template-header-cell">
+                    <div>Y{[{ $parent.$index + 1 }]} S{[{ $index + 1 }]}</div>
+                  </li>
+                  <li class="template-unit-cell" ng-style="styleTemplateCell(unit)"
+                      ng-repeat="unit in sem"
+                      ng-click="addUnitToPlan(unit)">
+                    <div>
+                      <span class="unit-id" class="unit-id">{[{ unit.name }]}</span>
+                      <span class="unit-subtext">({[{ unit.id }]})</span>
+                      <span class="unit-subtext">Cred: {[{ unit.credits | number : 1 }]} {[{ getUnitAttemptsText(unit.attempts, unit.status) }]}</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!--Planner Table-->
+      <div class="planner-table">
+        <div class="semester-heading-adder">
+          <div>
+            <label for=sem-header-year-input>Year:</label>
+            <input id="sem-header-year-input" maxlength="1" type="text" ng-model="semHeaderYearInput">
+          </div>
+            <div>
+            <label for=sem-header-year-input>Semester:</label>
+            <input id="sem-header-sem-input" maxlength="1" type="text" ng-model="semHeaderSemInput">
+          </div>
+          <input type="button" value="ADD" class="button reverse-button add-sem-header-button" ng-click="addSemHeader()">
+        </div>
+        <ul class="planner-list">
+          <li ng-repeat="year in thePlan">
+            <ul>
+              <li ng-repeat="sem in year">
+                <ul class="planner-unit-list">
+                  <li class="planner-row"
+                      ng-repeat="unit in sem"
+                      ng-style="stylePlannerRow(unit, $parent.$parent.$index, $parent.$index)"
+                      ng-class="{ 'planner-row-header': unit.type === 'heading', 'planner-row-unit': unit.type !== 'heading' }">
+                    <span>{[{ renderPlannerRow(unit) }]}</span>
+                    <div class="planner-row-icon-field">
+                      <input class="planner-trash-icon"
+                             type="image" src="{% static 'core_app/img/trash-icon-black.svg' %}"
+                             ng-click="plannerTrashClick(unit, $parent.$parent.$index, $parent.$index)">
+                       <input class="planner-bucket-icon"
+                              type="image" src="{% static '/core_app/img/bucket-icon.svg' %}"
+                              ng-click="plannerBucketClick($parent.$parent.$index, $parent.$index)">
+                      <div class="icon-overlay"></div>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!--Functionality Buttons-->
+      <div class="planner-func-button-wrapper">
+        <input type="button" class="button" value="RESET PLAN" ng-click="resetPlan()">
+        <input type="button" class="button" value="SAVE PLAN" ng-click="savePlan()">
+        <input type="button" class="button" value="EMAIL PLAN" ng-click="emailPlan()">
+      </div>
+    </div>
+
+    <div class="button-bottom">
+      <a href="#"
+         class="button-logout"
+         ng-click="backToStudents()">&#60; STUDENT SELECT</a>
+    </div>
+  </div>
+</body>
+</html>
