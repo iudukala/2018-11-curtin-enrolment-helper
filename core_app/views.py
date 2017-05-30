@@ -23,7 +23,6 @@ def course_progress(request):
             all_course_temp = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
             templates= form_templates(all_course_temp, student_id)
             all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
-
             plans = form_plans(all_plan)
             resp = return_resp(courses, templates, plans)
         except Student.DoesNotExist:
@@ -61,30 +60,55 @@ def form_course(student):
 
 def form_templates(all_course_temp, student_id):
     templates = []
+    year = []
+    semester_1 = []
+    semester_2 = []
+    this_semester = -1
+    this_year = -1
 
     for temp in all_course_temp:
         course_options = CourseTemplateOptions.objects.all().filter(Option=temp.Option).order_by('Year', 'Semester')
         for opt in course_options:
-            semester = []
-            year = []
-            #if 'ELECTIVE' in opt.UnitID.unitCode
-                # Search for a unit in StudentUnits which has;
-                #   - The elective flag set to True
-                #   - The same amount of credits as opt.UnitID.Credits
-                #   - Isnt in the 'excluded array'
-                # Add that unit object to 'excluded'
-            single_unit = Unit.objects.get(UnitID=opt.UnitID.UnitID)    #  !!!!!!!!!! unit id changed , actually this is passed an object rathera than ID
+            single_unit = Unit.objects.get(UnitID=opt.UnitID.UnitID)
             student = Student.objects.get(pk=student_id)
             try:
                 student_unit = StudentUnit.objects.get(StudentID=student, UnitID=opt.UnitID)
                 unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts}
             except StudentUnit.DoesNotExist:
                 unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : 1, 'attempts' : 0}
-            semester.append(unit)
-            year.append(semester)
-            templates.append(year)
+
+            if this_year is -1 and this_semester is -1:
+                this_year = opt.Year
+                this_semester = opt.Semester
+            if opt.Year is this_year and opt is not course_options[len(course_options)-1]:
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+            elif (opt.Year - this_year) is 1:
+                year.append(semester_1)
+                year.append(semester_2)
+                semester_1 = []
+                semester_2 = []
+                templates.append(year)
+                year = []
+                this_year = opt.Year
+                this_semester = opt.Semester
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+            elif opt is course_options[len(course_options)-1] and opt.Year is this_year:
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+                year.append(semester_1)
+                year.append(semester_2)
+                templates.append(year)
 
     return templates
+
 
 def form_plans(all_plans):
     plan = []
@@ -130,14 +154,6 @@ def form_plans(all_plans):
             year.append(semester_1)
             year.append(semester_2)
             plan.append(year)
-
-        elif (pl.Year - this_year) > 1 :
-            semester.append(None)
-            semester.append(None)
-            year.append(semester)
-            plans.append(None)
-            this_year += 1
-
 
     return plan
 ######################################################################################################
