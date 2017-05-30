@@ -85,11 +85,11 @@ DATABASES = {
     # Utilising the MySQL database
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Enrolment_Helper',
-        'USER': 'enrolment_helperuser',
-        'PASSWORD': 'user',
+        'NAME': 'test_enrolment_helper',
+        'USER': 'root',
+        'PASSWORD': '77497',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '3306',
     }
 }
 
