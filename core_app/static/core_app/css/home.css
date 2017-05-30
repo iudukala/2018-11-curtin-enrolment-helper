@@ -288,5 +288,5 @@ span {
 .button-center-add {
   width: 300px;
   padding-top: 10px; }
-
-/*# sourceMappingURL=home.css.map */
+  .button-center-add a {
+    text-decoration: none; }

@@ -134,4 +134,6 @@ def report_upload(request):
 
 def home(request):
     return render(request, 'core_app/home.html')
->>>>>>> ca2fe5c462dd590fdb4545313decb8fbd470dd11
+
+def planner(request):
+    return render(request, 'core_app/planner.html');

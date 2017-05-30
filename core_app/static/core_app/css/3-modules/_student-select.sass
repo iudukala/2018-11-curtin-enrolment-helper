@@ -1,0 +1,87 @@
+.student-selector
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: flex-start
+
+  #selector-error-text
+    height: 25px
+    color: #FF0000
+    transition: opacity .2s
+
+  .selector-error-text-invisible
+    opacity: 0
+
+  .cell
+    height: 100%
+    padding: 10px 5px
+    display: inline-block
+    +box-sizing(border-box)
+
+  .student-name-cell
+    width: 260px
+    border-right: 1px solid #979797
+
+  .student-id-cell
+    width: auto
+
+  .student-table-header
+    background-color: #F5F5F5
+    border: 1px solid #979797
+    border-bottom: 0
+    width: 40%
+    max-width: 450px
+    min-width: 300px
+
+  input
+    left: 0
+    margin: 0 0 10px 0
+
+  .student-name-table
+    list-style: none
+    border: 1px solid #979797
+    padding: 0
+    margin: 0
+    width: 40%
+    max-width: 450px
+    min-width: 300px
+    max-height: 40vh
+    overflow-y: scroll
+
+    li:last-of-type
+      border-bottom: none
+
+    .student-table-row
+      position: relative
+      background-color: #FFFFFF
+      border-bottom: 1px solid #979797
+
+      &:hover
+        ::after
+          z-index: 10
+          pointer-events: none
+          position: absolute
+          top: 0
+          left: 0
+          height: 100%
+          width: 100%
+          content: ""
+          background-color: rgba(0,0,0,0.05)
+
+    .row-selected
+      ::after
+        z-index: 10
+        position: absolute
+        top: 0
+        left: 0
+        height: 100%
+        width: 100%
+        content: ""
+        background-color: rgba(0,137,255,0.2)
+
+      &:hover
+        ::after
+          background-color: rgba(0,137,255,0.25)
+
+  .button
+    margin-top: 20px
