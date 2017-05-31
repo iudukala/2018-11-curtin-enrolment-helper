@@ -1,4 +1,4 @@
-from .models import Student, StudentUnit, CourseTemplate, CourseTemplateOptions, Units, Equivalence, Prerequisite, Options
+from .models import Student, StudentUnit, CourseTemplate, CourseTemplateOptions, Unit, Equivalence, Prerequisite, Options
 import json
 
 
@@ -9,7 +9,7 @@ import json
 def enrol_plan_validity(request):
     # If all good then add units to completedUnits array waiting to save
     valid_enrol_units = []
-    student_id = -1
+
     if student_id is not -1 and request.is_ajax():
         try:
             received_plan_json = json.loads(request.body.decode('utf-8'))
@@ -20,7 +20,7 @@ def enrol_plan_validity(request):
         except Student.DoesNotExist:
             raise RuntimeError('') from error
     else:
-        raise Http404()
+        raise Http500()
 
     return boolean_respond
 
@@ -29,65 +29,81 @@ def enrol_plan_validity(request):
 #
 ###############################################################################
 def validity_query(received_plan_json, valid_enrol_units, student_id):
-    for key, value in received_plan_json.items():
-        year = key
-        sem_value = value
-        for key, value in sem_value.items():
-            sem = Key
-            unit_value = value
-
+    for year in received_plan_json:
+        this_year = received_plan_json.index(year)
+        for semester in year:
+            this_semester = year.index(semester)
             credits_this_semester = 0
-            for key, value in unit_value.items():
-                unit_id = Key
-                unit_info = Value
-                if unit_id is not 'ELECTIVE'
-                    # retrieve information related to this unit in student plan
-                    completed_unit = StudentUnits.objects.get(StudentID=student_id AND UnitID=unit_id)
-                    # retrieve information related to this unit in coursetempoption
-                    course_temp_option = CourseTemplateOptions.objects.get(UnitID=unit_id)
-                    # retrieve equivalence
-                    equiv_unit = Equivalence.objects.get(UnitID=unit_id)
-                    # this is course temp object
-                    if not completed_unit
-                        if course_temp_option.Year is not year and course_temp_option.Semester is not sem
-                            del valid_enrol_units[:]
-                            return False
-                        # check if the equivalence already existed in the previous student plan and passed it
-                        elif StudentUnits.objects.get(StudentID=student_id AND UnitID=equiv_unit).Status is 2
-                            del valid_enrol_units[:]
-                            return False
-                        # checking prerequisite if it has been achieved
-                        prerequisite = Prerequisite.objects.get(UnitID=unit_id)
-                        prerequisite_units = Options.objects.all().filter(Option=prerequisite.Option)
-                        for unit in prerequisite_units:
-                            # if can not find the prerequisite unit in student plan that means does not enrol prerequisite before
-                            if not StudentUnits.objects.get(UnitID=unit.UnitID)
-                                del valid_enrol_units[:]
-                                return False
-                            # check the prerequisite if passed or failed in previous student plan
-                            a_unit = StudentUnits.objects.get(UnitID=unit.UnitID)
-                            if a_unit.Status is not 2
-                                del valid_enrol_units[:]
-                                return False
-                            # if all good add this temp unit and add up credits
-                            credits_this_semester += unit_info['credits']
-                            valid_enrol_units.append(unit)
+            for unit in semester:
+                unit_id = unit['id']
+                credit = unit['credits']
+                if unit_id is not 'ELECTIVE':
+                    this_student = Student.objects.get(StudentID=student_id)
+                    this_student_course = Course.objects.get(CourseID=this_student.CourseID.CourseID)
 
-                    # this is previous plan unit
-                    else
+                    single_unit = Unit.objects.get(UnitID=unit_id)
+                    course_temps = CourseTemplate.objects.get(CourseID=this_student_course)
+                    equiv_units = Equivalence.objects.get(UnitID=single_unit)
+                    course_temp_option = None
+                    for temp in course_temps:
+                        try:
+                            course_temp_option = CourseTemplateOptions.objects.get(UnitID=single_unit, Option=temp)
+                            break
+                        except CourseTemplateOptions.DoesNotExist:
+                            continue
+
+                    if course_temp_option is None:
+                        return False
+
+                    # the units in enrolplan could be either temp units or plan units
+                    try:
+                        # this is previous plan unit
+                        completed_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=single_unit)
                         # here will need to generate an error message to denote what problems are with enrollment (elif)
-                        if completed_unit.Status is 2 or course_temp_option.Year is not year or course_temp_option.Semester is not sem
-                            del valid_enrol_units[:]
+                        if completed_unit.Status is 2 or course_temp_option.Year is not this_year or course_temp_option.Semester is not this_semester:
+                            valid_enrol_units = []
                             return False
-                        else
-                            credits_this_semester += unit_info['credits']
-                            valid_enrol_units.append(unit)
-                # unit is elective
-                else
-                    credits_this_semester += unit_info['credits']
+                        else:
+                            credits_this_semester += credit
+                            valid_enrol_units.append(unit_id)
+                    # this is course temp unit
+                    except StudentUnit.DoesNotExist:
+                        if course_temp_option.Year is not this_year or course_temp_option.Semester is not this_semester:
+                            valid_enrol_units = []
+                            return False
+
+                        # check if the equivalence already existed in the previous student plan and passed it
+                        try:
+                            unit_status = StudentUnit.objects.get(StudentID=this_student, UnitID=equiv_units).Status
+                            if unit_status is 2:
+                                valid_enrol_units = []
+                                return False
+                        # no equivalence units in previous enrolment plan
+                        except StudentUnit.DoesNotExist:
+                            # checking prerequisite if it has been achieved
+                            prerequisites = Prerequisite.objects.get(UnitID=single_unit)
+
+                            for pre in prerequisites:
+                                opts = Options.objects.get(Option=prerequisites)
+
+
+                            for opt in opts:
+                                # if can not find the prerequisite unit in student plan that means does not enrol prerequisite before
+                                if not StudentUnit.objects.get(UnitID=opt.UnitID.UnitID):
+                                    valid_enrol_units = []
+                                    return False
+                                # check the prerequisite if passed or failed in previous student plan
+                                a_unit = StudentUnit.objects.get(UnitID=opt.UnitID.UnitID)
+                                if a_unit.Status is not 2:
+                                    valid_enrol_units = []
+                                    return False
+                                # if all good add this temp unit and add up credits
+                                credits_this_semester += credit
+                                valid_enrol_units.append(unit_id)
+
             # Credit amount per semester musn't exceed 100
-            if credits_this_semester > 100
-                del valid_enrol_units[:]
+            if credits_this_semester > 100:
+                valid_enrol_units = []
                 return False
 
     return True
