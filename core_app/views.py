@@ -25,6 +25,7 @@ def index(request):
 
 # TODO: Return 'success' (parsedInfo is Valid)
 # TODO: Return 'failed' (What is required to be returned?)
+@login_required
 def upload_file(request):
     """
     Handles pdf files being uploaded.
@@ -72,7 +73,7 @@ def upload_file(request):
     # Links to Eugene's html template.
     # return render(request, 'simple_upload.html')
 
-
+@login_required
 def get_student_list(request):
     """
     :param request:
@@ -107,14 +108,14 @@ def logout_user(request):
     logout(request)
     return render(request, 'core_app/login.html')
 
-
+@login_required
 def report_upload(request):
     return render(request, 'core_app/report_upload.html')
 
-
+@login_required
 def home(request):
     return render(request, 'core_app/home.html')
 
-
+@login_required
 def planner(request):
     return render(request, 'core_app/planner.html')
