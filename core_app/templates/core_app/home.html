@@ -1,0 +1,27 @@
+{% extends 'core_app/base.html' %}
+{% block title %}eTracker Home{% endblock %}
+{% block header %}eTracker{% endblock %}
+{% block sub %}Curtin's Student Enrolment Tracker{% endblock %}
+{% block link %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'core_app/css/home.css' %}"/>
+{% endblock %}
+
+{% block body %}
+<!--Menu Buttons-->
+<div class="sub-content">
+    <div class="button-center-add">
+            <a href="{% url 'core_app:report_upload' %}" class="button-main">UPLOAD REPORTS</a>
+    </div>
+    <div class="button-center-add">
+        <a href="{% url 'core_app:planner' %}" class="button-main">CREATE PLAN</a>
+    </div>
+</div>
+{% endblock %}
+
+<!--Logout Button-->
+{% block bottom %}
+<div class="button-bottom">
+    <a href="{% url 'core_app:logout_user' %}" class="button-logout">&#60; LOGOUT</a>
+</div>
+{% endblock %}

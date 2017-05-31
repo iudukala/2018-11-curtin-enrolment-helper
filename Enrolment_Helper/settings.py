@@ -26,8 +26,10 @@ SECRET_KEY = 'f_e8y2!a6btf7drzi-dbl$af4j(z*144wyp7nf8z*altuvt3e='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# Allow through bridged connection on VM.
+ALLOWED_HOSTS = [
+    '10.1.1.14'
+]
 
 # Application definition
 
@@ -38,13 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
-
-MY_APPS = [
     'core_app',
 ]
-
-INSTALLED_APPS += MY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -103,19 +100,27 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             # 'OPTIONS': {
-            #     'read_default_file': os.path.join(BASE_DIR, '../my.cnf'),
+            #     'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
             # },
             'NAME': 'Enrolment_Helper',
             'USER': 'enrolment_helperuser',
             'PASSWORD': 'user',
             'HOST': 'localhost',
             'PORT': '',
+            # 'OPTIONS': {
+            #     'ssl': {
+            #         'ca': '../../ca.pem',
+            #         'cert': '../../client-cert.pem',
+            #         'key': '../../client-key.pem'
+            #     }
+            # }
         },
     }
 
-# f = open(os.path.join(BASE_DIR, '../my.cnf'))
+# f = open(os.path.join(BASE_DIR, 'my.cnf'))
 # output = f.read()
 # print(output)
+# f.close()
 
 # DATABASES = {
 #     'default': {
@@ -203,3 +208,5 @@ LOGGING = {
         },
     },
 }
+# Default page
+# LOGIN_REDIRECT_URL = 'login'
