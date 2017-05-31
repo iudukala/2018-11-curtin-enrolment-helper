@@ -204,6 +204,7 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
   //Endpoint: /pdfFileUpload
   function setupAjaxRequest(fileIndex) {
     var formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrftoken);
     xhr = new XMLHttpRequest();
 
     //Setup formdata for file
@@ -226,8 +227,6 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
     };
 
     xhr.open('POST', '/pdfFileUpload');
-    xhr.setRequestHeader('X-CSRF-Token', csrftoken);
-    console.log(xhr);
     xhr.send(formData);
   }
 
