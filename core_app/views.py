@@ -142,11 +142,9 @@ def form_plans(all_plans):
 				semester_2.append(unit)
 		elif (pl.Year - this_year) is 1:
 			if not semester_1:
-				year.append(None)
 				year.append(semester_2)
 			elif not semester_2:
 				year.append(semester_1)
-				year.append(None)
 			else:
 				year.append(semester_1)
 				year.append(semester_2)
@@ -166,11 +164,9 @@ def form_plans(all_plans):
 			elif pl.Semester is 2:
 				semester_2.append(unit)
 			if not semester_1:
-				year.append(None)
 				year.append(semester_2)
 			elif not semester_2:
 				year.append(semester_1)
-				year.append(None)
 			else:
 				year.append(semester_1)
 				year.append(semester_2)
