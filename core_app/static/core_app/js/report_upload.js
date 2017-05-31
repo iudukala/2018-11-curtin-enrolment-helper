@@ -208,7 +208,6 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
     //Setup formdata for file
     formData.append('file[]', $scope.filelist[fileIndex]);
     formData.append('csrfmiddlewaretoken', csrftoken);
-    console.log(fileIndex);
 
     //Setup callback for request
     xhr.onload = function() {

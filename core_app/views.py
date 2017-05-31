@@ -48,11 +48,11 @@ def upload_file(request):
                 information_saver.set_student_units()
                 # d = {'pdf_valid': 'True'}
                 # HARDCODED_JSON = json.dumps(d)
-                print(information_saver.output_message)
+                # print(information_saver.output_message)
                 # return HttpResponse(HARDCODED_JSON, content_type='application/json')
                 return HttpResponse(status=200)
             else:
-                print(validator.output_message)
+                # print(validator.output_message)
                 # d = {'pdf_valid': 'False'}
                 # HARDCODED_JSON = json.dumps(d)
                 # return HttpResponse(HARDCODED_JSON, content_type='application/json')
