@@ -35,7 +35,10 @@ def enrol_plan_validity(request):
     else:
         raise Http500()
 
-    return HttpResponse(boolean_respond, error_msg)
+    if boolean_respond is False:
+        HttpResponse(error_msg)
+
+    return HttpResponse(boolean_respond)
 
 ##############################################################################################################################
 # Main function for verifying the student plan if valid
