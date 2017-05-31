@@ -33,12 +33,12 @@ def upload_file(request):
     print(request)
 
     if request.method == 'POST':
-        if request.FILES['myfile']:
+        if request.FILES.get('file[]'):
 
             # TEMP POPULATE DATABASE!!
             populate()
 
-            myfile = request.FILES['myfile']
+            myfile = request.FILES.get('file[]')
             file = File(myfile)
             validator = PdfValidator(file)
             valid, output_message = validator.pdf_is_valid()
@@ -47,17 +47,18 @@ def upload_file(request):
                 information_saver.set_student_units()
                 # d = {'pdf_valid': 'True'}
                 # HARDCODED_JSON = json.dumps(d)
+                print(information_saver.output_message)
                 # return HttpResponse(HARDCODED_JSON, content_type='application/json')
                 return HttpResponse(status=200)
             else:
-                # print(validator.output_message)
+                print(validator.output_message)
                 # d = {'pdf_valid': 'False'}
                 # HARDCODED_JSON = json.dumps(d)
                 # return HttpResponse(HARDCODED_JSON, content_type='application/json')
                 return HttpResponse("Validation or saving student error.", status=500)
 
         else:
-            return HttpResponse("ERRROR", status=403)
+            return HttpResponse("ERROR", status=403)
 
     else:
         return HttpResponse("Validation or saving student error.", status=403)

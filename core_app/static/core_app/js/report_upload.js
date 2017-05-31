@@ -180,7 +180,7 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
       $scope.uploading = true;
       for(var i = 0; i < $scope.filelist.length; i++) {
         $scope.fileState[i] = "uploading";
-        setupAjaxRequest(i);
+        setupAjaxRequest(i, new XMLHttpRequest());
       }
     }
     else {
@@ -202,18 +202,20 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
    * Notes: Randomly generates outcome for now, actual AJAX will be in future
    */
   //Endpoint: /pdfFileUpload
-  function setupAjaxRequest(fileIndex) {
+  function setupAjaxRequest(fileIndex, xhr) {
     var formData = new FormData();
-    formData.append('csrfmiddlewaretoken', csrftoken);
-    xhr = new XMLHttpRequest();
 
     //Setup formdata for file
     formData.append('file[]', $scope.filelist[fileIndex]);
+    formData.append('csrfmiddlewaretoken', csrftoken);
+    console.log(fileIndex);
 
     //Setup callback for request
     xhr.onload = function() {
+      console.log(fileIndex);
+      console.log(xhr.status);
       //Switch on status codes
-      if(xhr.status === '200') {
+      if(xhr.status === 200) {
         $scope.fileState[fileIndex] = 'success';
       }
       else {
