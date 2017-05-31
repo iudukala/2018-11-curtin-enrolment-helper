@@ -53,6 +53,7 @@ class TestCourseProgress(TestCase):
         StudentUnit.objects.create(StudentID=student1, UnitID=unit9, Attempts=0, Status='1', PrerequisiteAchieved=True, Year=3, Semester=2)
 
 
+    # this is for testing function can form course information correct
     def test_course_dict(self):
         expect_course = {'id': '1688888', 'name': 'CS'}
         student_id = 16102183
@@ -60,6 +61,7 @@ class TestCourseProgress(TestCase):
         self.courses = form_course(student)
         self.assertEqual(self.courses, expect_course)
 
+    # this is for testing function can form course templates units correct, pass
     def test_templates_dict(self):
         expect_temp = [[[{'credits': 25.0, 'id': 123, 'name': 'OOSE', 'attempts': 1, 'status': 1}, {'credits': 25.0, 'id': 777, 'name': 'PDM', 'attempts': 1, 'status': 1}], [{'credits': 25.0, 'id': 456, 'name': 'OOPD', 'attempts': 0, 'status': 1}, {'credits': 25.0, 'id': 789, 'name': 'OS', 'attempts': 1, 'status': 1}]], [[{'credits': 25.0, 'id': 888, 'name': 'CG', 'attempts': 1, 'status': 1}, {'credits': 25.0, 'id': 999, 'name': 'CC', 'attempts': 0, 'status': 1}], [{'credits': 25.0, 'id': 741, 'name': 'Metrics', 'attempts': 0, 'status': 1}, {'credits': 25.0, 'id': 369, 'name': 'UCP', 'attempts': 0, 'status': 1}]]]
         student_id = 16102183
@@ -69,12 +71,22 @@ class TestCourseProgress(TestCase):
         self.templates = form_templates(all_course_temp, student_id)
         self.assertEqual(self.templates, expect_temp)
 
+    # his is for testing function can form plan units correct, pass
     def test_plans_dict(self):
         expect_plan = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}], [{'credits': 25.0, 'id': 369}]]]
         student = Student.objects.get(StudentID=16102183)
         all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID).order_by('Year', 'Semester')
         self.plans = form_plans(all_plan)
         self.assertEqual(self.plans, expect_plan)
+
+    # # this test is for testing only one plan in db, pass in a plan unit(id 123) expect [[[{'credits': 25.0, 'id': 123}]]], actual output is
+    # # [[[{'credits': 25.0, 'id': 123}]]], return true
+    # def test_single_plan(self):
+    #     expect_plan = [[[{'credits': 25.0, 'id': 123}]]]
+    #     student = Student.objects.get(StudentID=16102183)
+    #     all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID).order_by('Year', 'Semester')
+    #     self.plans = form_plans(all_plan)
+    #     self.assertEqual(self.plans, expect_plan)
 
 
 if __name__=='__main__':

@@ -25,8 +25,8 @@ def course_progress(request):
             all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
             plans = form_plans(all_plan)
             resp = return_resp(courses, templates, plans)
-        except Student.DoesNotExist:
-            error_msg = 'wrong student ID input'
+        except (Student.DoesNotExist, CourseTemplate.DoesNotExist, StudentUnit.DoesNotExist) as e:
+            error_msg = 'Invalid data input'
             return HttpResponse(error_msg)
     else:
         raise Http500()
@@ -86,8 +86,13 @@ def form_templates(all_course_temp, student_id):
                 elif opt.Semester is 2:
                     semester_2.append(unit)
             elif (opt.Year - this_year) is 1:
-                year.append(semester_1)
-                year.append(semester_2)
+                if not semester_1:
+                    year.append(semester_2)
+                elif not semester_2:
+                    year.append(semester_1)
+                else:
+                    year.append(semester_1)
+                    year.append(semester_2)
                 semester_1 = []
                 semester_2 = []
                 templates.append(year)
@@ -103,59 +108,75 @@ def form_templates(all_course_temp, student_id):
                     semester_1.append(unit)
                 elif opt.Semester is 2:
                     semester_2.append(unit)
-                year.append(semester_1)
-                year.append(semester_2)
+
+                if not semester_1:
+                    year.append(semester_2)
+                elif not semester_2:
+                    year.append(semester_1)
+                else:
+                    year.append(semester_1)
+                    year.append(semester_2)
+
                 templates.append(year)
 
     return templates
 
 
 def form_plans(all_plans):
-    plan = []
-    year = []
-    semester_1 = []
-    semester_2 = []
-    this_semester = -1
-    this_year = -1
+	plan = []
+	year = []
+	semester_1 = []
+	semester_2 = []
+	this_semester = -1
+	this_year = -1
+	for pl in all_plans:
+		single_unit = Unit.objects.get(UnitID=pl.UnitID.UnitID)
+		unit = {'id':single_unit.UnitID, 'credits':single_unit.Credits}
+		if this_year is -1 and this_semester is -1:
+			this_year = pl.Year
+			this_semester = pl.Semester
+		if pl.Year is this_year and pl is not all_plans[len(all_plans)-1]:
+			if pl.Semester is 1:
+				semester_1.append(unit)
+			elif pl.Semester is 2:
+				semester_2.append(unit)
+		elif (pl.Year - this_year) is 1:
+			if not semester_1:
+				year.append(None)
+				year.append(semester_2)
+			elif not semester_2:
+				year.append(semester_1)
+				year.append(None)
+			else:
+				year.append(semester_1)
+				year.append(semester_2)
+				semester_1 = []
+				semester_2 = []
+				plan.append(year)
+				year = []
+				this_year = pl.Year
+				this_semester = pl.Semester
+				if pl.Semester is 1:
+					semester_1.append(unit)
+				elif pl.Semester is 2:
+					semester_2.append(unit)
+		elif pl is all_plans[len(all_plans) - 1] and pl.Year is this_year:
+			if pl.Semester is 1:
+				semester_1.append(unit)
+			elif pl.Semester is 2:
+				semester_2.append(unit)
+			if not semester_1:
+				year.append(None)
+				year.append(semester_2)
+			elif not semester_2:
+				year.append(semester_1)
+				year.append(None)
+			else:
+				year.append(semester_1)
+				year.append(semester_2)
+				plan.append(year)
 
-    for pl in all_plans:
-        single_unit = Unit.objects.get(UnitID=pl.UnitID.UnitID)
-        unit = {'id':single_unit.UnitID, 'credits':single_unit.Credits}
-
-        if this_year is -1 and this_semester is -1:
-            this_year = pl.Year
-            this_semester = pl.Semester
-
-        if pl.Year is this_year and pl is not all_plans[len(all_plans)-1]:
-            if pl.Semester is 1:
-                semester_1.append(unit)
-            elif pl.Semester is 2:
-                semester_2.append(unit)
-
-        elif (pl.Year - this_year) is 1:
-            year.append(semester_1)
-            year.append(semester_2)
-            semester_1 = []
-            semester_2 = []
-            plan.append(year)
-            year = []
-            this_year = pl.Year
-            this_semester = pl.Semester
-            if pl.Semester is 1:
-                semester_1.append(unit)
-            elif pl.Semester is 2:
-                semester_2.append(unit)
-
-        elif pl is all_plans[len(all_plans)-1] and pl.Year is this_year:
-            if pl.Semester is 1:
-                semester_1.append(unit)
-            elif pl.Semester is 2:
-                semester_2.append(unit)
-            year.append(semester_1)
-            year.append(semester_2)
-            plan.append(year)
-
-    return plan
+	return plan
 ######################################################################################################
 
 
