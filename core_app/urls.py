@@ -10,7 +10,7 @@ app_name = 'core_app'
 
 urlpatterns = [
 
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.home, name='index'),
     url(r'^pdfFileUpload$', views.upload_file, name='pdfFileUpload'),
     url(r'^getStudentList$', views.get_student_list, name='getStudentList'),
     url(r'^login/$', views.login_user, name='login_user'),
@@ -35,4 +35,3 @@ urlpatterns = [
 #     url(r'^home/$', views.home, name='home'),
 # >>>>>>> develop
 # ]
-

@@ -212,8 +212,6 @@ var app = angular.module('uploadApp', []).config(function($interpolateProvider) 
 
     //Setup callback for request
     xhr.onload = function() {
-      console.log(fileIndex);
-      console.log(xhr.status);
       //Switch on status codes
       if(xhr.status === 200) {
         $scope.fileState[fileIndex] = 'success';
