@@ -36,9 +36,6 @@ def upload_file(request):
     if request.method == 'POST':
         if request.FILES.get('file[]'):
 
-            # TEMP POPULATE DATABASE!!
-            populate()
-
             myfile = request.FILES.get('file[]')
             file = File(myfile)
             validator = PdfValidator(file)
@@ -46,32 +43,18 @@ def upload_file(request):
             if valid:
                 information_saver = StudentInformationSaver(validator.get_validated_information())
                 information_saver.set_student_units()
-                # d = {'pdf_valid': 'True'}
-                # HARDCODED_JSON = json.dumps(d)
-                # print(information_saver.output_message)
-                # return HttpResponse(HARDCODED_JSON, content_type='application/json')
+                print(information_saver.output_message)
                 return HttpResponse(status=200)
             else:
-                # print(validator.output_message)
-                # d = {'pdf_valid': 'False'}
-                # HARDCODED_JSON = json.dumps(d)
-                # return HttpResponse(HARDCODED_JSON, content_type='application/json')
+                print(validator.output_message)
                 return HttpResponse("Validation or saving student error.", status=500)
 
         else:
-            return HttpResponse("ERROR", status=403)
+            return HttpResponse("Request is not correct.", status=403)
 
     else:
         return HttpResponse("Validation or saving student error.", status=403)
 
-            # print(json.dumps(return_list))
-
-    # d = {'Campbell': 'Front-end God'}
-    # HARDCODED_JSON = json.dumps(d)
-    # return HttpResponse(HARDCODED_JSON, content_type='application/json')
-
-    # Links to Eugene's html template.
-    # return render(request, 'simple_upload.html')
 
 @login_required
 def get_student_list(request):
@@ -82,8 +65,10 @@ def get_student_list(request):
     if request.method == 'GET':
 
         return_list = list(Student.objects.all().values('StudentID', 'Name'))
-
         return HttpResponse(json.dumps(return_list), content_type='application/list')
+
+    else:
+        return HttpResponse("Request Error", status=400)
 
 
 # Create your views here.

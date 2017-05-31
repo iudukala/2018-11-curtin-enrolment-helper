@@ -1493,5 +1493,55 @@ class Command(BaseCommand):
                 # Object has already been created
                 pass
 
+        # ELECTIVES
+        elective_templates = []
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='1',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='1',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='1',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='1',  Credits=12.5, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='2',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='2',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='2',  Credits=12.5, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='2',  Credits=12.5, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='1',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='1',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='1',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='1',  Credits=25.0, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='2',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='2',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='2',  Credits=25.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='2',  Credits=25.0, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='1',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='1',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='1',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='1',  Credits=50.0, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE',  Version='1',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE',  Version='1',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE', Version='1',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE', Version='1',  Credits=75.0, Semester=-1, Elective=True))
+
+        elective_templates.append(Unit(UnitCode='ELECTIVE1', Name='ELECTIVE', Version='2',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE2', Name='ELECTIVE', Version='2',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE', Version='2',  Credits=75.0, Semester=-1, Elective=True))
+        elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE', Version='2',  Credits=50.0, Semester=-1, Elective=True))
+
+        for entry in elective_templates:
+            try:
+                with transaction.atomic():
+                    entry.save()
+
+            except IntegrityError:
+                pass
+
     def handle(self, *args, **options):
         self._create_data()

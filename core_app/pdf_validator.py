@@ -6,6 +6,11 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 class PdfValidator:
+    """
+    Class which performs two main functions:
+    * Ensure that the parsed PDF information is correctly formatted.
+    * Checks that the student has a currently course template in the database.
+    """
 
     def __init__(self, file):
         self.in_file = file
@@ -13,7 +18,7 @@ class PdfValidator:
             '\n\nIssue detected during pdf validation:\n---------------------------------------------\n'
         self.json_parsed_file = {}
         self.is_parsed_pdf_valid = True
-        # HARDCODED: Should be able to create these automatically.
+        # Hardcoded values.
         self.HARDCODED_REQUIRED_JSON_FIELDS = ["course", "id", "name", "date", "units", "automatic", "planned"]
 
     def read_file(self):
@@ -37,7 +42,6 @@ class PdfValidator:
             self.is_parsed_pdf_valid = False
             return False
 
-    # The function that Eugene will call to check pdf validity
     def pdf_is_valid(self):
         """
         Function that runs all the validators on the parsed PDF file.
@@ -56,14 +60,17 @@ class PdfValidator:
         return self.json_parsed_file
 
     # CHECKING THAT ALL KEYS ARE CORRECT ONE.
+
     def check_attributes(self):
+        """
+        Checks to ensure that the keys in the parsed information are correct.
+        """
         for key in self.json_parsed_file.keys():
             if key not in self.HARDCODED_REQUIRED_JSON_FIELDS:
                 print(key)
                 self.output_message += "All JSON attribute key are not correct\n"
                 self.is_parsed_pdf_valid = False
 
-        # CHECKING THAT ALL KEYS IN THE PARSED REPORT
         for key in self.HARDCODED_REQUIRED_JSON_FIELDS:
             if key not in self.json_parsed_file.keys():
                 self.output_message += "All required attribute keys are not in the parsed information\n"
@@ -71,16 +78,28 @@ class PdfValidator:
 
     def check_courses(self):
         """
-        Check that the major course for the student exists within the database.
+        At least one of the courses are required to be Computer stream courses.
         :return:
         """
-        course_id = list(self.json_parsed_file['course'].items())[0][0]
-        version = list(self.json_parsed_file['course'].items())[0][1]
-        if not Course.objects.filter(CourseID=course_id, Version=version).exists():
+        course_list = list(self.json_parsed_file['course'].items())
+        course_found = False
+        index = 0
+
+        for courses in course_list:
+            course_id = courses[0]
+            version = courses[1]
+
+            if Course.objects.filter(CourseID=course_id, Version=version).exists():
+                course_found = True
+                self.json_parsed_file['course'] = course_list[index]
+                continue
+
+            index += 1
+
+        if not course_found:
             self.is_parsed_pdf_valid = False
-            new_message = 'Courses: ' + str(course_id) + ', Version: ' + str(version) + \
-                          ' Does not exist in the database.\n'
-            self.output_message += new_message
+            self.output_message += 'Courses: ' + str(course_id) + ', Version: ' + str(version) + \
+                                   ' Does not exist in the database.\n'
 
     def check_date(self):
         """

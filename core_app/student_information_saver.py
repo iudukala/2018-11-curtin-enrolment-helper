@@ -10,7 +10,7 @@ Basic steps:
 
 class StudentInformationSaver:
     """
-    Check Prerequisite and Equivalence. 
+    Class which is responsible for interpreting and saving the student information into the database.
     """
 
     def __init__(self, in_json_parsed_file):
@@ -22,6 +22,10 @@ class StudentInformationSaver:
             'Student: {}, {}\n'.format(self.parsed_report['id'], self.parsed_report['name'])
 
     def set_student_units(self):
+        """
+        The main function.
+        Called from the upload_file method.
+        """
         if Student.objects.all().filter(StudentID=self.parsed_report['id']).exists():
             this_student = Student.objects.get(StudentID=self.parsed_report['id'])
 
@@ -29,6 +33,10 @@ class StudentInformationSaver:
             self.output_message += "Creating new student for {}\n.".format(self.parsed_report['id'])
             this_student = self.create_student()
 
+        # Removes all 'ELECTIVE' units from the StudentUnit table.
+        self.remove_all_simple_electives(this_student)
+
+        # Each section for the units is processed differently and therefore each have their own function.
         self.create_required_units(self.parsed_report['planned'])
         self.create_required_units(self.parsed_report['automatic'])
         self.create_required_units(self.parsed_report['units'])
@@ -39,47 +47,46 @@ class StudentInformationSaver:
 
     def create_student(self):
         """
-        Create a student object using the parsed PDF information.
+        Create a student object using the parsed PDF information if one does not already exist within that database.
         :return: 
         """
         s_name = self.parsed_report['name'].split(" ")
         # Removes name title.
         joined_name = " ".join(s_name[1:])
-        try:
-            # Create student.
 
-            # Determine student course
-            # While the object retrieved from the parer is a dict, the course information is created with
-            # collections.OrderedDict() Ensuring that the first parsed course in the course Major.
-            student_major_course_info = list(self.parsed_report['course'].items())[0]
-            new_student_course = Course.objects.get(CourseID=student_major_course_info[0],
-                                                    Version=student_major_course_info[1])
+        student_major_course_info = self.parsed_report['course']
 
-            # Determine completed credits, and set completed units.
-            completed_credits, self.completed_units = self.calculate_completed_credits()
+        new_student_course = Course.objects.get(CourseID=student_major_course_info[0],
+                                                Version=student_major_course_info[1])
 
-            # Determine academic status.
-            # FIXME: Calculate academic status?
-            default_academic_status = 1
 
-            new_student = Student(StudentID=self.parsed_report['id'], Name=joined_name,
-                                  AcademicStatus=default_academic_status, CourseID=new_student_course,
-                                  CreditsCompleted=completed_credits)
-            self.output_message += "New student with id: {} created.\n".format(new_student.StudentID)
-            # FIXME: Actually save student.
-            new_student.save()
+        # Determine completed credits, and set completed units.
+        completed_credits, self.completed_units = self.calculate_completed_credits()
 
-        except ObjectDoesNotExist:
-            self.error_detected = True
-            self.output_message += \
-                "Unexpected error while creating student detected retrieving course information: {}\n"\
-                .format(self.parsed_report['course'][0])
+        # Determine academic status.
+        # FIXME: Calculate academic status?
+        default_academic_status = 1
+
+        new_student = Student(StudentID=self.parsed_report['id'], Name=joined_name,
+                              AcademicStatus=default_academic_status, CourseID=new_student_course,
+                              CreditsCompleted=completed_credits)
+        self.output_message += "New student with id: {} created.\n".format(new_student.StudentID)
+
+        new_student.save()
+
+        # except ObjectDoesNotExist:
+        #     self.error_detected = True
+        #     self.output_message += \
+        #         "Unexpected error while creating student detected retrieving course information: {}\n"\
+        #         .format(self.parsed_report['course'][0])
 
         return Student.objects.get(StudentID=self.parsed_report['id'])
 
     def calculate_completed_credits(self):
         """
         Calculates the number of credits completed by the student from the parsed plan.
+        Also calculates the units that have been completed by the student. While not directly used within this
+        method, it is required for the prerequisite method so is created here.
         :return: Number of credits, as well as a dict containing completed units.
         """
         # FIXME:
@@ -92,7 +99,7 @@ class StudentInformationSaver:
                 completed_units[unitCode] = unit_info
                 counted_credits += Decimal(unit_info['credits'])
 
-        # Credited units.
+        # Loops through automatically creditted units.
         for unitCode, unit_info in self.parsed_report['automatic'].items():
             if unitCode not in completed_units:
                 completed_units[unitCode] = unit_info
@@ -102,7 +109,10 @@ class StudentInformationSaver:
 
     def create_required_units(self, student_dict):
         """
-        Function checks whether units exist within 'planned', 'automatic' and 'units'
+        Function checks whether units exist within 'planned', 'automatic' and 'units'.
+        It should be noted that this function creates a unit object if one does not already exist within the database.
+        It is suppose, although unlikely that if the parser produces corrupt unit fields these will be created for the
+        database. These units although will be marked as electives and therefore easy to identify by admin.
         Creates them as Electives if they do not exist.
         :return: 
         """
@@ -234,8 +244,14 @@ class StudentInformationSaver:
         """
         prerequisite_achieved = True
 
+        if unit is None:
+            """
+            Nasty way to deal with undefined. Units which most likely are ELECTIVES.
+            """
+            pass
+
         # No need to process electives.
-        if "ELECTIVE" in unit.UnitCode:
+        elif "ELECTIVE" in unit.UnitCode:
             pass
 
         else:
@@ -261,7 +277,6 @@ class StudentInformationSaver:
                     option_list = Options.objects.filter(Option=prerequisite_object)
 
                     for option_object in option_list:
-                        print("{}".format(option_object.UnitID.UnitCode))
                         if StudentUnit.objects.filter(StudentID=student_object, UnitID=option_object.UnitID).exists():
                             student_unit = StudentUnit.objects.get(StudentID=student_object,
                                                                    UnitID=option_object.UnitID)
@@ -275,28 +290,49 @@ class StudentInformationSaver:
 
                     # if or_achieved is false here the prerequisite have not been met.
                     if not or_achieved:
+                        self.output_message += "Prerequisite/s not met for unit: {}.\n".format(unit.UnitCode)
                         prerequisite_achieved = False
                         continue
 
         return prerequisite_achieved
 
-    @staticmethod
-    def create_update_student_unit(student_object, unit_object, attempts, status, prerequisite_achieved):
+    def create_update_student_unit(self, student_object, unit_object, attempts, status, prerequisite_achieved):
 
-        # Check if the StudentUnit already exists within the database, creates one if it does not.
-        if StudentUnit.objects.filter(StudentID=student_object, UnitID=unit_object).exists():
-            existing_student_unit_object = StudentUnit.objects.get(StudentID=student_object, UnitID=unit_object)
-
-            existing_student_unit_object.Attempts = attempts
-            existing_student_unit_object.Status = status
-            existing_student_unit_object.PrerequisiteAchieved = prerequisite_achieved
-
-            existing_student_unit_object.save()
+        if unit_object is None:
+            """
+            Nasty last minute fix. 
+            """
+            self.output_message += \
+                "Error with a unit.\n\tMost likely cause is an 'ELECTIVE' which does not exist in the database."
+            # Issue with the unit.
+            pass
 
         else:
-            student_unit_object = StudentUnit(StudentID=student_object, UnitID=unit_object, Attempts=attempts,
-                                              Status=status, PrerequisiteAchieved=prerequisite_achieved)
-            student_unit_object.save()
+            # Check if the StudentUnit already exists within the database, creates one if it does not.
+            if StudentUnit.objects.filter(StudentID=student_object, UnitID=unit_object).exists():
+                existing_student_unit_object = StudentUnit.objects.get(StudentID=student_object, UnitID=unit_object)
+
+                existing_student_unit_object.Attempts = attempts
+                existing_student_unit_object.Status = status
+                existing_student_unit_object.PrerequisiteAchieved = prerequisite_achieved
+
+                existing_student_unit_object.save()
+
+            else:
+                student_unit_object = StudentUnit(StudentID=student_object, UnitID=unit_object, Attempts=attempts,
+                                                  Status=status, PrerequisiteAchieved=prerequisite_achieved)
+
+                student_unit_object.save()
+
+    @staticmethod
+    def remove_all_simple_electives(student_object):
+        """
+        Function deletes all ELECTIVE units from current student's units.
+        :param student_object:
+        :return:
+        """
+        elective_list = StudentUnit.objects.filter(StudentID=student_object, UnitID__UnitCode__regex=r'ELECTIVE')
+        elective_list.delete()
 
     @staticmethod
     def process_elective(student_object, unit_code, unit_info):
@@ -305,7 +341,6 @@ class StudentInformationSaver:
         The function called if the unit is an ELECTIVE 
         :return: the ELECTIVE unit to be created for StudentUnit.
         """
-        # self.output_message += "ELECTIVE unit detected: {}\n".format(unit_code)
         return_unit = None
 
         elective_unit_version_one = Unit.objects.get(UnitCode=unit_code, Version='1',
