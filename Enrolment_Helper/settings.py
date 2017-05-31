@@ -28,7 +28,8 @@ DEBUG = True
 
 # Allow through bridged connection on VM.
 ALLOWED_HOSTS = [
-    '10.1.1.14'
+    # '10.1.1.14',
+    # '127.0.0.1'
 ]
 
 # Application definition
