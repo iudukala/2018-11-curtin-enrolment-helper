@@ -127,151 +127,151 @@ class Command(BaseCommand):
         units.append(Unit(UnitCode='12332', Name='Foundations of Computer Science 200', Version=3, Semester=1, Credits=25, Elective=False))
 
         units.append(Unit(UnitCode='MATH1004', Name='Mathematics 1', Version=1, Semester=1, Credits=25, Elective=False))
-        #57
+        
         units.append(Unit(UnitCode='4521', Name='Computer Communications 200', Version=7, Semester=1, Credits=25, Elective=False))
-        #58
+
         units.append(Unit(UnitCode='313670', Name='Engineering Programming 210', Version=1, Semester=1, Credits=25, Elective=False))
-        #59
+
         units.append(Unit(UnitCode='4542', Name='Operating Systems 200', Version=9, Semester=1, Credits=25, Elective=False))
-        #60
+
         units.append(Unit(UnitCode='8934', Name='Software Engineering 200', Version=9, Semester=1, Credits=25, Elective=False))
-        #61
+
         units.append(Unit(UnitCode='MATH1005', Name='Pre Calculus', Version=1, Semester=1, Credits=12.5, Elective=False))
-        #62
+
         units.append(Unit(UnitCode='12333', Name='Design and Analysis of Algorithms 300', Version=6, Semester=1, Credits=25, Elective=False))
-        #63
+
         units.append(Unit(UnitCode='314246', Name='Fundamental Concepts of Cyber Security 220', Version=1, Semester=1, Credits=25, Elective=False))
-        #64
+
         units.append(Unit(UnitCode='314244', Name='Fundamental Concepts of Cryptography 220', Version=1, Semester=1, Credits=25, Elective=False))
-        #65
+
         units.append(Unit(UnitCode='10926', Name='Mathematics 103', Version=5, Semester=1, Credits=25, Elective=False))
-        #66
+
         units.append(Unit(UnitCode='307536', Name='Engineering Mathematics 120', Version=4, Semester=1, Credits=25, Elective=False))
-        #67
+
         units.append(Unit(UnitCode='MATH1002', Name='Engineering Mathematics 1', Version=1, Semester=1, Credits=25, Elective=False))
-        #68
+
         units.append(Unit(UnitCode='2519', Name='Unix Systems Programming 200', Version=17, Semester=1, Credits=25, Elective=False))
-        #69
+
         units.append(Unit(UnitCode='4524', Name='Computer Graphics 200', Version=6, Semester=1, Credits=25, Elective=False))
-        #70
+
         units.append(Unit(UnitCode='3437', Name='Programming Languages', Version=13, Semester=1, Credits=25, Elective=False))
-        #71
+
         units.append(Unit(UnitCode='13390', Name='Requirements Engineering 252', Version=4, Semester=1, Credits=25, Elective=False))
-        #72
+
         units.append(Unit(UnitCode='314247', Name='Network Security and Firewalls 310', Version=1, Semester=1, Credits=25, Elective=False))
-        #73
+
         units.append(Unit(UnitCode='4529', Name='Computing Topics 251', Version=4, Semester=1, Credits=25, Elective=False))
-        #74
+
         units.append(Unit(UnitCode='ICTE4000', Name='Human Computer Interface', Version=1, Semester=1, Credits=25, Elective=False))
-        #75
+
         units.append(Unit(UnitCode='4517', Name='Artificial and Machine Intelligence 300', Version=8, Semester=1, Credits=25, Elective=False))
-        #76
+
         units.append(Unit(UnitCode='7062', Name='Mathematics 101', Version=6, Semester=1, Credits=25, Elective=False))
-        #77
+
         units.append(Unit(UnitCode='307535', Name='Engineering Mathematics 110', Version=3, Semester=1, Credits=25, Elective=False))
-        #78
+
         units.append(Unit(UnitCode='MATH1010', Name='Advanced Mathematics', Version=1, Semester=1, Credits=25, Elective=False))
-        #79
+
         units.append(Unit(UnitCode='MATH1000', Name='Engineering Mathematics Specialist 1', Version=1, Semester=1, Credits=25, Elective=False))
-        #80
+
         units.append(Unit(UnitCode='ISAD4002', Name='Software Metrics', Version=1, Semester=1, Credits=25, Elective=False))
-        #81
+
         units.append(Unit(UnitCode='314248', Name='Cyber Security Concepts 310', Version=1, Semester=1, Credits=25, Elective=False))
-        #82
+
         units.append(Unit(UnitCode='COMP4002', Name='Extended Distributed Computing', Version=2, Semester=1, Credits=25, Elective=False))
-        #83
+
         units.append(Unit(UnitCode='12334', Name='Theoretical Foundations of Computer Science 300', Version=5, Semester=1, Credits=25, Elective=False))
-        #84
+
         units.append(Unit(UnitCode='COMP4001', Name='Machine Perception', Version=1, Semester=1, Credits=25, Elective=False))
-        #85
+
         units.append(Unit(UnitCode='310288', Name='Software Engineering Project 330', Version=2, Semester=1, Credits=25, Elective=False))
-        #86
+
         units.append(Unit(UnitCode='12335', Name='Software Engineering 300', Version=6, Semester=1, Credits=25, Elective=False))
-        #87
+
         units.append(Unit(UnitCode='CMPE4001', Name='Extended Software Engineering Testing', Version=2, Semester=1, Credits=25, Elective=False))
-        #88
+
         units.append(Unit(UnitCode='314250', Name='Cyber Security: Intrusion Detection System and Incident Handling 320', Version=1, Semester=1, Credits=25, Elective=False))
-        #89
+
         units.append(Unit(UnitCode='314249', Name='Cyber Crime and Security Enhanced Programming 320', Version=1, Semester=1, Credits=25, Elective=False))
-        #90
+
         units.append(Unit(UnitCode='ISEC4001', Name='Extended Cyber Crime and Security Enhanced Programming', Version=1, Semester=1, Credits=25, Elective=False))
-        #91
+
         units.append(Unit(UnitCode='ISEC5007', Name='Advanced Cyber Crime and Security Enhanced Programming', Version=1, Semester=1, Credits=25, Elective=False))
-        #92
+
         units.append(Unit(UnitCode='305684', Name='Network Systems Design 300', Version=3, Semester=1, Credits=25, Elective=False))
-        #93
+
         units.append(Unit(UnitCode='300538', Name='Data Communications and Network Management 203', Version=2, Semester=1, Credits=25, Elective=False))
-        #94
+
         units.append(Unit(UnitCode='CMPE2000', Name='Data Communications and Network Management', Version=1, Semester=1, Credits=25, Elective=False))
-        #95
+
         units.append(Unit(UnitCode='4522', Name='Advanced Computer Communications 300', Version=7, Semester=1, Credits=25, Elective=False))
-        #96
+
         units.append(Unit(UnitCode='PRJM3000', Name='Project Design and Management', Version=1, Semester=1, Credits=25, Elective=False))
-        #97
+
         units.append(Unit(UnitCode='4549', Name='Project Design and Management 300', Version=9, Semester=1, Credits=25, Elective=False))
-        #98
+
         units.append(Unit(UnitCode='MATH1014', Name='Foundations of Calculus', Version=1, Semester=3, Credits=25, Elective=False))
-        #99
+
         units.append(Unit(UnitCode='ISAD3000', Name='Software Engineering Project 1', Version=1, Semester=3, Credits=25, Elective=False))
-        #100
+
         units.append(Unit(UnitCode='310287', Name='Software Engineering Project 320', Version=2, Semester=3, Credits=25, Elective=False))
-        #101
+
         units.append(Unit(UnitCode='ISAD3001', Name='Software Engineering Project 2', Version=1, Semester=3, Credits=25, Elective=False))
-        #102
+
         units.append(Unit(UnitCode='ISEC3001', Name='Advanced Cryptography', Version=1, Semester=2, Credits=25, Elective=False))
-        #103
+
         units.append(Unit(UnitCode='314245', Name='Advanced Cryptography 310', Version=1, Semester=1, Credits=25, Elective=False))
-        #104
+
         units.append(Unit(UnitCode='314256', Name='Fundamental Concepts of Cryptography 520', Version=1, Semester=1, Credits=25, Elective=False))
-        #105
+
         units.append(Unit(UnitCode='ISEC5002', Name='Introduction to Cryptography', Version=1, Semester=1, Credits=25, Elective=False))
-        #106
+
         units.append(Unit(UnitCode='CMPE1000', Name='Hardware Fundamentals', Version=1, Semester=1, Credits=25, Elective=False))
-        #107
+
         units.append(Unit(UnitCode='12702', Name='Hardware Fundamentals 101', Version=3, Semester=1, Credits=25, Elective=False))
-        #108
+
         units.append(Unit(UnitCode='COMP4002', Name='Software Components', Version=1, Semester=1, Credits=25, Elective=False))
-        #109
+
         units.append(Unit(UnitCode='4547', Name='Software Components 400', Version=5, Semester=1, Credits=25, Elective=False))
-        #110
+
         units.append(Unit(UnitCode='BLAW2000', Name='Law for Engineers', Version=2, Semester=3, Credits=25, Elective=False))
-        #111
+
         units.append(Unit(UnitCode='307664', Name='Law for Engineers 202', Version=2, Semester=1, Credits=12.5, Elective=False))
-        #112
+
         units.append(Unit(UnitCode='ENEN2000', Name='Engineering Sustainable Development', Version=2, Semester=3, Credits=12.5, Elective=False))
-        #113
+
         units.append(Unit(UnitCode='307660', Name='Engineering Sustainable Development 201', Version=4, Semester=3, Credits=12.5, Elective=False))
-        #114
+
         units.append(Unit(UnitCode='PRJM2000', Name='Personal Software Processes', Version=1, Semester=1, Credits=12.5, Elective=False))
-        #115
+
         units.append(Unit(UnitCode='308714', Name='Personal Software Processes 251', Version=1, Semester=1, Credits=25, Elective=False))
-        #116
+
         units.append(Unit(UnitCode='ISAD4000', Name='Software Engineering Project A', Version=1, Semester=3, Credits=50, Elective=False))
-        #117
+
         units.append(Unit(UnitCode='13396', Name='Software Engineering Project 401', Version=5, Semester=3, Credits=50, Elective=False))
-        #118
+
         units.append(Unit(UnitCode='ISAD4001', Name='Software Engineering Project B', Version=1, Semester=3, Credits=50, Elective=False))
-        #119
+
         units.append(Unit(UnitCode='13397', Name='Software Engineering Project 402', Version=6, Semester=3, Credits=50, Elective=False))
-        #120
+
         units.append(Unit(UnitCode='MGMT3000', Name='Engineering Management', Version=1, Semester=3, Credits=25, Elective=False))
-        #121
+
         units.append(Unit(UnitCode='310683', Name='Engineering Management 302', Version=1, Semester=3, Credits=25, Elective=False))
-        #122
+
         units.append(Unit(UnitCode='MATH1007', Name='Pre and Introductory Calculus', Version=1, Semester=3, Credits=25, Elective=False))
-        #123
+
         units.append(Unit(UnitCode='305639', Name='Mathematics 135', Version=1, Semester=3, Credits=25, Elective=False))
-        #124
+
         units.append(Unit(UnitCode='MATH1008', Name='Calculus and Linear Algebra', Version=1, Semester=3, Credits=25, Elective=False))
-        #125
+
         units.append(Unit(UnitCode='304640', Name='Mathematics 136', Version=1, Semester=3, Credits=25, Elective=False))
-        #126
+
         units.append(Unit(UnitCode='ELECTIVE1', Name='Elective1', Version=1, Semester=3, Credits=25, Elective=True))
-        #127
+
         units.append(Unit(UnitCode='ELECTIVE2', Name='Elective2', Version=1, Semester=3, Credits=25, Elective=True))
-        #128
+
         units.append(Unit(UnitCode='ELECTIVE3', Name='Elective3', Version=1, Semester=3, Credits=25, Elective=True))
-        #129
+
         units.append(Unit(UnitCode='ELECTIVE4', Name='Elective4', Version=1, Semester=3, Credits=25, Elective=True))
         for entry in units:
             try:
