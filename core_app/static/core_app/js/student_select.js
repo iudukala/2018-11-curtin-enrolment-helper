@@ -121,7 +121,6 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
   function studentListHandler(response) {
     $scope.students = response.data;
     $rootScope.closeSpinner();
-    $rootScope.$apply();
   }
 
   /*
@@ -228,6 +227,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
 app.run(function($http, $rootScope) {
   //csrf setup
   $http.defaults.headers.post['X-CSRFToken'] = csrftoken;
+
   //rootScope setup
   $rootScope.selectingStudent = true;
   $rootScope.$on('$viewContentLoaded', function(){
