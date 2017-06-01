@@ -1,4 +1,4 @@
-campbell_expected_output = \
+campbell = \
     {
         'name': 'Mr Campbell James Pedersen',
         'id': '16171921',
@@ -78,7 +78,7 @@ campbell_expected_output = \
         }
     }
 
-chienfeilin_expected_output = \
+chienfeilin = \
     {
         'name': 'Mr Chien-Fei Lin',
         'id': '14553899',
@@ -149,7 +149,7 @@ chienfeilin_expected_output = \
 
     }
 
-darryl_expected_output = \
+darryl = \
     {
         'name': 'Mr Darryl Chng',
         'id': '18402636',
@@ -197,7 +197,7 @@ darryl_expected_output = \
         }
     }
 
-steven_expected_output = \
+steven = \
     {
         'name': 'Mr Chung Yen Lu',
         'id': '16365481',
@@ -256,7 +256,7 @@ steven_expected_output = \
         }
     }
 
-eugene_expected_output = \
+eugene = \
     {
         'name': 'Mr Trinh Quang Thien',
         'id': '17898755',
@@ -315,7 +315,7 @@ eugene_expected_output = \
         }
     }
 
-ximingwong_expected_output = \
+ximingwong = \
     {
         'name': 'Miss Xi Ming Wong',
         'id': '17660585',
@@ -362,7 +362,7 @@ ximingwong_expected_output = \
         }
     }
 
-yoakim_expected_output = \
+yoakim = \
     {
         'name': 'Mr Yoakim Sadao Persson',
         'id': '17080170',
