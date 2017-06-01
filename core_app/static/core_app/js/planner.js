@@ -510,7 +510,7 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
     var savedPlan = angular.copy($scope.thePlan);
     cleanupPlan(savedPlan);
 
-    $http.post('/emailPlan', savedPlan)
+    $http.post('/savePlan', savedPlan)
     .then(saveSuccess, plannerErrorHandler);
   }
 
