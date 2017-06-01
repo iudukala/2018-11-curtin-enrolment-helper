@@ -68,7 +68,6 @@
     To disconnect from the virtualenv run
     $ deactivate
 
-
     Clone Git from our BitBucket project next to the project_env folder. 
     Make sure you are using the virtualenv still.
     Navigate to the project root folder.

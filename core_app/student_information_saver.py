@@ -276,17 +276,13 @@ class StudentInformationSaver:
 
                             if student_unit.Status == 2:
                                 or_achieved = True
-                                # continue
                                 # # If the student has passed no need to check the other 'OR' units.
-                                # if student_unit.Status == '2':
-                                #     or_achieved = True
-                                #     continue
 
                     # if or_achieved is false here the prerequisite have not been met.
                     if not or_achieved:
-                        self.output_message += "Prerequisite/s not met for unit: {}.\n".format(unit.UnitCode)
+                        self.output_message += "For unit {}, prerequisite option {} list has not been met.\n"\
+                            .format(unit.UnitCode, prerequisite_object.Option)
                         prerequisite_achieved = False
-                        # continue
 
         return prerequisite_achieved
 
