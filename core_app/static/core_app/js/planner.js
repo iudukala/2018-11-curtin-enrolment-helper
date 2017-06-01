@@ -510,7 +510,7 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
     var savedPlan = angular.copy($scope.thePlan);
     cleanupPlan(savedPlan);
 
-    $http.post('/savePlan', savedPlan)
+    $http.post('/saveplan', savedPlan)
     .then(saveSuccess, plannerErrorHandler);
   }
 
@@ -530,16 +530,16 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
   function cleanupPlan(dirtyPlan) {
     //Remove semester headings
     angular.forEach(dirtyPlan, function(year, yearIndex) {
-        angular.forEach(year, function(sem, semIndex) {
-          if(sem.length > 0 && sem[0].type === 'heading') {
-            sem.shift();
-          }
-        });
+      angular.forEach(year, function(sem, semIndex) {
+        if(sem.length > 0 && sem[0].type === 'heading') {
+          sem.shift();
+        }
+      });
     });
 
     //Remove redundant years
     var i = dirtyPlan.length - 1;
-    while(isEmptyYear(dirtyPlan[i])) {
+    while(isEmptyYear(dirtyPlan[i]) && i > 0) {
       dirtyPlan.splice(i, 1);
       i--;
     }
@@ -594,8 +594,9 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
    * Notes: N/A
    */
   function plannerErrorHandler(response) {
+    console.log(response.data);
     var endtext = response.data;
-    if(!response.data) {
+    if(typeof response.data === 'undefined') {
       endtext = response.statusText;
     }
       showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);

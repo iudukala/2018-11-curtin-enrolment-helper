@@ -23,7 +23,7 @@ def enrol_plan_validity(request):
         student_id = request.user.username
     else:
         error_msg = 'deny invalid user'
-        return HttpResponse(error_msg)
+        return HttpResponse(error_msg, status=500)
 
     if request.is_ajax() and student_id is not -1:
         try:
@@ -34,18 +34,19 @@ def enrol_plan_validity(request):
             return HttpResponse(error_msg)
         boolean_respond = validity_query(new_plan, valid_enrol_dict, valid_enrol_units, student_id, error_msg)
     else:
-        raise Http500()
+        error_msg = 'invalid request'
+        return HttpResponse(error_msg, status=500)
 
     if boolean_respond is False:
-        HttpResponse(error_msg)
+        HttpResponse(error_msg, status=500)
     else:
         flag = save_student_plan(valid_enrol_dict, valid_enrol_units, student_id)
         if flag is False:
             error_msg = 'failed to save new student plan'
-            HttpResponse(error_msg)
+            HttpResponse(error_msg, status=500)
         else:
             msg = 'success'
-            HttpResponse(msg)
+            HttpResponse(msg, status=200)
 
 
 ##############################################################################################################################
