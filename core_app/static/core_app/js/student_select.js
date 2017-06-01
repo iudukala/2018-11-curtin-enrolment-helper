@@ -101,10 +101,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   function getStudentList() {
     $rootScope.openSpinner('Loading student list...');
-    //Uncomment when merging
     $http.get('/getStudentList').then(studentListHandler, studentSelectErrorHandler);
-
-    // setTimeout(studentListHandler, 1000);
   };
 
   /*
@@ -136,7 +133,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   function studentSelectErrorHandler(response) {
     var endtext = response.data;
-    if(!response.data) {
+    if(response.data === null) {
       endtext = response.statusText;
     }
     showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);
