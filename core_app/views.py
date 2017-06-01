@@ -13,6 +13,7 @@ import json
 ###############################################################################
 def enrol_plan_validity(request):
     # If all good then add units to completedUnits array waiting to save
+    received_json = {}
     valid_enrol_dict = {}
     valid_enrol_units = []
     error_msg = ''
@@ -20,33 +21,33 @@ def enrol_plan_validity(request):
     # student_id = 16102183, for use as test option
     student_id = -1
     if request.user.is_authenticated():
-        student_id = request.user.username
+        try:
+            received_json = json.loads(request.body.decode('utf-8'))
+            student_id = received_json['id']
+        except Student.DoesNotExist:
+            error_msg = 'can not parse json object'
+            return HttpResponse(error_msg, status=500)
     else:
         error_msg = 'deny invalid user'
         return HttpResponse(error_msg, status=500)
 
-    if request.is_ajax() and student_id is not -1:
-        try:
-            received_plan_json = json.loads(request.body.decode('utf-8'))
-            new_plan = received_plan_json['plan']
-        except Student.DoesNotExist:
-            error_msg = 'can not parse json object'
-            return HttpResponse(error_msg)
+    if request.method == 'POST' and student_id is not -1:
+        new_plan = received_json['plan']
         boolean_respond = validity_query(new_plan, valid_enrol_dict, valid_enrol_units, student_id, error_msg)
     else:
         error_msg = 'invalid request'
         return HttpResponse(error_msg, status=500)
 
     if boolean_respond is False:
-        HttpResponse(error_msg, status=500)
+        return HttpResponse(error_msg, status=500)
     else:
         flag = save_student_plan(valid_enrol_dict, valid_enrol_units, student_id)
         if flag is False:
             error_msg = 'failed to save new student plan'
-            HttpResponse(error_msg, status=500)
+            return HttpResponse(error_msg, status=500)
         else:
             msg = 'success'
-            HttpResponse(msg, status=200)
+            return HttpResponse(msg, status=200)
 
 
 ##############################################################################################################################

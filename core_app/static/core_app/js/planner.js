@@ -509,8 +509,12 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
     $rootScope.openSpinner('Saving plan data...');
     var savedPlan = angular.copy($scope.thePlan);
     cleanupPlan(savedPlan);
+    packet = {
+      id: $scope.theStudent.id,
+      plan: savedPlan
+    }
 
-    $http.post('/saveplan', savedPlan)
+    $http.post('/saveplan', packet)
     .then(saveSuccess, plannerErrorHandler);
   }
 
