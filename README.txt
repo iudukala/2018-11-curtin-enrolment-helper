@@ -127,3 +127,11 @@ MySQL database with Django:
   to login to the admin page.
 
   Please everyone see if you can get to the “It Worked!” page with our Django repo. As it is configured to use MySQL, getting to the “It Worked!” page also proves MySQL is setup correctly as well as Django.
+
+                                  * * *
+
+ICON CREDITS:
+[Dave Gandy](http://www.flaticon.com/authors/dave-gandy)  
+[Nas Ztudio](http://www.flaticon.com/authors/nas-ztudio)  
+[Freepik](http://www.freepik.com)
+
