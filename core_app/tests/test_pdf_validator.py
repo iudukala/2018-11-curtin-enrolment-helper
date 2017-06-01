@@ -1,3 +1,4 @@
+import os
 from django import test
 from django.db import IntegrityError, transaction
 from django.core.files import File
@@ -9,6 +10,9 @@ from core_app.pdf_validator import PdfValidator
 
 
 class TestPdfValidation(test.TestCase):
+    """
+    Created by Yoakim Persson
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -16,14 +20,16 @@ class TestPdfValidation(test.TestCase):
         database_objects = []
         cls.validators = []
 
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
         # Derricks course does not exists within the database.
         cls.filenames = [
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
+        	os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Darryl-pr.pdf'),
+            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Campbell-pr.pdf'),
+            # os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Derrick-pr.pdf'),
+            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/ChienFeiLin-pr.pdf'),
+            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Eugene-pr.pdf'),
+            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/XiMingWong-pr.pdf'),
         ]
 
         """
