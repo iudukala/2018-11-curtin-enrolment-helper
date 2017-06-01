@@ -10,6 +10,7 @@ Basic steps:
 
 class StudentInformationSaver:
     """
+    Create by Yoakim Persson
     Class which is responsible for interpreting and saving the student information into the database.
     """
 

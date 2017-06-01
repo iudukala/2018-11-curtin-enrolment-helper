@@ -128,7 +128,7 @@
     Please everyone see if you can get to the “It Worked!” page with our Django repo. As it is configured to use MySQL, 
     getting to the “It Worked!” page also proves MySQL is setup correctly as well as Django.
  
-## Testing
+### Testing
     For testing purposes, the tests are conducted on a new database created from the current models.
     This is obviously good as it isolates the existing databases from test data.
     The test data (which is created and destroyed for the test) is called 'test_Enrolment_Helper' (in own case).
@@ -186,7 +186,7 @@
     Encryption and decryption is provided via Django fernet fields.
     
     Encryption occurs at the database and backup created with the above tools with also contain encrypted values.
-    The encryption key is the django 'secret key' so please do not change/generate a new key without consultanting the 
+    *IMPORTANT NOTE* The encryption key is the django 'secret key' so please do not change/generate a new key without consultanting the 
     documentation below.
     
     Documention

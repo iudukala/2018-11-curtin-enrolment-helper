@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class PdfValidator:
     """
+    Create by Yoakim Persson
     Class which performs two main functions:
     * Ensure that the parsed PDF information is correctly formatted.
     * Checks that the student has a currently course template in the database.

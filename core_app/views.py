@@ -504,6 +504,7 @@ def upload_file(request):
 @login_required
 def get_student_list(request):
     """
+    Create by Yoakim Persson
     :param request:
     :return: A JSON dict object of StudentID and name
     """
