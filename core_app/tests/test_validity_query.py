@@ -1,7 +1,7 @@
 from django.test import TestCase
 from core_app.models import Course, CourseTemplate, CourseTemplateOptions, StudentUnit, Unit, Equivalence, Prerequisite, Options
 from core_app.models import Student
-from core_app.views import validity_query
+from core_app.views import validity_query, save_student_plan
 import json
 
 
@@ -109,9 +109,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_1 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_1 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_1, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_1, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # test case: include a unit that has a equiv unit already passed in previous plan, we can not enrol that unit
@@ -121,9 +122,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_2 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 101, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_2 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 101, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_2, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_2, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # test case: include a unit that has a equiv unit but did not pass in previous plan, we can enrol that unit
@@ -133,9 +135,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_3 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 100, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_3 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 100, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_3, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_3, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # test case: include a unit that a prerequisite unit did not pass in previous plan, we can not enrol that unit
@@ -145,9 +148,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_4 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 102, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_4 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 102, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_4, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_4, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # test case: include a unit that a prerequisite unit has passed in previous plan, we can enrol that unit
@@ -157,9 +161,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_5 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_5 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_5, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_5, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # test case: a smester include more than 100 credits
@@ -169,9 +174,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_6 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 373, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 104, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 3838, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_6 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 373, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 104, 'version' : 200, 'course_version' : '2B'}, {'credits' : 25.0, 'id' : 3838, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_6, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_6, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
 
     # a new enrollment plan includes a elective unit {'credits': 25.0, 'id': 666} and other units, checking if the can store the all valid units into a list properly
@@ -181,9 +187,10 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_7 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 666, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_7 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'course_version' : '2B'}, {'credits': 25.0, 'id': 666, 'version' : 200, 'course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_7, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_7, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(valid_enrol_units, expect_list)
 
     # only 1 unit in enrolment plan and it is not allowed to enrol because prerequis was failed before
@@ -193,10 +200,20 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_8 = [[[{'credits': 25.0, 'id': 102, 'version' : 200, 'its_course_version' : '2B'}]]]
+        valid_enrol_dict = {}
+        new_plan_8 = [[[{'credits': 25.0, 'id': 102, 'version' : 200, 'course_version' : '2B'}]]]
 
-        self.result_validity = validity_query(new_plan_8, valid_enrol_units, student_id, error_message)
+        self.result_validity = validity_query(new_plan_8, valid_enrol_dict, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
+
+    # this for testing save the newly created student enrolment plan to the database.
+    def test_save_student_plan(self):
+        expect_boolean = True
+        student_id = 16102183
+        valid_enrol_dict = {'123':{'version':'200', 'credits':25.0}, '456':{'version':'200', 'credits':25.0}}
+        valid_enrol_units = ['123', '456']
+        self.result_save = save_student_plan(valid_enrol_dict, valid_enrol_units, student_id)
+        self.assertEqual(self.result_save, expect_boolean)
 
 if __name__=='__main__':
 	unittest.main()
