@@ -1,3 +1,265 @@
+from .models import Student, StudentUnit, CourseTemplate, CourseTemplateOptions, Unit, Equivalence, Prerequisite, Options, Course
+from django.http import HttpResponse
+import json
+
+
+###############################################################################
+# For processing the fron-end request checking if the newly created student
+# enrollment plan is valid, then will response back the True and generated a
+# valid enrolment unit list, otherwise responsing the error message.
+#
+# Json Structure:
+#   {'plan' : [[[{'id' : <UNIT ID>, 'credits' : <UNIT CREDITS>}]]]}
+###############################################################################
+def enrol_plan_validity(request):
+    # If all good then add units to completedUnits array waiting to save
+    valid_enrol_dict = {}
+    valid_enrol_units = []
+    error_msg = ''
+    boolean_respond = False
+    # student_id = 16102183, for use as test option
+    student_id = -1
+    if request.user.is_authenticated():
+        student_id = request.user.username
+    else:
+        error_msg = 'deny invalid user'
+        return HttpResponse(error_msg)
+
+    if request.is_ajax() and student_id is not -1:
+        try:
+            received_plan_json = json.loads(request.body.decode('utf-8'))
+            new_plan = received_plan_json['plan']
+        except Student.DoesNotExist:
+            error_msg = 'can not parse json object'
+            return HttpResponse(error_msg)
+        boolean_respond = validity_query(new_plan, valid_enrol_dict, valid_enrol_units, student_id, error_msg)
+    else:
+        raise Http500()
+
+    if boolean_respond is False:
+        HttpResponse(error_msg)
+    else:
+        flag = save_student_plan(valid_enrol_dict, valid_enrol_units, student_id)
+        if flag is False:
+            error_msg = 'failed to save new student plan'
+            HttpResponse(error_msg)
+        else:
+            msg = 'success'
+            HttpResponse(msg)
+
+
+##############################################################################################################################
+# This function is try to save the valid_unit_list to database
+##############################################################################################################################
+def save_student_plan(valid_enrol_dict, valid_enrol_units, student_id):
+    temp = None
+    for valid_unit in valid_enrol_units:
+        student = Student.objects.get(StudentID=student_id)
+        unit_entryset = valid_enrol_dict[valid_unit]
+        version = unit_entryset['version']
+        credits = unit_entryset['credits']
+        unit = Unit.objects.get(UnitCode=valid_unit, Version=version, Credits=credits)
+        try:
+            failed_unit = StudentUnit.objects.get(StudentID=student, UnitID=unit)
+            new_student_unit = StudentUnit(StudentID=student, UnitID=unit, Attempts=failed_unit.Attemps)
+            new_student_unit.save()
+            temp = new_student_unit.id
+        except StudentUnit.DoesNotExist:
+            new_student_unit = StudentUnit(StudentID=student, UnitID=unit, Attempts=0)
+            new_student_unit.save()
+            temp = new_student_unit.id
+        if temp is None:
+            return False
+
+    return True
+
+##############################################################################################################################
+# Main function for verifying the student plan if valid
+# Parameter_1: new student plan passed from fron-end
+# Parameter_2: empty list for storing valid unit_code
+# Parameter_3: empty dict for forming unit info
+# Parameter_4: student_id for retrieving student object that is for collecting
+# Parameter_5: collect error message and give front-end currnet error
+# course, and then its course templates and course template option based on
+# the data model design
+#
+# Main Algorithm:
+#   traversing the new plan list, its structure is like [[[{'id' : <UNIT ID>, 'credits' : <UNIT CREDITS>}]]]
+#   1st it isn't Elective unit
+#       2nd new enrolled unit is previous enrolled unit
+#           - the unit passed or not available current year/semester will return False, otherwise will allow ro add that unit
+#       new enrolled unit is never enrolled before
+#           3rd check this unit if has equivalence unit and if its equivalence has passed,
+#               - if allow to go next then will check if it has prerequisite unit if its prerequisite unit passed
+#   it is Elective unit, then add its id and credits
+#       - will add this elective unit id and credits
+#   4th here will check total credits each semester if exceeded max 100
+##############################################################################################################################
+def validity_query(new_plan, valid_enrol_dict, valid_enrol_units, student_id, error_msg):
+    for year in new_plan:
+        this_year = new_plan.index(year) + 1
+
+        for semester in year:
+            this_semester = year.index(semester) + 1
+            credits_this_semester = 0
+
+            for unit in semester:
+                unit_id = unit['id']
+                credit = unit['credits']
+                version = unit['version']
+                course_version = unit['course_version']
+                if unit_id is not 'ELECTIVE':
+                    this_student = Student.objects.get(StudentID=student_id)
+					# issue 1 also need version
+                    this_student_course = Course.objects.get(CourseID=this_student.CourseID.CourseID, Version=course_version)
+					# issue 2 may need pass me version
+                    single_unit = Unit.objects.get(UnitCode=unit_id, Credits=credit, Version=version)
+
+                    # find this student this course temp and its course temp option so that can retrieve temp unit information
+                    course_temps = CourseTemplate.objects.all().filter(CourseID=this_student_course)
+                    course_temp_option = None
+                    # here will only one course_temp_option be retrieved
+                    for temp in course_temps:
+                        try:
+                            course_temp_option = CourseTemplateOptions.objects.get(UnitID=single_unit, Option=temp)
+                        except CourseTemplateOptions.DoesNotExist:
+                            continue
+
+                    # return false if no related course option to this enrolled unit (invalid unit in student course temp)
+                    if course_temp_option is None:
+                        error_msg = 'invalid unit in student course temp'
+                        return False
+
+
+                    # find this student a enrol unit related Equivalence units, otherwise none
+                    try:
+                        equiv_units = Equivalence.objects.all().filter(UnitID=single_unit)
+                    except Equivalence.DoesNotExist:
+                        continue
+
+                    # the units in enrolplan could be either temp units or plan units, so will check previous enrolled unit status
+                    try:
+                        completed_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=single_unit)
+                        # here will need to generate an error message to denote what problems are with enrollment (elif)
+                        if completed_unit.Status is 2:
+                            valid_enrol_dict.clear()
+                            error_msg = 'one of unit is passed'
+                            return False
+                        elif course_temp_option.Year is not this_year:
+                            valid_enrol_dict.clear()
+                            error_msg = 'one of unit is not available this year'
+                            return False
+                        elif course_temp_option.Semester is not this_semester:
+                            valid_enrol_dict.clear()
+                            error_msg = 'one of unit is not available this semester'
+                            return False
+                        else:
+                            credits_this_semester += credit
+                            valid_enrol_units.append(unit_id)
+                            unit_info = {}
+                            unit_info['version'] = version
+                            unit_info['credits'] = credit
+                            valid_enrol_dict = {unit_id : unit_info}
+                    except StudentUnit.DoesNotExist:
+                        if course_temp_option.Year is not this_year or course_temp_option.Semester is not this_semester:
+                            valid_enrol_dict.clear()
+                            error_msg = 'one of unit is not available this year/semester'
+                            return False
+                        # here need to check if its equi units have been finished before
+                        if equiv_units.exists():
+                            # check if the equivalence already existed in the previous student plan and passed it
+                            for equiv in equiv_units:
+                                try:
+                                    unit_status = StudentUnit.objects.get(StudentID=this_student, UnitID=equiv.EquivID).Status
+                                    if unit_status is 2:
+                                        valid_enrol_dict.clear()
+                                        error_msg = 'related equivalence has been finished'
+                                        return False
+                                # no equivalence units in previous enrolment plan
+                                except StudentUnit.DoesNotExist:
+                                    prerequisites = Prerequisite.objects.all().filter(UnitID=single_unit)
+                                    if prerequisites.exists():
+                                        for pre in prerequisites:
+                                            opts = Options.objects.get(Option=pre)
+                                            for opt in opts:
+                                                # if can not find the prerequisite unit in student plan that means does not enrol prerequisite before
+                                                try:
+                                                    prerequis_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=opt.UnitID.UnitID)
+                                                    if prerequis_unit.Status is not 2:
+                                                        valid_enrol_dict.clear()
+                                                        error_msg = 'did not pass its prerequis unit'
+                                                        return False
+                                                    elif prerequis_unit.Status is 2:
+                                                        credits_this_semester += credit
+                                                        valid_enrol_units.append(unit_id)
+                                                        unit_info = {}
+                                                        unit_info['version'] = version
+                                                        unit_info['credits'] = credit
+                                                        valid_enrol_dict = {unit_id : unit_info}
+                                                except StudentUnit.DoesNotExist:
+                                                    valid_enrol_dict.clear()
+                                                    error_msg = 'has not enrolled its prerequis unit before'
+                                                    return False
+                                    else:
+                                        credits_this_semester += credit
+                                        valid_enrol_units.append(unit_id)
+                                        unit_info = {}
+                                        unit_info['version'] = version
+                                        unit_info['credits'] = credit
+                                        valid_enrol_dict = {unit_id : unit_info}
+
+                        else:
+                            prerequisites = Prerequisite.objects.all().filter(UnitID=single_unit)
+                            if prerequisites.exists():
+                                for pre in prerequisites:
+                                    opts = Options.objects.all().filter(Option=pre)
+                                    for opt in opts:
+                                        # if can not find the prerequisite unit in student plan that means does not enrol prerequisite before
+                                        try:
+                                            prerequis_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=opt.UnitID)
+                                            if prerequis_unit.Status is not 2:
+                                                valid_enrol_dict.clear()
+                                                error_msg = 'did not pass its prerequis unit'
+                                                return False
+                                            elif prerequis_unit.Status is 2:
+                                                credits_this_semester += credit
+                                                valid_enrol_units.append(unit_id)
+                                                unit_info = {}
+                                                unit_info['version'] = version
+                                                unit_info['credits'] = credit
+                                                valid_enrol_dict = {unit_id : unit_info}
+                                        except StudentUnit.DoesNotExist:
+                                            valid_enrol_dict.clear()
+                                            error_msg = 'has not enrolled its prerequis unit before'
+                                            return False
+                            else:
+                                credits_this_semester += credit
+                                valid_enrol_units.append(unit_id)
+                                unit_info = {}
+                                unit_info['version'] = version
+                                unit_info['credits'] = credit
+                                valid_enrol_dict = {unit_id : unit_info}
+                else:
+                    credits_this_semester += credit
+                    valid_enrol_units.append(unit_id)
+                    unit_info = {}
+                    unit_info['version'] = version
+                    unit_info['credits'] = credit
+                    valid_enrol_dict = {unit_id : unit_info}
+            # Credit amount per semester musn't exceed 100
+            if credits_this_semester > 100:
+                valid_enrol_dict.clear()
+                error_msg = 'can not enrol units more than 100 credits a semester'
+                return False
+
+    return True
+###############################################################################
+
+
+
+
+
+from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth import login

@@ -35,13 +35,13 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'core_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core_app',
     'dbbackup',  # django-dbbackup
     'django_cron',
 ]
@@ -94,6 +94,7 @@ WSGI_APPLICATION = 'Enrolment_Helper.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
 # Testing takes place on a sqlite database. Significantly faster.
 if 'test' in sys.argv:
     DATABASES = {

@@ -16,7 +16,7 @@ class TestEnrolmentPlanCreation(test.TestCase):
     def setUpTestData(cls):
         """
         YOAKIM'S PDF.
-        :return: 
+        :return:
         """
         database_objects = []
         cls.information_savers = []

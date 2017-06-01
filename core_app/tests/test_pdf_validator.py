@@ -23,7 +23,7 @@ class TestPdfValidation(test.TestCase):
     def setUpTestData(cls):
         """
         YOAKIM'S PDF.
-        :return: 
+        :return:
         """
         database_objects = []
         cls.validators = []
@@ -237,7 +237,7 @@ class TestPdfValidation(test.TestCase):
     def test_file(self):
         """
         Static method so the file object still exists.
-        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf 
+        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf
         parser again are required to create and send again.
         """
         for filename in self.filenames:
@@ -251,7 +251,7 @@ class TestPdfValidation(test.TestCase):
 
     def test_is_valid(self):
         """
-        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf 
+        progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf
         parser again are required to create and send again.
         """
         for filename in self.filenames:
