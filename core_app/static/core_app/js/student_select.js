@@ -133,7 +133,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   function studentSelectErrorHandler(response) {
     var endtext = response.data;
-    if(response.data === null) {
+    if(response.data.indexOf('<!DOCTYPE html>' !== -1)) {
       endtext = response.statusText;
     }
     showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);
