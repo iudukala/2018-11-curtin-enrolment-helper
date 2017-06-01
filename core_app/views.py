@@ -253,7 +253,189 @@ def validity_query(new_plan, valid_enrol_dict, valid_enrol_units, student_id, er
                 return False
 
     return True
-###############################################################################
+####################################################################################################
+
+
+
+
+from core_app.models import Student, StudentUnit, Course, CourseTemplate, CourseTemplateOptions, Unit
+from django.http import HttpResponse
+from django.http import JsonResponse
+import json
+
+######################################################################################################
+# For retrieving the student course progress information, 1st get the student id
+# from request with json object, and retrieving the data from data model and forming
+# the new json object return back to the Front-end
+######################################################################################################
+def course_progress(request):
+    resp = {}
+    if request.is_ajax():
+        try:
+            received_data = json.loads(request.body.decode('utf-8'))
+        except ValueError:
+            error_msg = 'can not parse json object'
+            return HttpResponse(error_msg)
+        try:
+            student_id = received_data.get['id']
+            student = Student.objects.get(pk=student_id)
+            courses = form_course(student)
+
+            all_course_temp = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
+            templates= form_templates(all_course_temp, student_id)
+
+            all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
+            plans = form_plans(all_plan)
+
+            resp = return_resp(courses, templates, plans)
+        except (Student.DoesNotExist, CourseTemplate.DoesNotExist, StudentUnit.DoesNotExist) as e:
+            error_msg = 'Invalid data input'
+            return HttpResponse(error_msg)
+    else:
+        raise Http500()
+
+    return JsonResponse(resp)
+
+######################################################################################################
+# Form the json object
+# the final output should be like {course:<courses>, template:<templates>, plan:<plans>}
+######################################################################################################
+def return_resp(courses, templates, plans):
+    resp = {
+        'course' : courses,
+        'template' : templates,
+        'plan' : plans
+    }
+
+    return resp
+
+######################################################################################################
+# Finding each data as required and save and construct with the pre-defined
+# json data, for both template_option and plans, i.e. courses :{name:<>, id:<>}
+# templates = [[[{id:<>, name:<>, credits:<>,status:<>, attempts:<>}]]] and plans same as templates
+######################################################################################################
+def form_course(student):
+    student_course = student.CourseID
+    courses = {'name' : student_course.Name, 'id' : student_course.CourseID, 'course_version' : student_course.Version}
+    return courses
+
+def form_templates(all_course_temp, student_id):
+    templates = []
+    year = []
+    semester_1 = []
+    semester_2 = []
+    this_semester = -1
+    this_year = -1
+
+    for temp in all_course_temp:
+        course_options = CourseTemplateOptions.objects.all().filter(Option=temp.Option).order_by('Year', 'Semester')
+        for opt in course_options:
+            single_unit = opt.UnitID
+            student = Student.objects.get(pk=student_id)
+            try:
+                student_unit = StudentUnit.objects.get(StudentID=student, UnitID=opt.UnitID)
+                unit = {'id' : single_unit.UnitCode, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts, 'version' : single_unit.Version}
+            except StudentUnit.DoesNotExist:
+                unit = {'id' : single_unit.UnitCode, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : 1, 'attempts' : 0, 'version' : single_unit.Version}
+
+            if this_year is -1 and this_semester is -1:
+                this_year = opt.Year
+                this_semester = opt.Semester
+            if opt.Year is this_year and opt is not course_options[len(course_options)-1]:
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+            elif (opt.Year - this_year) is 1:
+                if not semester_1:
+                    year.append(semester_2)
+                elif not semester_2:
+                    year.append(semester_1)
+                else:
+                    year.append(semester_1)
+                    year.append(semester_2)
+                semester_1 = []
+                semester_2 = []
+                templates.append(year)
+                year = []
+                this_year = opt.Year
+                this_semester = opt.Semester
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+            elif opt is course_options[len(course_options)-1] and opt.Year is this_year:
+                if opt.Semester is 1:
+                    semester_1.append(unit)
+                elif opt.Semester is 2:
+                    semester_2.append(unit)
+
+                if not semester_1:
+                    year.append(semester_2)
+                elif not semester_2:
+                    year.append(semester_1)
+                else:
+                    year.append(semester_1)
+                    year.append(semester_2)
+                    templates.append(year)
+
+    return templates
+
+
+def form_plans(all_plans):
+	plan = []
+	year = []
+	semester_1 = []
+	semester_2 = []
+	this_semester = -1
+	this_year = -1
+	for pl in all_plans:
+		single_unit = pl.UnitID
+		unit = {'id':single_unit.UnitCode, 'credits':single_unit.Credits, 'version' : single_unit.Version}
+		if this_year is -1 and this_semester is -1:
+			this_year = pl.Year
+			this_semester = pl.Semester
+		if pl.Year is this_year and pl is not all_plans[len(all_plans)-1]:
+			if pl.Semester is 1:
+				semester_1.append(unit)
+			elif pl.Semester is 2:
+				semester_2.append(unit)
+		elif (pl.Year - this_year) is 1:
+			if not semester_1:
+				year.append(semester_2)
+			elif not semester_2:
+				year.append(semester_1)
+			else:
+				year.append(semester_1)
+				year.append(semester_2)
+				semester_1 = []
+				semester_2 = []
+				plan.append(year)
+				year = []
+				this_year = pl.Year
+				this_semester = pl.Semester
+				if pl.Semester is 1:
+					semester_1.append(unit)
+				elif pl.Semester is 2:
+					semester_2.append(unit)
+		elif pl is all_plans[len(all_plans) - 1] and pl.Year is this_year:
+			if pl.Semester is 1:
+				semester_1.append(unit)
+			elif pl.Semester is 2:
+				semester_2.append(unit)
+			if not semester_1:
+				year.append(semester_2)
+			elif not semester_2:
+				year.append(semester_1)
+			else:
+				year.append(semester_1)
+				year.append(semester_2)
+			plan.append(year)
+
+	return plan
+######################################################################################################
+
+
 
 
 
@@ -362,6 +544,7 @@ def report_upload(request):
 @login_required
 def home(request):
     return render(request, 'core_app/home.html')
+
 
 @login_required
 def planner(request):
