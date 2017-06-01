@@ -594,7 +594,11 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
    * Notes: N/A
    */
   function plannerErrorHandler(response) {
-      showErrorMessage('HTTP ERROR '+ response.status + ': ' + response.statusText);
+    var endtext = response.data;
+    if(!response.data) {
+      endtext = response.statusText;
+    }
+      showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);
       $rootScope.closeSpinner();
   };
 

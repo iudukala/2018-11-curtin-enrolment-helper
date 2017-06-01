@@ -5,11 +5,13 @@
     <title>eTracker - Planner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load staticfiles %}
+    {% csrf_token %}
     <link rel="stylesheet" href="{% static 'core_app/css/planner.css' %}"/>
     <script src="{% static '/core_app/js/angular.min.js' %}"></script>
     <script src="{% static 'core_app/js/colors.js' %}"></script>
     <script src="{% static 'core_app/js/student_select.js' %}"></script>
     <script src="{% static 'core_app/js/planner.js' %}"></script>
+    <script type="text/javascript">var csrftoken = '{{ csrf_token }}'</script>
 </head>
 
 <body ng-app="plannerApp" ng-class="{'invisible': loaded}">

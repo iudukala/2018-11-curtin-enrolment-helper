@@ -136,8 +136,12 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    * Notes: N/A
    */
   function studentSelectErrorHandler(response) {
-      showErrorMessage('HTTP ERROR '+ response.status + ': ' + response.statusText);
-      $rootScope.closeSpinner();
+    var endtext = response.data;
+    if(!response.data) {
+      endtext = response.statusText;
+    }
+    showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);
+    $rootScope.closeSpinner();
   };
 
   /*
@@ -221,7 +225,9 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
 });
 
 //Method runs when angular app runs
-app.run(function($rootScope) {
+app.run(function($http, $rootScope) {
+  //csrf setup
+  $http.defaults.headers.post['X-CSRFToken'] = csrftoken;
   //rootScope setup
   $rootScope.selectingStudent = true;
   $rootScope.$on('$viewContentLoaded', function(){
