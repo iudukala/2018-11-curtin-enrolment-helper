@@ -127,7 +127,7 @@ class Command(BaseCommand):
         units.append(Unit(UnitCode='12332', Name='Foundations of Computer Science 200', Version=3, Semester=1, Credits=25, Elective=False))
 
         units.append(Unit(UnitCode='MATH1004', Name='Mathematics 1', Version=1, Semester=1, Credits=25, Elective=False))
-        
+
         units.append(Unit(UnitCode='4521', Name='Computer Communications 200', Version=7, Semester=1, Credits=25, Elective=False))
 
         units.append(Unit(UnitCode='313670', Name='Engineering Programming 210', Version=1, Semester=1, Credits=25, Elective=False))

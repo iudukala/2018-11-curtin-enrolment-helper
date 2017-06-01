@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'^report_upload/$', views.report_upload, name='report_upload'),
     url(r'^planner/$', views.planner, name='planner'),
     url(r'^home/$', views.home, name='home'),
-
+    url(r'^emailplan$', views.email_to_student, name='emailplan')
 ]
 
 # =======

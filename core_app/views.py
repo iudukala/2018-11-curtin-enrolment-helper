@@ -451,14 +451,14 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.shortcuts import render
 from django.core.files import File
+from django.core.exceptions import ObjectDoesNotExist
 from .models import Student
 # from django.utils import simple
-
+from core_app.emailer import *
 import json
 from .pdf_validator import PdfValidator
 from .student_information_saver import StudentInformationSaver
 from core_app.temp_populating_database import populate, delete_database
-
 
 def index(request):
     """
@@ -549,3 +549,16 @@ def home(request):
 @login_required
 def planner(request):
     return render(request, 'core_app/planner.html')
+
+@login_required
+def email_to_student(request):
+    if request.method == 'POST':
+            received_id_json = json.loads(request.body.decode('utf-8'))
+            id = received_id_json['id']
+            try:
+                SendingEmailToStudent.send_email_to_student(id)
+                return HttpResponse("Successful", status=200)
+            except ObjectDoesNotExist as e:
+                return HttpResponse("No plan", status=500)
+    else:
+        return HttpResponse("Error", status=500)

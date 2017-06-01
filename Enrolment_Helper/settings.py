@@ -219,5 +219,23 @@ LOGGING = {
 # Default page
 LOGIN_URL = '/login/'
 
+# Save database to this file path
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': '/home/hannes/ENROLMENT_HELPER/backups/'}
+
+# Backend is for smtp email sever
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Host is setup for email
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_USE_TLS = True
+
+# User is email address in form from@example.com
+EMAIL_HOST_USER = 'etracker.notification@gmail.com'
+
+# Password of email
+EMAIL_HOST_PASSWORD = 'ihatebears18'
+
+# Port to send
+EMAIL_PORT = 587
