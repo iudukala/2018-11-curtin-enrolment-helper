@@ -192,3 +192,8 @@
     
     Documention
     https://django-fernet-fields.readthedocs.io/en/latest/
+    
+### Icon Author Credit
+    Dave Gandy: http://www.flaticon.com/authors/dave-gandy  
+    Nas Ztudio: http://www.flaticon.com/authors/nas-ztudio
+    Freepik: http://www.freepik.com
