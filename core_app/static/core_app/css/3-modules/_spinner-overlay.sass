@@ -1,0 +1,41 @@
+.spinner-overlay
+  height: 100vh
+  width: 100vw
+  position: fixed
+  top: 0
+  left: 0
+  display: flex
+  align-items: center
+  justify-content: center
+  +transition(opacity 0.2s ease)
+  background-color: rgba(0, 0, 0, 0.7)
+  z-index: 10
+
+  .spinner-prompt
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    +border-radius(5px)
+    height: 250px
+    min-width: 500px
+
+    .spinner-image
+      height: 80px
+      width: 80px
+      border: 10px solid #AAAAAA
+      border-top-color: white
+      border-radius: 50%
+      margin: 30px
+      animation: spinnerAnim 1.2s linear infinite
+
+    @keyframes spinnerAnim
+      0%
+        +transform(rotate(0deg))
+
+      100%
+        +transform(rotate(360deg))
+
+.spinner-overlay-disappeared
+  opacity: 0
+  pointer-events: none

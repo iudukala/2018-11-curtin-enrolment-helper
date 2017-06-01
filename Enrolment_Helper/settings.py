@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,8 +26,11 @@ SECRET_KEY = 'f_e8y2!a6btf7drzi-dbl$af4j(z*144wyp7nf8z*altuvt3e='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# Allow through bridged connection on VM.
+ALLOWED_HOSTS = [
+    # '10.1.1.14',
+    # '127.0.0.1'
+]
 
 # Application definition
 
@@ -38,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-   # 'core_app.apps.CoreAppConfig',
+    'dbbackup',  # django-dbbackup
 ]
 
 MIDDLEWARE = [
@@ -53,10 +57,21 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Enrolment_Helper.urls'
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            # '/Users/Eugene/SEP1_Project/2017-11.3-enrolment-helper/templates',
+            # '/home/yoakim/UNI/2017/SEP2/',
+            # './2017-11.3-enrolment-helper/templates',
+            'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,31 +90,59 @@ WSGI_APPLICATION = 'Enrolment_Helper.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    # Old default SQLite database
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-
-    # Utilising the MySQL database
-    #'default': {
-    #    'ENGINE': 'django.db.backends.mysql',
-    #    'NAME': 'Enrolment_Helper',
-    #    'USER': 'enrolment_helperuser',
-    #    'PASSWORD': 'user',
-    #    'HOST': 'localhost',
-    #    'PORT': '',
-    #}
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_enrolment_helper',
-        'USER': 'root',
-        'PASSWORD': '77497',
-        'HOST': 'localhost',
-        'PORT': '3306',
+# Testing takes place on a sqlite database. Significantly faster.
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            # 'OPTIONS': {
+            #     'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
+            # },
+            'NAME': 'Enrolment_Helper',
+            'USER': 'enrolment_helperuser',
+            'PASSWORD': 'user',
+            'HOST': 'localhost',
+            'PORT': '',
+            # 'OPTIONS': {
+            #     'ssl': {
+            #         'ca': '../../ca.pem',
+            #         'cert': '../../client-cert.pem',
+            #         'key': '../../client-key.pem'
+            #     }
+            # }
+        },
+    }
+
+# f = open(os.path.join(BASE_DIR, 'my.cnf'))
+# output = f.read()
+# print(output)
+# f.close()
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'Enrolment_Helper',
+#         'USER': 'enrolment_helperuser',
+#         'PASSWORD': 'user',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#
+#         'OPTIONS': {
+#             'ssl': {
+#                 'ca': '../../ca.pem',
+#                 'cert': '../../client-cert.pem',
+#                 'key': '../../client-key.pem'
+#             }
+#         }
+#     }
+# }
 
 
 # Password validation
@@ -126,7 +169,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Perth'
 
 USE_I18N = True
 
@@ -140,5 +184,35 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s - %(levelname)s - %(message)s'
+            },
+        },
+    'handlers': {
+        'core_app_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'logging.log',
+            'formatter': 'default',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            },
+    },
+    'loggers': {
+        'core_app': {
+            'handlers': ['core_app_handler'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 # Default page
-# LOGIN_REDIRECT_URL = 'login'
+LOGIN_URL = '/login/'
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/home/hannes/ENROLMENT_HELPER/backups/'}

@@ -57,16 +57,19 @@
         &:last-of-type
           border-bottom: none
 
-        span
-          font-size: 18px
-          color: #ADADAD
-          height: auto
+        .file-item-info
+          width: 90%
 
-        p
-          color: #ADADAD
-          margin: 0
-          font-size: 12px
-          font-weight: 200px
+          span
+            font-size: 18px
+            color: #ADADAD
+            height: auto
+
+          p
+            color: #ADADAD
+            margin: 0
+            font-size: 12px
+            font-weight: 200px
 
         .visible-element
           display: inline
@@ -107,16 +110,18 @@
         background-color: rgba(50,205,50,0.5)
         border-bottom-color: rgb(50,205,50)
 
-        span, p
-          color: #FFFFFF
+        .file-item-info
+          span, p
+            color: #FFFFFF
 
       .file-item-failure
         +box-sizing(border-box)
         background-color: rgba(255,0,0,0.5)
         border-bottom-color: rgb(255,0,0)
 
-        span, p
-          color: #FFFFFF
+        .file-item-info
+          span, p
+            color: #FFFFFF
 
     .file-list-filled
       width: 50%

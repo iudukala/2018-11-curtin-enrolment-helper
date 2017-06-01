@@ -2,6 +2,27 @@ README.txt
 
 Setting up Django backend. Including configuring database. (MySQL)
 
+                                  * * *
+
+TESTING:
+    For testing purposes, the tests are conducted on a new database created from the current models.
+    This is obviously good as it isolates the existing databases from test data.
+    The test data (which is created and destroyed for the test) is called 'test_Enrolment_Helper' (in own case).
+    However the user (enrolment_helperuser) does not have permission to do anything with with database.
+
+    To fix:
+    Login to mySQL as root.
+    'GRANT ALL PRIVILGES ON test_Enrolment_Helper.* TO enrolment_helperuser@localhost;'
+    'FLUSH PRIVILEGES;'
+
+    This may change depending on how tests are setup and is only going to be required if you wish to run tests on
+    your local machine.
+
+    Tests can be currently run as:
+    'python manage.py test core_app'
+
+                                  * * *
+
 Please read the entire README.txt/related weblinks BEFORE running any code. 
 Also always check that you are using the virtualenv when running commands, and deactive when you are done.
 
