@@ -6,3 +6,6 @@ pyparsing==2.2.0
 six==1.10.0
 pdfminer.six==20160614
 django-fernet-fields==0.5
+django-dbbackup
+python-gnupg
+django-cron

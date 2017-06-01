@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core_app',
+    'dbbackup',  # django-dbbackup
 ]
 
 MIDDLEWARE = [
@@ -211,3 +212,6 @@ LOGGING = {
 }
 # Default page
 LOGIN_URL = '/login/'
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/home/hannes/ENROLMENT_HELPER/backups/'}
