@@ -3,75 +3,39 @@ from django.db import IntegrityError, transaction
 from django.core.files import File
 from core_app.models import *
 from core_app.pdf_validator import PdfValidator
-import unittest
 
 # Run tests with:
 # 'python manage test core_app.tests'
 
-# FIXME.
-# The same unit can have multiple versions.
-# Issues then on what version to create and cannot test that particular version of the unit exists
-#   in the database as cannot create BOTH versions of the unit.
 
-
-# @unittest.skip("Skipping")
-# Renamed TestCase to reference test.TestCase to ensure not using unittest by accident.
 class TestPdfValidation(test.TestCase):
 
-    # Setting up a database with correct values for student 17080170 .
     @classmethod
     def setUpTestData(cls):
-        """
-        YOAKIM'S PDF.
-        :return:
-        """
+
         database_objects = []
         cls.validators = []
+
+        # Derricks course does not exists within the database.
         cls.filenames = [
             '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Darryl-pr.pdf',
-            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf'
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Campbell-pr.pdf',
             # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Derrick-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
-            # '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/ChienFeiLin-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/Eugene-pr.pdf',
+            '/home/yoakim/2017/SEP2/SEP2_Project/new_PDF_PLANS/XiMingWong-pr.pdf'
         ]
 
         """
         Yoakim's PDF.
         """
         # COURSES - Required as the Course is referenced when creating a Student object.
-        # bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-        # bachelor_of_engineering = Course.objects.create(CourseID='313683', Version='5', Name='Course1',
-        #                                                 TotalCredits=600)
 
-        bachelor_of_engineering = Course.objects.create(CourseID='307808', Version='2', Name='Course1', TotalCredits=600)
-        bachelor_of_science = Course.objects.create(CourseID='B-SCNCE', Version='5', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='B-SCNCE', Version='1', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='313312', Version='1', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='311148', Version='5', Name='Course1', TotalCredits=600)
-        Course.objects.create(CourseID='BH-ENGR', Version='1', Name='Course1', TotalCredits=600)
-
-        # Campbell
-        Course.objects.create(CourseID='313605', Version='1', Name='Software Engineering Major (BEng)',
-                              TotalCredits=600)
-
-        # Derrick
-        Course.objects.create(CourseID='313313', Version='1', Name='Computer Science Major (Extended) (BScComp)',
-                              TotalCredits=600)
-
-        # Chien-Fei Lin
-        Course.objects.create(CourseID='313313', Version='2', Name='Computer Science Major (Extended) (BScComp)',
-                              TotalCredits=600)
-
-        database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
-        database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
-        database_objects.append(Course(CourseID='313799',     Version='2', Name='Course3', TotalCredits=600))
-        database_objects.append(Course(CourseID='STRU-SWENG', Version='1', Name='Course4', TotalCredits=600))
-
-        database_objects.append(Course(CourseID='311148',     Version='5', Name='Course1', TotalCredits=600))
-        database_objects.append(Course(CourseID='MJRU-COMPT', Version='1', Name='Course2', TotalCredits=600))
-        database_objects.append(Course(CourseID='313799',     Version='2', Name='Course3', TotalCredits=600))
-        database_objects.append(Course(CourseID='STRU-SWENG', Version='1', Name='Course4', TotalCredits=600))
+        Course.objects.create(CourseID='STRU-CMPSC', Name='Computer Science Stream (BSc Science)', Version=1, TotalCredits=600)
+        Course.objects.create(CourseID='STRU-SWENG', Name='Software Engineering Stream (BSc Science)', Version=1, TotalCredits=600)
+        Course.objects.create(CourseID='STRU-CYBSC', Name='Cyber Security Stream (BSc Science)', Version=1, TotalCredits=600)
+        Course.objects.create(CourseID='STRU-INFTC', Name='Information Technology Stream (BSc Science)', Version=1, TotalCredits=600)
+        Course.objects.create(CourseID='313605', Name='Software Engineering Major (BEng)', Version=1, TotalCredits=600)
 
         # UNITS
         database_objects.append(Unit(UnitCode='312649',    Version='4',  Credits=25, Semester=1))
@@ -184,16 +148,6 @@ class TestPdfValidation(test.TestCase):
         database_objects.append(Unit(UnitCode='ELECTIVE3',  Version='2',  Credits=75.0, Semester=-1, Elective=True))
         database_objects.append(Unit(UnitCode='ELECTIVE4',  Version='2',  Credits=50.0, Semester=-1, Elective=True))
 
-        # cls.filename = '/home/yoakim/2017/SEP2/SEP2_Project/PDF_PLANS/StudentProgressReport-18402636-23_Mar_2017.pdf'
-
-        # STUDENTS
-        database_objects.append(Student(StudentID='16171921', Name='Campell James Pedersen',
-                                        CreditsCompleted='300', AcademicStatus='1',
-                                        CourseID=bachelor_of_engineering))
-        database_objects.append(Student(StudentID='18402636', Name='Darryl Chng',
-                                        CreditsCompleted='300', AcademicStatus='1',
-                                        CourseID=bachelor_of_science))
-
         # Actually populates the database.
         for entry in database_objects:
             try:
@@ -207,8 +161,6 @@ class TestPdfValidation(test.TestCase):
         for filename in cls.filenames:
             with open(filename, 'rb') as fp:
                 file = File(fp)
-                # cls.validator = PdfValidator(file)
-                # cls.validator.read_file()
                 validator = PdfValidator(file)
                 validator.read_file()
                 cls.validators.append(validator)
@@ -236,7 +188,10 @@ class TestPdfValidation(test.TestCase):
 
     def test_file(self):
         """
+<<<<<<< Updated upstream
         Static method so the file object still exists.
+=======
+>>>>>>> Stashed changes
         progress_parser (the pdf parser) closes the file object, therefore tests which are required to run the pdf
         parser again are required to create and send again.
         """

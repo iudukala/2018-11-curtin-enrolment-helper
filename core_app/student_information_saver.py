@@ -59,7 +59,6 @@ class StudentInformationSaver:
         new_student_course = Course.objects.get(CourseID=student_major_course_info[0],
                                                 Version=student_major_course_info[1])
 
-
         # Determine completed credits, and set completed units.
         completed_credits, self.completed_units = self.calculate_completed_credits()
 
@@ -73,12 +72,6 @@ class StudentInformationSaver:
         self.output_message += "New student with id: {} created.\n".format(new_student.StudentID)
 
         new_student.save()
-
-        # except ObjectDoesNotExist:
-        #     self.error_detected = True
-        #     self.output_message += \
-        #         "Unexpected error while creating student detected retrieving course information: {}\n"\
-        #         .format(self.parsed_report['course'][0])
 
         return Student.objects.get(StudentID=self.parsed_report['id'])
 
@@ -99,7 +92,7 @@ class StudentInformationSaver:
                 completed_units[unitCode] = unit_info
                 counted_credits += Decimal(unit_info['credits'])
 
-        # Loops through automatically creditted units.
+        # Loops through automatically credited units.
         for unitCode, unit_info in self.parsed_report['automatic'].items():
             if unitCode not in completed_units:
                 completed_units[unitCode] = unit_info
@@ -280,9 +273,10 @@ class StudentInformationSaver:
                         if StudentUnit.objects.filter(StudentID=student_object, UnitID=option_object.UnitID).exists():
                             student_unit = StudentUnit.objects.get(StudentID=student_object,
                                                                    UnitID=option_object.UnitID)
-                            if student_unit.Status == '2':
+
+                            if student_unit.Status == 2:
                                 or_achieved = True
-                                continue
+                                # continue
                                 # # If the student has passed no need to check the other 'OR' units.
                                 # if student_unit.Status == '2':
                                 #     or_achieved = True
@@ -292,7 +286,7 @@ class StudentInformationSaver:
                     if not or_achieved:
                         self.output_message += "Prerequisite/s not met for unit: {}.\n".format(unit.UnitCode)
                         prerequisite_achieved = False
-                        continue
+                        # continue
 
         return prerequisite_achieved
 

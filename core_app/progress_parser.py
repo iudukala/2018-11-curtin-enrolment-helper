@@ -419,3 +419,17 @@ def parse_progress_report(fp):
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
     return report_dict
+
+
+# Test code
+paths = ['/Users/CPedersen/Documents/SEP-2017/Progress-Report/Campbell-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/ChienFeiLin-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Darryl-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Derrick-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Eugene-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/XiMingWong-pr.pdf',
+         '/Users/CPedersen/Documents/SEP-2017/Progress-Report/Yoakim-pr.pdf']
+
+# for path in paths:
+#     fp = open(path, 'rb')
+#     parse_progress_report(fp)

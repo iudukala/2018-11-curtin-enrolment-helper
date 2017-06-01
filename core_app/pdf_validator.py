@@ -85,6 +85,9 @@ class PdfValidator:
         course_found = False
         index = 0
 
+        course_id = ""
+        version = ""
+
         for courses in course_list:
             course_id = courses[0]
             version = courses[1]
@@ -96,7 +99,11 @@ class PdfValidator:
 
             index += 1
 
-        if not course_found:
+        if course_list is []:
+            self.is_parsed_pdf_valid = False
+            self.output_message += "No parsed course information found\n"
+
+        elif not course_found:
             self.is_parsed_pdf_valid = False
             self.output_message += 'Courses: ' + str(course_id) + ', Version: ' + str(version) + \
                                    ' Does not exist in the database.\n'

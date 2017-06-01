@@ -458,7 +458,6 @@ from core_app.emailer import *
 import json
 from .pdf_validator import PdfValidator
 from .student_information_saver import StudentInformationSaver
-from core_app.temp_populating_database import populate, delete_database
 
 def index(request):
     """

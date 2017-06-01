@@ -21,15 +21,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'f_e8y2!a6btf7drzi-dbl$af4j(z*144wyp7nf8z*altuvt3e='
+with open(os.path.join(BASE_DIR, 'SECRET_KEY.txt')) as f:
+    SECRET_KEY = f.read().strip()
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Allow through bridged connection on VM.
 ALLOWED_HOSTS = [
-    # '10.1.1.14',
-    # '127.0.0.1'
 ]
 
 # Application definition
@@ -108,47 +108,15 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             # 'OPTIONS': {
-            #     'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
+            #     'read_default_file': os.path.join(BASE_DIR, 'my.cnf')
             # },
             'NAME': 'Enrolment_Helper',
             'USER': 'enrolment_helperuser',
             'PASSWORD': 'user',
             'HOST': 'localhost',
             'PORT': '',
-            # 'OPTIONS': {
-            #     'ssl': {
-            #         'ca': '../../ca.pem',
-            #         'cert': '../../client-cert.pem',
-            #         'key': '../../client-key.pem'
-            #     }
-            # }
         },
     }
-
-# f = open(os.path.join(BASE_DIR, 'my.cnf'))
-# output = f.read()
-# print(output)
-# f.close()
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'Enrolment_Helper',
-#         'USER': 'enrolment_helperuser',
-#         'PASSWORD': 'user',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#
-#         'OPTIONS': {
-#             'ssl': {
-#                 'ca': '../../ca.pem',
-#                 'cert': '../../client-cert.pem',
-#                 'key': '../../client-key.pem'
-#             }
-#         }
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
