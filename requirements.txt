@@ -9,3 +9,4 @@ django-fernet-fields==0.5
 django-dbbackup
 python-gnupg
 django-cron
+django-crontab

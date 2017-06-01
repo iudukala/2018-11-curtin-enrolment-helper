@@ -5,9 +5,9 @@ from django_cron import CronJobBase, Schedule
 
 
 class Backup(CronJobBase):
-    RUN_AT_TIMES = ['6:00', '18:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'my_app.Backup'
+    RUN_EVERY_MINS = 1
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'core_app.back_up'
 
     def do(self):
         management.call_command('dbbackup')

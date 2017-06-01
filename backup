@@ -1,0 +1,3 @@
+#!/bin/sh
+source /home/hannes/ENROLMENT_HELPER/virtualenv/bin/activate && python /home/hannes/ENROLMENT_HELPER/2017-11.3-enrolment-helper/manage.py runcrons > /home/hannes/ENROLMENT_HELPER/2017-11.3-enrolment-helper/cronjob.log
+

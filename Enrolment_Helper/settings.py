@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core_app',
     'dbbackup',  # django-dbbackup
+    'django_cron',
+]
+
+CRON_CLASSES = [
+    'core_app.cron.Backup',
 ]
 
 MIDDLEWARE = [
