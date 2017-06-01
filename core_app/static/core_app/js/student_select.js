@@ -102,9 +102,9 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
   function getStudentList() {
     $rootScope.openSpinner('Loading student list...');
     //Uncomment when merging
-    //$http.get('/getStudentList').then(studentListHandler, studentSelectErrorHandler);
+    $http.get('/getStudentList').then(studentListHandler, studentSelectErrorHandler);
 
-    setTimeout(studentListHandler, 1000);
+    // setTimeout(studentListHandler, 1000);
   };
 
   /*
@@ -120,7 +120,7 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    */
   function studentListHandler(response) {
     //var json = response.data;
-    var json = testStudents;
+    var json = response.data;
 
     /*TEST DATA*/
     $scope.students = json;

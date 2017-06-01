@@ -71,10 +71,15 @@ def validity_query(new_plan, valid_enrol_units, student_id, error_msg):
             for unit in semester:
                 unit_id = unit['id']
                 credit = unit['credits']
+                version = unit['version']
+                course_version = unit['its_course_version']
                 if unit_id is not 'ELECTIVE':
+
                     this_student = Student.objects.get(StudentID=student_id)
-                    this_student_course = Course.objects.get(CourseID=this_student.CourseID.CourseID)
-                    single_unit = Unit.objects.get(UnitID=unit_id)
+					# issue 1 also need version
+                    this_student_course = Course.objects.get(CourseID=this_student.CourseID.CourseID, Version=course_version)
+					# issue 2 may need pass me version
+                    single_unit = Unit.objects.get(UnitCode=unit_id, Credits=credit, Version=version)
 
                     # find this student this course temp and its course temp option so that can retrieve temp unit information
                     course_temps = CourseTemplate.objects.all().filter(CourseID=this_student_course)
@@ -127,7 +132,7 @@ def validity_query(new_plan, valid_enrol_units, student_id, error_msg):
                             # check if the equivalence already existed in the previous student plan and passed it
                             for equiv in equiv_units:
                                 try:
-                                    unit_status = StudentUnit.objects.get(StudentID=this_student, UnitID=equiv.EquivID.UnitID).Status
+                                    unit_status = StudentUnit.objects.get(StudentID=this_student, UnitID=equiv.EquivID).Status
                                     if unit_status is 2:
                                         valid_enrol_units = []
                                         error_msg = 'related equivalence has been finished'
@@ -165,7 +170,7 @@ def validity_query(new_plan, valid_enrol_units, student_id, error_msg):
                                     for opt in opts:
                                         # if can not find the prerequisite unit in student plan that means does not enrol prerequisite before
                                         try:
-                                            prerequis_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=opt.UnitID.UnitID)
+                                            prerequis_unit = StudentUnit.objects.get(StudentID=this_student, UnitID=opt.UnitID)
                                             if prerequis_unit.Status is not 2:
                                                 valid_enrol_units = []
                                                 error_msg = 'did not pass its prerequis unit'
@@ -202,6 +207,72 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.core import serializers
+from django.shortcuts import render
+from django.core.files import File
+from .models import Student
+# from django.utils import simple
+
+import json
+from .pdf_validator import PdfValidator
+from .student_information_saver import StudentInformationSaver
+from core_app.temp_populating_database import populate, delete_database
+
+
+def index(request):
+    """
+    Default Index page
+    """
+    return HttpResponse("At the core_app page")
+
+
+# TODO: Return 'success' (parsedInfo is Valid)
+# TODO: Return 'failed' (What is required to be returned?)
+@login_required
+def upload_file(request):
+    """
+    Handles pdf files being uploaded.
+    https://docs.djangoproject.com/en/1.10/topics/http/file-uploads/
+    """
+    print(request)
+
+    if request.method == 'POST':
+        if request.FILES.get('file[]'):
+
+            myfile = request.FILES.get('file[]')
+            file = File(myfile)
+            validator = PdfValidator(file)
+            valid, output_message = validator.pdf_is_valid()
+            if valid:
+                information_saver = StudentInformationSaver(validator.get_validated_information())
+                information_saver.set_student_units()
+                print(information_saver.output_message)
+                return HttpResponse(status=200)
+            else:
+                print(validator.output_message)
+                return HttpResponse("Validation or saving student error.", status=500)
+
+        else:
+            return HttpResponse("Request is not correct.", status=403)
+
+    else:
+        return HttpResponse("Validation or saving student error.", status=403)
+
+
+@login_required
+def get_student_list(request):
+    """
+    :param request:
+    :return: A JSON dict object of StudentID and name
+    """
+    if request.method == 'GET':
+
+        return_list = list(Student.objects.all().values('StudentID', 'Name'))
+        return HttpResponse(json.dumps(return_list), content_type='application/list')
+
+    else:
+        return HttpResponse("Request Error", status=400)
 
 
 # Create your views here.
@@ -226,13 +297,14 @@ def logout_user(request):
     logout(request)
     return render(request, 'core_app/login.html')
 
-
+@login_required
 def report_upload(request):
     return render(request, 'core_app/report_upload.html')
 
-
+@login_required
 def home(request):
     return render(request, 'core_app/home.html')
 
+@login_required
 def planner(request):
-    return render(request, 'core_app/planner.html');
+    return render(request, 'core_app/planner.html')

@@ -3,8 +3,19 @@
 /*****Python Temporary Files*****/
 *.pyc
 
+<<<<<<< HEAD
+/* Various linter/Vim stuff */
+.pylintrc
+.ropeproject/
+Session.vim
+*.json
+.idea
+db.sqlite3
+
+=======
 /*****Prepros Ignores*****/
 prepros-6.config
+>>>>>>> develop
 
 /*****OSX Gitignore*****/
 *.DS_Store

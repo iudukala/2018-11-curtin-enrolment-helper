@@ -473,8 +473,9 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
    * Notes: Set as the ng-click attribute of the email plan button
    */
   $scope.emailPlan = function() {
+    studentObj = {id: $scope.theStudent.id};
     $rootScope.openSpinner('Emailing plan to student...');
-    $http.post('/emailPlan').then(emailSuccess, plannerErrorHandler);
+    $http.post('/emailplan', studentObj).then(emailSuccess, plannerErrorHandler);
   }
 
   /*

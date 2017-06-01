@@ -38,10 +38,10 @@
       <ul class="student-name-table">
         <li class="student-table-row"
             ng-repeat="student in students | filter:searchText"
-            ng-class="{'row-selected': (selectedStudent.id === student.id)}"
-            ng-click="selectStudent(student.id, student.name)">
-          <div class="cell student-name-cell">{[{ student.name }]}</div>
-          <div class="cell student-id-cell">{[{ student.id }]}</div>
+            ng-class="{'row-selected': (selectedStudent.id === student.StudentID)}"
+            ng-click="selectStudent(student.StudentID, student.Name)">
+          <div class="cell student-name-cell">{[{ student.Name }]}</div>
+          <div class="cell student-id-cell">{[{ student.StudentID }]}</div>
         </li>
       </ul>
       <input type="button"

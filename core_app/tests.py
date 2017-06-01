@@ -19,33 +19,33 @@ class TestCourseProgress(TestCase):
         student1 = Student.objects.create(StudentID=16102183, Name='Chen', CreditsCompleted=500, AcademicStatus=1, CourseID=course1)
 
         # UNITS
-        unit1 = Unit.objects.create(UnitID=123, UnitCode='abc123', Name='OOSE', Version='100', Semester=1, Credits=25.0)
-        unit2 = Unit.objects.create(UnitID=456, UnitCode='abc456', Name='OOPD', Version='100', Semester=2, Credits=25.0)
-        unit3 = Unit.objects.create(UnitID=789, UnitCode='abc789', Name='OS', Version='100', Semester=2, Credits=25.0)
-        unit4 = Unit.objects.create(UnitID=777, UnitCode='abc777', Name='PDM', Version='300', Semester=1, Credits=25.0)
-        unit5 = Unit.objects.create(UnitID=888, UnitCode='abc888', Name='CG', Version='200', Semester=1, Credits=25.0)
-        unit6 = Unit.objects.create(UnitID=999, UnitCode='abc999', Name='CC', Version='200', Semester=1, Credits=25.0)
-        unit7 = Unit.objects.create(UnitID=741, UnitCode='abc741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
-        unit8 = Unit.objects.create(UnitID=363, UnitCode='abc363', Name='HCI', Version='200', Semester=1, Credits=25.0)
-        unit9 = Unit.objects.create(UnitID=369, UnitCode='abc369', Name='UCP', Version='200', Semester=2, Credits=25.0)
+        unit1 = Unit.objects.create(UnitCode='abc123', Name='OOSE', Version='100', Semester=1, Credits=25.0)
+        unit2 = Unit.objects.create(UnitCode='abc456', Name='OOPD', Version='100', Semester=2, Credits=25.0)
+        unit3 = Unit.objects.create(UnitCode='abc789', Name='OS', Version='100', Semester=2, Credits=25.0)
+        unit4 = Unit.objects.create(UnitCode='abc777', Name='PDM', Version='300', Semester=1, Credits=25.0)
+        unit5 = Unit.objects.create(UnitCode='abc888', Name='CG', Version='200', Semester=1, Credits=25.0)
+        unit6 = Unit.objects.create(UnitCode='abc999', Name='CC', Version='200', Semester=1, Credits=25.0)
+        unit7 = Unit.objects.create(UnitCode='abc741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
+        unit8 = Unit.objects.create(UnitCode='abc363', Name='HCI', Version='200', Semester=1, Credits=25.0)
+        unit9 = Unit.objects.create(UnitCode='abc369', Name='UCP', Version='200', Semester=2, Credits=25.0)
 
-        unit10 = Unit.objects.create(UnitID=100, UnitCode='abc100', Name='UP1', Version='200', Semester=1, Credits=25.0)
-        unit11 = Unit.objects.create(UnitID=101, UnitCode='abc101', Name='UP2', Version='200', Semester=1, Credits=25.0)
-        unit12 = Unit.objects.create(UnitID=102, UnitCode='abc102', Name='UP3', Version='200', Semester=1, Credits=25.0)
-        unit13 = Unit.objects.create(UnitID=103, UnitCode='abc103', Name='UP4', Version='200', Semester=2, Credits=25.0)
-        unit14 = Unit.objects.create(UnitID=104, UnitCode='abc104', Name='UP5', Version='200', Semester=2, Credits=25.0)
-        unit20 = Unit.objects.create(UnitID=3838, UnitCode='abc3838', Name='UP38', Version='200', Semester=2, Credits=25.0)
-        unit21 = Unit.objects.create(UnitID=373, UnitCode='abc373', Name='UP373', Version='200', Semester=2, Credits=25.0)
+        unit10 = Unit.objects.create(UnitCode='abc100', Name='UP1', Version='200', Semester=1, Credits=25.0)
+        unit11 = Unit.objects.create(UnitCode='abc101', Name='UP2', Version='200', Semester=1, Credits=25.0)
+        unit12 = Unit.objects.create(UnitCode='abc102', Name='UP3', Version='200', Semester=1, Credits=25.0)
+        unit13 = Unit.objects.create(UnitCode='abc103', Name='UP4', Version='200', Semester=2, Credits=25.0)
+        unit14 = Unit.objects.create(UnitCode='abc104', Name='UP5', Version='200', Semester=2, Credits=25.0)
+        unit20 = Unit.objects.create(UnitCode='abc3838', Name='UP38', Version='200', Semester=2, Credits=25.0)
+        unit21 = Unit.objects.create(UnitCode='abc373', Name='UP373', Version='200', Semester=2, Credits=25.0)
 
 
         # units for equivalence
-        unit15 = Unit.objects.create(UnitID=111, UnitCode='abc111', Name='SE100', Version='200', Semester=1, Credits=25.0)
-        unit16 = Unit.objects.create(UnitID=222, UnitCode='abc222', Name='SE200', Version='200', Semester=2, Credits=25.0)
+        unit15 = Unit.objects.create(UnitCode='abc111', Name='SE100', Version='200', Semester=1, Credits=25.0)
+        unit16 = Unit.objects.create(UnitCode='abc222', Name='SE200', Version='200', Semester=2, Credits=25.0)
         # units for prerequisite
-        unit17 = Unit.objects.create(UnitID=333, UnitCode='abc333', Name='SE300', Version='200', Semester=1, Credits=25.0)
-        unit18 = Unit.objects.create(UnitID=444, UnitCode='abc444', Name='SEP1', Version='200', Semester=2, Credits=25.0)
+        unit17 = Unit.objects.create(UnitCode='abc333', Name='SE300', Version='200', Semester=1, Credits=25.0)
+        unit18 = Unit.objects.create(UnitCode='abc444', Name='SEP1', Version='200', Semester=2, Credits=25.0)
         # a elective unit
-        unit19 = Unit.objects.create(UnitID=666, UnitCode='abc666', Name='CCP', Version='300', Semester=1, Credits=25.0)
+        unit19 = Unit.objects.create(UnitCode='abc666', Name='CCP', Version='300', Semester=1, Credits=25.0, Elective=True)
 
         # Course Temp
         courseTemp1 = CourseTemplate.objects.create(CourseID=course1, Option=163)

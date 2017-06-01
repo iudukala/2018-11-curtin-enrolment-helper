@@ -19,33 +19,33 @@ class TestCourseProgress(TestCase):
         student1 = Student.objects.create(StudentID=16102183, Name='Chen', CreditsCompleted=500, AcademicStatus=1, CourseID=course1)
 
         # UNITS
-        unit1 = Unit.objects.create(UnitID=123, UnitCode='abc123', Name='OOSE', Version='100', Semester=1, Credits=25.0)
-        unit2 = Unit.objects.create(UnitID=456, UnitCode='abc456', Name='OOPD', Version='100', Semester=2, Credits=25.0)
-        unit3 = Unit.objects.create(UnitID=789, UnitCode='abc789', Name='OS', Version='100', Semester=2, Credits=25.0)
-        unit4 = Unit.objects.create(UnitID=777, UnitCode='abc777', Name='PDM', Version='300', Semester=1, Credits=25.0)
-        unit5 = Unit.objects.create(UnitID=888, UnitCode='abc888', Name='CG', Version='200', Semester=1, Credits=25.0)
-        unit6 = Unit.objects.create(UnitID=999, UnitCode='abc999', Name='CC', Version='200', Semester=1, Credits=25.0)
-        unit7 = Unit.objects.create(UnitID=741, UnitCode='abc741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
-        unit8 = Unit.objects.create(UnitID=363, UnitCode='abc363', Name='HCI', Version='200', Semester=1, Credits=25.0)
-        unit9 = Unit.objects.create(UnitID=369, UnitCode='abc369', Name='UCP', Version='200', Semester=2, Credits=25.0)
+        unit1 = Unit.objects.create(UnitCode='123', Name='OOSE', Version='200', Semester=1, Credits=25.0)
+        unit2 = Unit.objects.create(UnitCode='456', Name='OOPD', Version='200', Semester=2, Credits=25.0)
+        unit3 = Unit.objects.create(UnitCode='789', Name='OS', Version='200', Semester=2, Credits=25.0)
+        unit4 = Unit.objects.create(UnitCode='777', Name='PDM', Version='200', Semester=1, Credits=25.0)
+        unit5 = Unit.objects.create(UnitCode='888', Name='CG', Version='200', Semester=1, Credits=25.0)
+        unit6 = Unit.objects.create(UnitCode='999', Name='CC', Version='200', Semester=1, Credits=25.0)
+        unit7 = Unit.objects.create(UnitCode='741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
+        unit8 = Unit.objects.create(UnitCode='363', Name='HCI', Version='200', Semester=1, Credits=25.0)
+        unit9 = Unit.objects.create(UnitCode='369', Name='UCP', Version='200', Semester=2, Credits=25.0)
 
-        unit10 = Unit.objects.create(UnitID=100, UnitCode='abc100', Name='UP1', Version='200', Semester=1, Credits=25.0)
-        unit11 = Unit.objects.create(UnitID=101, UnitCode='abc101', Name='UP2', Version='200', Semester=1, Credits=25.0)
-        unit12 = Unit.objects.create(UnitID=102, UnitCode='abc102', Name='UP3', Version='200', Semester=1, Credits=25.0)
-        unit13 = Unit.objects.create(UnitID=103, UnitCode='abc103', Name='UP4', Version='200', Semester=2, Credits=25.0)
-        unit14 = Unit.objects.create(UnitID=104, UnitCode='abc104', Name='UP5', Version='200', Semester=2, Credits=25.0)
-        unit20 = Unit.objects.create(UnitID=3838, UnitCode='abc3838', Name='UP38', Version='200', Semester=2, Credits=25.0)
-        unit21 = Unit.objects.create(UnitID=373, UnitCode='abc373', Name='UP373', Version='200', Semester=2, Credits=25.0)
+        unit10 = Unit.objects.create(UnitCode='100', Name='UP1', Version='200', Semester=1, Credits=25.0)
+        unit11 = Unit.objects.create(UnitCode='101', Name='UP2', Version='200', Semester=1, Credits=25.0)
+        unit12 = Unit.objects.create(UnitCode='102', Name='UP3', Version='200', Semester=1, Credits=25.0)
+        unit13 = Unit.objects.create(UnitCode='103', Name='UP4', Version='200', Semester=2, Credits=25.0)
+        unit14 = Unit.objects.create(UnitCode='104', Name='UP5', Version='200', Semester=2, Credits=25.0)
+        unit20 = Unit.objects.create(UnitCode='3838', Name='UP38', Version='200', Semester=2, Credits=25.0)
+        unit21 = Unit.objects.create(UnitCode='373', Name='UP373', Version='200', Semester=2, Credits=25.0)
 
 
         # units for equivalence
-        unit15 = Unit.objects.create(UnitID=111, UnitCode='abc111', Name='SE100', Version='200', Semester=1, Credits=25.0)
-        unit16 = Unit.objects.create(UnitID=222, UnitCode='abc222', Name='SE200', Version='200', Semester=2, Credits=25.0)
+        unit15 = Unit.objects.create(UnitCode='111', Name='SE100', Version='200', Semester=1, Credits=25.0)
+        unit16 = Unit.objects.create(UnitCode='222', Name='SE200', Version='200', Semester=2, Credits=25.0)
         # units for prerequisite
-        unit17 = Unit.objects.create(UnitID=333, UnitCode='abc333', Name='SE300', Version='200', Semester=1, Credits=25.0)
-        unit18 = Unit.objects.create(UnitID=444, UnitCode='abc444', Name='SEP1', Version='200', Semester=2, Credits=25.0)
+        unit17 = Unit.objects.create(UnitCode='333', Name='SE300', Version='200', Semester=1, Credits=25.0)
+        unit18 = Unit.objects.create(UnitCode='444', Name='SEP1', Version='200', Semester=2, Credits=25.0)
         # a elective unit
-        unit19 = Unit.objects.create(UnitID=666, UnitCode='abc666', Name='CCP', Version='300', Semester=1, Credits=25.0)
+        unit19 = Unit.objects.create(UnitCode='666', Name='CCP', Version='200', Semester=1, Credits=25.0, Elective=True)
 
         # Course Temp
         courseTemp1 = CourseTemplate.objects.create(CourseID=course1, Option=163)
@@ -109,7 +109,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_1 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}], [{'credits': 25.0, 'id': 369}]]]
+        new_plan_1 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_1, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -121,7 +121,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_2 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}, {'credits' : 25.0, 'id' : 101}], [{'credits': 25.0, 'id': 369}]]]
+        new_plan_2 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 101, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_2, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -133,7 +133,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_3 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}, {'credits' : 25.0, 'id' : 100}], [{'credits': 25.0, 'id': 369}]]]
+        new_plan_3 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 100, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_3, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -145,7 +145,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_4 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}, {'credits' : 25.0, 'id' : 102}], [{'credits': 25.0, 'id': 369}]]]
+        new_plan_4 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 102, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_4, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -157,7 +157,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_5 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}], [{'credits': 25.0, 'id': 369}, {'credits' : 25.0, 'id' : 103}]]]
+        new_plan_5 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_5, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -169,7 +169,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_6 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}], [{'credits': 25.0, 'id': 369}, {'credits' : 25.0, 'id' : 103}, {'credits' : 25.0, 'id' : 373}, {'credits' : 25.0, 'id' : 104}, {'credits' : 25.0, 'id' : 3838}]]]
+        new_plan_6 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 103, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 373, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 104, 'version' : 200, 'its_course_version' : '2B'}, {'credits' : 25.0, 'id' : 3838, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_6, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
@@ -181,7 +181,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_7 = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}, {'credits': 25.0, 'id': 666}], [{'credits': 25.0, 'id': 369}]]]
+        new_plan_7 = [[[{'credits': 25.0, 'id': 123, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 777, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 888, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 789, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 999, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 741, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 456, 'version' : 200, 'its_course_version' : '2B'}]], [[{'credits': 25.0, 'id': 363, 'version' : 200, 'its_course_version' : '2B'}, {'credits': 25.0, 'id': 666, 'version' : 200, 'its_course_version' : '2B'}], [{'credits': 25.0, 'id': 369, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_7, valid_enrol_units, student_id, error_message)
         self.assertEqual(valid_enrol_units, expect_list)
@@ -193,7 +193,7 @@ class TestCourseProgress(TestCase):
         student_id = 16102183
         error_message = ''
         valid_enrol_units = []
-        new_plan_8 = [[[{'credits': 25.0, 'id': 102}]]]
+        new_plan_8 = [[[{'credits': 25.0, 'id': 102, 'version' : 200, 'its_course_version' : '2B'}]]]
 
         self.result_validity = validity_query(new_plan_8, valid_enrol_units, student_id, error_message)
         self.assertEqual(self.result_validity, expect_boolean)
