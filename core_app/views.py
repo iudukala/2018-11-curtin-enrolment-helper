@@ -20,10 +20,13 @@ def course_progress(request):
             student_id = received_data.get['id']
             student = Student.objects.get(pk=student_id)
             courses = form_course(student)
+
             all_course_temp = CourseTemplate.objects.all().filter(CourseID=student.CourseID)
             templates= form_templates(all_course_temp, student_id)
+
             all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
             plans = form_plans(all_plan)
+
             resp = return_resp(courses, templates, plans)
         except (Student.DoesNotExist, CourseTemplate.DoesNotExist, StudentUnit.DoesNotExist) as e:
             error_msg = 'Invalid data input'
@@ -52,10 +55,8 @@ def return_resp(courses, templates, plans):
 # templates = [[[{id:<>, name:<>, credits:<>,status:<>, attempts:<>}]]] and plans same as templates
 ######################################################################################################
 def form_course(student):
-    course_id = student.CourseID.CourseID
-    student_course = Course.objects.get(CourseID=course_id)
-    courses = {'name' : student_course.Name, 'id' : course_id}
-
+    student_course = student.CourseID
+    courses = {'name' : student_course.Name, 'id' : student_course.CourseID, 'course_version' : student_course.Version}
     return courses
 
 def form_templates(all_course_temp, student_id):
@@ -69,13 +70,13 @@ def form_templates(all_course_temp, student_id):
     for temp in all_course_temp:
         course_options = CourseTemplateOptions.objects.all().filter(Option=temp.Option).order_by('Year', 'Semester')
         for opt in course_options:
-            single_unit = Unit.objects.get(UnitID=opt.UnitID.UnitID)
+            single_unit = opt.UnitID
             student = Student.objects.get(pk=student_id)
             try:
                 student_unit = StudentUnit.objects.get(StudentID=student, UnitID=opt.UnitID)
-                unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts}
+                unit = {'id' : single_unit.UnitCode, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : student_unit.Status, 'attempts' : student_unit.Attempts, 'version' : single_unit.Version}
             except StudentUnit.DoesNotExist:
-                unit = {'id' : single_unit.UnitID, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : 1, 'attempts' : 0}
+                unit = {'id' : single_unit.UnitCode, 'name' : single_unit.Name, 'credits' : single_unit.Credits, 'status' : 1, 'attempts' : 0, 'version' : single_unit.Version}
 
             if this_year is -1 and this_semester is -1:
                 this_year = opt.Year
@@ -116,8 +117,7 @@ def form_templates(all_course_temp, student_id):
                 else:
                     year.append(semester_1)
                     year.append(semester_2)
-
-                templates.append(year)
+                    templates.append(year)
 
     return templates
 
@@ -130,8 +130,8 @@ def form_plans(all_plans):
 	this_semester = -1
 	this_year = -1
 	for pl in all_plans:
-		single_unit = Unit.objects.get(UnitID=pl.UnitID.UnitID)
-		unit = {'id':single_unit.UnitID, 'credits':single_unit.Credits}
+		single_unit = pl.UnitID
+		unit = {'id':single_unit.UnitCode, 'credits':single_unit.Credits, 'version' : single_unit.Version}
 		if this_year is -1 and this_semester is -1:
 			this_year = pl.Year
 			this_semester = pl.Semester
@@ -170,7 +170,7 @@ def form_plans(all_plans):
 			else:
 				year.append(semester_1)
 				year.append(semester_2)
-				plan.append(year)
+			plan.append(year)
 
 	return plan
 ######################################################################################################

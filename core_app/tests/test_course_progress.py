@@ -18,15 +18,15 @@ class TestCourseProgress(TestCase):
         student1 = Student.objects.create(StudentID=16102183, Name='Chen', CreditsCompleted=500, AcademicStatus=1, CourseID=course1)
 
         # UNITS
-        unit1 = Unit.objects.create(UnitID=123, UnitCode='abc123', Name='OOSE', Version='100', Semester=1, Credits=25.0)
-        unit2 = Unit.objects.create(UnitID=456, UnitCode='abc456', Name='OOPD', Version='100', Semester=2, Credits=25.0)
-        unit3 = Unit.objects.create(UnitID=789, UnitCode='abc789', Name='OS', Version='100', Semester=2, Credits=25.0)
-        unit4 = Unit.objects.create(UnitID=777, UnitCode='abc777', Name='PDM', Version='300', Semester=1, Credits=25.0)
-        unit5 = Unit.objects.create(UnitID=888, UnitCode='abc888', Name='CG', Version='200', Semester=1, Credits=25.0)
-        unit6 = Unit.objects.create(UnitID=999, UnitCode='abc999', Name='CC', Version='200', Semester=1, Credits=25.0)
-        unit7 = Unit.objects.create(UnitID=741, UnitCode='abc741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
-        unit8 = Unit.objects.create(UnitID=363, UnitCode='abc363', Name='HCI', Version='200', Semester=1, Credits=25.0)
-        unit9 = Unit.objects.create(UnitID=369, UnitCode='abc369', Name='UCP', Version='200', Semester=2, Credits=25.0)
+        unit1 = Unit.objects.create(UnitCode='123', Name='OOSE', Version='200', Semester=1, Credits=25.0)
+        unit2 = Unit.objects.create(UnitCode='456', Name='OOPD', Version='200', Semester=2, Credits=25.0)
+        unit3 = Unit.objects.create(UnitCode='789', Name='OS', Version='200', Semester=2, Credits=25.0)
+        unit4 = Unit.objects.create(UnitCode='777', Name='PDM', Version='200', Semester=1, Credits=25.0)
+        unit5 = Unit.objects.create(UnitCode='888', Name='CG', Version='200', Semester=1, Credits=25.0)
+        unit6 = Unit.objects.create(UnitCode='999', Name='CC', Version='200', Semester=1, Credits=25.0)
+        unit7 = Unit.objects.create(UnitCode='741', Name='Metrics', Version='200', Semester=2, Credits=25.0)
+        unit8 = Unit.objects.create(UnitCode='363', Name='HCI', Version='200', Semester=1, Credits=25.0)
+        unit9 = Unit.objects.create(UnitCode='369', Name='UCP', Version='200', Semester=2, Credits=25.0)
 
         # Course Temp
         courseTemp1 = CourseTemplate.objects.create(CourseID=course1, Option=163)
@@ -55,7 +55,7 @@ class TestCourseProgress(TestCase):
 
     # this is for testing function can form course information correct
     def test_course_dict(self):
-        expect_course = {'id': '1688888', 'name': 'CS'}
+        expect_course = {'course_version': '2B', 'name': 'CS', 'id': '1688888'}
         student_id = 16102183
         student = Student.objects.get(pk=student_id)
         self.courses = form_course(student)
@@ -63,17 +63,17 @@ class TestCourseProgress(TestCase):
 
     # this is for testing function can form course templates units correct, pass
     def test_templates_dict(self):
-        expect_temp = [[[{'credits': 25.0, 'id': 123, 'name': 'OOSE', 'attempts': 1, 'status': 1}, {'credits': 25.0, 'id': 777, 'name': 'PDM', 'attempts': 1, 'status': 1}], [{'credits': 25.0, 'id': 456, 'name': 'OOPD', 'attempts': 0, 'status': 1}, {'credits': 25.0, 'id': 789, 'name': 'OS', 'attempts': 1, 'status': 1}]], [[{'credits': 25.0, 'id': 888, 'name': 'CG', 'attempts': 1, 'status': 1}, {'credits': 25.0, 'id': 999, 'name': 'CC', 'attempts': 0, 'status': 1}], [{'credits': 25.0, 'id': 741, 'name': 'Metrics', 'attempts': 0, 'status': 1}, {'credits': 25.0, 'id': 369, 'name': 'UCP', 'attempts': 0, 'status': 1}]]]
+        expect_temp = [[[{'status': 1, 'attempts': 1, 'name': 'OOSE', 'version': '200', 'credits': 25.0, 'id': '123'}, {'status': 1, 'attempts': 1, 'name': 'PDM', 'version': '200', 'credits': 25.0, 'id': '777'}], [{'status': 1, 'attempts': 0, 'name': 'OOPD', 'version': '200', 'credits': 25.0, 'id': '456'}, {'status': 1, 'attempts': 1, 'name': 'OS', 'version': '200', 'credits': 25.0, 'id': '789'}]], [[{'status': 1, 'attempts': 1, 'name': 'CG', 'version': '200', 'credits': 25.0, 'id': '888'}, {'status': 1, 'attempts': 0, 'name': 'CC', 'version': '200', 'credits': 25.0, 'id': '999'}], [{'status': 1, 'attempts': 0, 'name': 'Metrics', 'version': '200', 'credits': 25.0, 'id': '741'}, {'status': 1, 'attempts': 0, 'name': 'UCP', 'version': '200', 'credits': 25.0, 'id': '369'}]]]
         student_id = 16102183
         student = Student.objects.get(StudentID=16102183)
-        course = Course.objects.get(CourseID=student.CourseID.CourseID)
-        all_course_temp = CourseTemplate.objects.all().filter(CourseID=course.CourseID)
+        course = student.CourseID
+        all_course_temp = CourseTemplate.objects.all().filter(CourseID=course)
         self.templates = form_templates(all_course_temp, student_id)
         self.assertEqual(self.templates, expect_temp)
 
     # his is for testing function can form plan units correct, pass
     def test_plans_dict(self):
-        expect_plan = [[[{'credits': 25.0, 'id': 123}, {'credits': 25.0, 'id': 777}, {'credits': 25.0, 'id': 888}], [{'credits': 25.0, 'id': 789}]], [[{'credits': 25.0, 'id': 999}], [{'credits': 25.0, 'id': 741}, {'credits': 25.0, 'id': 456}]], [[{'credits': 25.0, 'id': 363}], [{'credits': 25.0, 'id': 369}]]]
+        expect_plan = [[[{'id': '123', 'version': '200', 'credits': 25.0}, {'id': '777', 'version': '200', 'credits': 25.0}, {'id': '888', 'version': '200', 'credits': 25.0}], [{'id': '789', 'version': '200', 'credits': 25.0}]], [[{'id': '999', 'version': '200', 'credits': 25.0}], [{'id': '741', 'version': '200', 'credits': 25.0}, {'id': '456', 'version': '200', 'credits': 25.0}]], [[{'id': '363', 'version': '200', 'credits': 25.0}], [{'id': '369', 'version': '200', 'credits': 25.0}]]]
         student = Student.objects.get(StudentID=16102183)
         all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID).order_by('Year', 'Semester')
         self.plans = form_plans(all_plan)
@@ -82,9 +82,9 @@ class TestCourseProgress(TestCase):
     # # this test is for testing only one plan in db, pass in a plan unit(id 123) expect [[[{'credits': 25.0, 'id': 123}]]], actual output is
     # # [[[{'credits': 25.0, 'id': 123}]]], return true
     # def test_single_plan(self):
-    #     expect_plan = [[[{'credits': 25.0, 'id': 123}]]]
+    #     expect_plan = [[[{'id': '123', 'version': '200', 'credits': 25.0}]]]
     #     student = Student.objects.get(StudentID=16102183)
-    #     all_plan = StudentUnit.objects.all().filter(StudentID=student.StudentID).order_by('Year', 'Semester')
+    #     all_plan = StudentUnit.objects.all().filter(StudentID=student).order_by('Year', 'Semester')
     #     self.plans = form_plans(all_plan)
     #     self.assertEqual(self.plans, expect_plan)
 
