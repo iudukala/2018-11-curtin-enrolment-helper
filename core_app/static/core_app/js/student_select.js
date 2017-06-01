@@ -132,9 +132,8 @@ app.controller('studentSelectCtrl', function($scope, $rootScope, $http, StudentS
    * Notes: N/A
    */
   function studentSelectErrorHandler(response) {
-    console.log(response.data);
     var endtext = response.data;
-    if(typeof response.data === 'undefined') {
+    if(response.data === null) {
       endtext = response.statusText;
     }
     showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);

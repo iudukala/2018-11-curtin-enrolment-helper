@@ -594,9 +594,8 @@ app.controller('plannerCtrl', function($scope, $http, $rootScope, StudentService
    * Notes: N/A
    */
   function plannerErrorHandler(response) {
-    console.log(response.data);
     var endtext = response.data;
-    if(typeof response.data === 'undefined') {
+    if(response.data === null) {
       endtext = response.statusText;
     }
       showErrorMessage('HTTP ERROR '+ response.status + ': ' + endtext);
