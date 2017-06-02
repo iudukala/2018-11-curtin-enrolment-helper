@@ -323,5 +323,32 @@ var parsedJSON = {
               ],
             ],
   plan: [//Array of years
+          [//Year 1
+            [//Sem 1 Unit Objects
+              {id: 'COMP3001', name: 'DAA', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ELECTIVE3', name: 'ELECTIVE', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ISAD4002', name: 'SM 400', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'CNCO2000', name: 'CC', credits: 25.0, status: 'PLN', attempts: 0, version: '1'}
+            ],
+            [//Sem 2 Unit Objects
+              {id: 'CMPE3008', name: 'SET', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ICTE3002', name: 'HCI 400', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'COMP2004', name: 'CG 200', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'COMP2003', name: 'OO SE', credits: 25.0, status: 'PLN', attempts: 0, version: '1'}
+            ]
+          ],
+          [//Year 2
+            [//Sem 1 Unit Objects
+              {id: 'BLAW2000', name: 'Eng. Law', credits: 12.5, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ELECTIVE4', name: 'ELECTIVE', credits: 12.5, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ENEN2000', name: 'ESD 201', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ISAD4000', name: 'SEP A', credits: 50.0, status: 'PLN', attempts: 0, version: '1'},
+            ],
+            [//Sem 2 Unit Objects
+              {id: 'MGMT3000', name: 'E Man', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'COMP3003', name: 'SE Concepts', credits: 25.0, status: 'PLN', attempts: 0, version: '1'},
+              {id: 'ISAD4001', name: 'SEP B', credits: 50.0, status: 'PLN', attempts: 0, version: '1'}
+            ]
+          ],
         ]
 }
