@@ -150,6 +150,9 @@
     
     root user:
     Password: hannes
+
+    mysql root:
+    Password: enrolment
     
     A folder containing the project exists in the home directory. 'ENROLMENT_HELPER'
     This folder contains several project related folders and documents including the enrolment PDF files which were 
