@@ -21,16 +21,21 @@ class TestPdfValidation(test.TestCase):
         cls.validators = []
 
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        test_pdf_dir = "../parser tests/test_inputs/"
+        filenames_temp = \
+            [
+                'Darryl-pr.pdf',
+                'Campbell-pr.pdf',
+                # a comment by the previous group read : "# Derricks course does not exists within the database"
+                # 'Derrick-pr.pdf',
+                'ChienFeiLin-pr.pdf',
+                'Eugene-pr.pdf',
+                'XiMingWong-pr.pdf'
+            ]
 
-        # Derricks course does not exists within the database.
-        cls.filenames = [
-        	os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Darryl-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Campbell-pr.pdf'),
-            # os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Derrick-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/ChienFeiLin-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Eugene-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/XiMingWong-pr.pdf'),
-        ]
+        cls.filenames = []
+        for filename in filenames_temp:
+            cls.filenames.append(os.path.join(BASE_DIR, test_pdf_dir, filename))
 
         """
         Yoakim's PDF.

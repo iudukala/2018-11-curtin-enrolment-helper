@@ -1,12 +1,12 @@
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-from io import StringIO
-import re
-
 # Yoakim's added
 import collections
+import re
+from io import StringIO
+
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfpage import PDFPage
 
 # # # # # # # # # # # # # # # # #
 # REGULAR EXPRESSIONS (compiled)#
@@ -14,6 +14,7 @@ import collections
 
 # Regex for finding specific data points in the report output
 course_id_regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$')
+
 semester_header_regex = re.compile(
     r'^([0-9]{4}\s+Semester\s+[1-2]{1}|Automatic Credit|Exempt|General|Elective|Designated|Not assigned to a specific year)$')
 elective_header_regex = re.compile(r'^(Automatic Credit|Exempt|Elective|Designated|General)$')
@@ -169,7 +170,7 @@ def extract_progress_details(report, report_dict):
         while i < indexCount and 'Course' not in lines[i]:  # While not at EOF and not at the next course header
             semHeaderPrev = semHeaderRecent  # Keep track of last sem header seen
             while i < indexCount and (
-                            'Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
+                    'Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
                 semUnitIDs = []  # Stores the units taken in each semester
                 semUnitDetails = []  # Stores the units version, credit worth and status as dictionaries
 
@@ -348,6 +349,7 @@ def advance_line(lines, i, semHeaderPrev, semHeaderRecent, semHeaderRecentIdx):
 def extract_course_details(lines, report_dict, i):
     # courseDetails = {}
     # MODIFIED to use a OrderedDict() rather then dict
+
     courseDetails = collections.OrderedDict()
     ignoredVersions = set()
     semHeader = True
@@ -413,6 +415,7 @@ def convert_pdf_to_txt(fp):
 #
 # Notes:    IMPORT THIS METHOD, THEN CALL IT
 def parse_progress_report(fp):
+    # import pdb; pdb.set_trace();
     report = convert_pdf_to_txt(fp)  # Converts PDF to text
     report = remove_garbage(report)  # Removes unneeded labels from report
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date

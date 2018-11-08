@@ -110,3 +110,5 @@ db.sqlite3
 /.gitignore.swp
 # python3 bytecode folder
 **/__pycache__/
+# dummy reports
+/parser tests/dummy_reports

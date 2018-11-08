@@ -12,21 +12,41 @@ class TestEnrolmentPlanCreation(test.TestCase):
     Created by Yoakim Persson
     """
 
+    def save_entry(data):
+        for entry in data:
+            try:
+                with transaction.atomic():
+                    entry.save()
+
+            except IntegrityError:
+                # Object has already been created
+                pass
+
     @classmethod
     def setUpTestData(cls):
 
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        test_pdf_dir = "../parser tests/test_inputs/"
 
         database_objects = []
         cls.information_savers = []
-        cls.filenames = [
-        	os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Darryl-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Campbell-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Derrick-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/ChienFeiLin-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/Eugene-pr.pdf'),
-            os.path.join(BASE_DIR, '../../Enrolment_Plans/Test/XiMingWong-pr.pdf'),
-        ]
+
+        filenames_temp = \
+            [
+                'Darryl-pr.pdf',
+                'Campbell-pr.pdf',
+                # a comment by the previous group read : "# Derricks course does not exists within the database"
+                # 'Derrick-pr.pdf',
+                'ChienFeiLin-pr.pdf',
+                'Eugene-pr.pdf',
+                'XiMingWong-pr.pdf'
+            ]
+
+        cls.filenames = []
+        for filename in filenames_temp:
+            cls.filenames.append(os.path.join(BASE_DIR, test_pdf_dir, filename))
+
+
         # Populating test data with data from Eugene's populate_db.py
         units = []
         prerequisites = []
@@ -296,6 +316,11 @@ class TestEnrolmentPlanCreation(test.TestCase):
         units.append(Unit(UnitCode='ELECTIVE3', Name='Elective3', Version=1, Semester=3, Credits=25, Elective=True))
 
         units.append(Unit(UnitCode='ELECTIVE4', Name='Elective4', Version=1, Semester=3, Credits=25, Elective=True))
+
+        print("Units count : " + str(len(units)))
+
+
+
         for entry in units:
             try:
                 with transaction.atomic():
@@ -434,6 +459,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
         prerequisites.append(Prerequisite(UnitID=units[116], Option=64))
 
         prerequisites.append(Prerequisite(UnitID=units[118], Option=65))
+
+        print("Prerequisites count : " + str(len(prerequisites)))
 
 
         for entry in prerequisites:
@@ -749,6 +776,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
 
         options.append(Options(UnitID=units[60], Option=prerequisites[64]))
 
+        print("opitions count : " + str(len(options)))
+
         for entry in options:
             try:
                 with transaction.atomic():
@@ -870,6 +899,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
 
         equivalences.append(Equivalence(UnitID=units[124], EquivID=units[125]))
 
+        print("equivalences countt : " + str(len(equivalences)))
+
 
         for entry in equivalences:
             try:
@@ -889,6 +920,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
         courses.append(Course(CourseID='STRU-INFTC', Name='Information Technology Stream (BSc Science)', Version=1, TotalCredits=600))
 
         courses.append(Course(CourseID='313605', Name='Software Engineering Major (BEng)', Version=1, TotalCredits=600))
+
+        print ("courses count: " + str(len(courses)))
 
 
         for entry in courses:
@@ -934,6 +967,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
 
         #BEng Software Engineering without midyear intake
         course_templates.append(CourseTemplate(CourseID=courses[4], Option=17, MidYearEntry=False))
+
+        print("course templates count : " + str(len(course_templates)))
 
 
         for entry in course_templates:
@@ -1507,6 +1542,8 @@ class TestEnrolmentPlanCreation(test.TestCase):
         course_template_options.append(CourseTemplateOptions(Option=course_templates[16], UnitID=units[32], Year=4, Semester=2))
         course_template_options.append(CourseTemplateOptions(Option=course_templates[16], UnitID=units[120], Year=4, Semester=2))
 
+        print("course_template_options count : " + str(len(course_template_options)))
+
         for entry in course_template_options:
             try:
                 with transaction.atomic():
@@ -1558,6 +1595,7 @@ class TestEnrolmentPlanCreation(test.TestCase):
         elective_templates.append(Unit(UnitCode='ELECTIVE3', Name='ELECTIVE', Version='2',  Credits=75.0, Semester=-1, Elective=True))
         elective_templates.append(Unit(UnitCode='ELECTIVE4', Name='ELECTIVE', Version='2',  Credits=50.0, Semester=-1, Elective=True))
 
+        ("elective_template_options count : " + str(len(elective_templates)))
         for entry in elective_templates:
             try:
                 with transaction.atomic():
