@@ -36,7 +36,6 @@ class PDFMinerWrapper:
         self.pdf_extracted_text = None
         self.pdf_page_count = -1
 
-
     def parse_data(self):
         rsrcmgr = PDFResourceManager()
         text_stream = StringIO()
