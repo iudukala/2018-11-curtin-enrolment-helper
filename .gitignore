@@ -1,6 +1,12 @@
+
+#######################################################################################################################
+
+
 # -------JETBRAINS GITIGNORE TEMPLATE ( https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore )
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+#######################################################################################################################
 
 # User-specific stuff
 .idea/**/workspace.xml
@@ -67,8 +73,15 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
+
+#######################################################################################################################
+
+
 # ----------JETBRAINS GITIGNORE TEMPLATE END
+
 # ----------MACOS GITIGNORE TEMPLATE START ( https://github.com/github/gitignore/blob/master/Global/macOS.gitignore )
+
+#######################################################################################################################
 
 # General
 .DS_Store
@@ -98,9 +111,16 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# ---------MACOS GITIGNORE TEMPLATE END
 
+#######################################################################################################################
+
+
+# ---------MACOS GITIGNORE TEMPLATE END
+# ---------VISUAL STUDIO CODE TEMPLATE START
 # ---------CUSTOM
+
+#######################################################################################################################
+
 
 # virtualenv environment folder
 /venv/

@@ -178,8 +178,8 @@ def extract_progress_details(report, report_dict):
 
                 ### GET UNIT IDs ###
                 # Advance to first unit ID from semester header that hasn't been read already
-                while (i < indexCount and not re.match(unit_id_regex,
-                                                       lines[i])) or i == semHeaderRecentIdx or i in ignoredUnits:
+                while (i < indexCount and not re.match(unit_id_regex, lines[i])) \
+                        or i == semHeaderRecentIdx or i in ignoredUnits:
                     i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
                                                                           semHeaderRecentIdx)
 
@@ -252,6 +252,7 @@ def extract_progress_details(report, report_dict):
                         ignoredStatus.add(i)  # Add current line to ignored version list
                         i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
                                                                               semHeaderRecentIdx)
+
 
                 ### ADD UNITS TO DICTIONARY ###
                 for index, unit in enumerate(semUnitIDs):
@@ -421,6 +422,8 @@ def parse_progress_report(fp):
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
+    import pprint
+    # pprint.pprint(report_dict)
     return report_dict
 
 
