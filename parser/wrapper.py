@@ -18,14 +18,8 @@ class PDFFile:
     def __init__(self, file_path, extracted_text, page_count):
         self.file_path = file_path
 
-        self.pdf_extracted_text = extracted_text
-        self.pdf_page_count = page_count
-
-    def fetch_text(self):
-        return self.pdf_extracted_text
-
-    def fetch_page_count(self):
-        return self.pdf_page_count
+        self.text = extracted_text
+        self.page_count = page_count
 
 
 class PDFMinerWrapper:
