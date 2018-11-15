@@ -1,5 +1,8 @@
-import unittest
+# Author    : Isuru Udukala (iudukala@gmail.com)
+
+
 import glob
+import unittest
 
 import regexes
 from wrapper import PDFMinerWrapper
@@ -7,6 +10,7 @@ from wrapper import PDFMinerWrapper
 
 class RegexTestCases(unittest.TestCase):
     """tests if there exists a regex garbage match for each page"""
+
     def test_garbage_regex_per_page(self):
         for pdf_path in fetch_pdf_list():
             pdf_file = PDFMinerWrapper(pdf_path).parse_data()
@@ -22,7 +26,7 @@ class RegexTestCases(unittest.TestCase):
 
 def fetch_pdf_list():
     return glob.glob("parser_tests/**/*.pdf")
-    # return glob.glob("parser_tests/test_inputs/*.pdf")
-    # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
 
 
+if __name__ == '__main__':
+    unittest.main()

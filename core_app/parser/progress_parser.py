@@ -134,7 +134,13 @@ def extract_student_details(report):
 # Return:   A python dictionary which now contains a student's progress details.
 #
 # Notes:    None
-def extract_progress_details(report, report_dict):
+def extract_progress_details(report, report_dict) -> object:
+    """
+
+    :param report:
+    :param report_dict:
+    :return:
+    """
     lines = report.split('\n')  # Split report into lines
     indexCount = len(lines) - 1
     i = 0  # Index for line counting

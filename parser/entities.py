@@ -1,3 +1,6 @@
+# Author    : Isuru Udukala (iudukala@gmail.com)
+
+
 class Student:
     def __init__(self, student_id, student_name):
         self.student_id = student_id
@@ -5,7 +8,7 @@ class Student:
         self.student_progress = {}
 
     def __str__(self):
-        return "Student name\t: {}\nStudent ID\t: {}".format(self.student_name, self.student_id)
+        return "Student name\t: {}\nStudent ID\t\t: {}".format(self.student_name, self.student_id)
 
 
 class CourseInstance:

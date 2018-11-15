@@ -1,22 +1,20 @@
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfpage import PDFTextExtractionNotAllowed
-from pdfminer.pdfinterp import PDFResourceManager
-from pdfminer.pdfinterp import PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
+# Author    : Isuru Udukala (iudukala@gmail.com)
+
 
 from io import StringIO
+import os
 
-import collections
-import re
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfpage import PDFPage
 
 
 class PDFFile:
     def __init__(self, file_path, extracted_text, page_count):
         self.file_path = file_path
+        self.file_name = os.path.basename(file_path)
 
         self.text = extracted_text
         self.page_count = page_count

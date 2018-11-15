@@ -149,3 +149,4 @@ python $PATH_REPO/manage.py createsuperuser
 # brew install zsh-syntax-highlighting
 # mysql -uroot -proot -e "select @@datadir;"
 # mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'
+# /usr/local/var/mysql
