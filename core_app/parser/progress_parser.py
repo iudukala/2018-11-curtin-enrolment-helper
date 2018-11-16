@@ -428,9 +428,6 @@ def parse_progress_report(fp):
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
-    import pprint
-    # pprint.pprint(report_dict)
-    return report_dict
 
 
 # Test code

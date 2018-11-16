@@ -1,60 +1,85 @@
 # Author    : Isuru Udukala (iudukala@gmail.com)
+#
 
-
-import glob
+import os.path
+import pprint
 import re
+import glob
 
-
-import regexes
+import regex_handler
+from entities import Student, CourseInstance
+from regex_handler import garbage, data
 from wrapper import PDFMinerWrapper
-from entities import Student, CourseInstance, UnitInstance
+
+LOGGING_DIR = "Logging"
 
 
 class ReportParser:
     def __init__(self, pdffile):
-        self.report_student = None
         self.pdffile = pdffile
         self.report_text = self.pdffile.text
+
+        self.student = None
+        self.courses = []
 
     def parse(self):
         # removing garbage
         print("\n{} - {}".format(self.report_text.count("\n"), self.pdffile.file_name))
 
-        with open("initial output.txt", "w") as filehandle:
+        initial_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_initial.txt")
+        with open(initial_outputlogname, "w") as filehandle:
             filehandle.write(self.report_text)
 
-        for rgx_pat in regexes.garbage.values():
-            self.strip_match(rgx_pat)
+        # removing garbage
+        self.report_text = regex_handler.remove_garbage(self.report_text)
 
         print("{} - {}".format(self.report_text.count("\n"), self.pdffile.file_name))
 
         # collecting student data
-        student_regex = regexes.data['student_id_name']
+        student_regex = data['student_id_name']
         student_match = student_regex.search(self.report_text).groups()
-        self.report_student = Student(student_match[0], student_match[1])
-        self.strip_match(student_regex)
 
-        with open("final_output.txt", "w") as filehandle:
+        self.student = Student(student_match[0], student_match[1])
+        self.report_text = regex_handler.strip_match(text=self.report_text, regex=student_regex)
+
+        self.process_course_section()
+
+        final_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_final.txt")
+        with open(final_outputlogname, "w") as filehandle:
             filehandle.write(self.report_text)
 
-    def strip_match(self, regex):
-        """
-        Returns the matched groups in the passed regex and
-        :param regex: compiled regular expression object to be matched and stripped from the report data
-        :return: None. Modifies the instance attribute report_text
-        """
-        self.report_text = regex.sub("", self.report_text)
-        # removing newlines or spaces at the start of report data
-        self.report_text = re.sub(r"^\s*", "", self.report_text)
+    def process_course_section(self):
+        # collecting course data from the first line that contains a course
+        regex_first_course = data['first_course_on_page']
+        match_first_course = regex_first_course.search(self.report_text).groups()
+        self.courses.append(CourseInstance(match_first_course[0], match_first_course[1]))
+        self.report_text = regex_handler.strip_match(self.report_text, regex_first_course, repl_count=1)
+
+        # collecting courses from next lines
+        regex_next_course = data['next_courses']
+        courses_list = regex_next_course.match(self.report_text).group(1).split("\n")
+        versions_list = regex_next_course.match(self.report_text).group(2).split("\n")
+
+        for index in range(len(courses_list)):
+            if courses_list[index] is not '':
+                self.courses.append(CourseInstance(courses_list[index], versions_list[index].lower().replace("v. ", "")))
+
+        self.report_text = regex_handler.strip_match(self.report_text, regex_next_course, repl_count=1)
+
+    def __str__(self):
+        output = str(self.student) + "\n"
+        output += pprint.pformat(self.courses)
+        return output
 
 
 def fetch_pdf_list():
     # return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
-    # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
+    return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf"]
     # return ['parser_tests/dummy_reports/Term - Stream Not Expanded.pdf']
-
-    return ["parser_tests/test_inputs/Eugene-pr.pdf"]
+    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
+    # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
+    # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
 
 
 def maintwo():
@@ -62,21 +87,24 @@ def maintwo():
     # regexes.print_regex_groups(xr)
     # xr = regexes.garbage.get("garbage_per_page_page_number")
     # regexes.check_regex_match([xr])
-    regex = regexes.garbage['garbage_per_page_report_id_1']
+    # regex = regex_handler.garbage['garbage_per_page_report_id_1']
     # regex = re.compile(r"^\d{6}[a-z]$", re.IGNORECASE | re.MULTILINE)
-    regexes.check_regex_match([regex])
+    # regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$', re.IGNORECASE | re.MULTILINE)
+    # regex = data['first_course_on_page']
+    # regex = data['next_courses']
+    regex = regex_handler.situational_regexes['progress_upto']
+    # regex = garbage['garbage_default_location']
+    # regex_handler.print_regex_groups(regex, garbage_remove=True)
+    regex_handler.check_regex_match([regex])
 
 
 def main():
     for filepath in fetch_pdf_list():
-        pdffile = PDFMinerWrapper(filepath).parse_data()
-        ReportParser(pdffile).parse()
+        report = ReportParser(PDFMinerWrapper(filepath).parse_data())
+        report.parse()
+
+        # print(report)
 
 
 main()
-# regex_list = [regexes.garbage.get("garbage_per_page_report_id")]
-# regexes.check_regex_match(regex_list)
 # maintwo()
-
-
-

@@ -12,10 +12,13 @@ class Student:
 
 
 class CourseInstance:
-    def __init__(self, course_id, course_ver, course_attempt):
+    def __init__(self, course_id, course_ver):
         self.course_id = course_id
         self.course_version = course_ver
-        self.course_attempt = course_attempt
+        # self.course_attempt = course_attempt
+
+    def __repr__(self):
+        return "Course ID\t\t: {}\nCourse version\t: [{}]".format(self.course_id, self.course_version)
 
 
 class UnitInstance:

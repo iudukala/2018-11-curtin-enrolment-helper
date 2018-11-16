@@ -4,7 +4,7 @@
 import glob
 import unittest
 
-import regexes
+import regex_handler
 from wrapper import PDFMinerWrapper
 
 
@@ -17,9 +17,9 @@ class RegexTestCases(unittest.TestCase):
             pdf_text = pdf_file.text
             pdf_pagecount = pdf_file.page_count
 
-            for rgx_key in regexes.garbage.keys():
+            for rgx_key in regex_handler.garbage.keys():
                 if 'per_page' in rgx_key:
-                    regex_match_count = len(regexes.garbage.get(rgx_key).findall(pdf_text))
+                    regex_match_count = len(regex_handler.garbage.get(rgx_key).findall(pdf_text))
                     self.assertTrue(pdf_pagecount == regex_match_count,
                                     msg="Failiure on per_page for [{}] on {}".format(rgx_key, pdf_path))
 
