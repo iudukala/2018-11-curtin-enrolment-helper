@@ -5,8 +5,8 @@ import os.path
 import pprint
 
 import regex_handler
-from entities import Student, CourseInstance
-from regex_handler import data
+from entities import Student, CourseInstance, UnitInstance
+from regex_handler import data, everything_upto, progress_upto
 from wrapper import PDFMinerWrapper
 
 LOGGING_DIR = "Logging"
@@ -25,6 +25,9 @@ class ReportParser:
 
         self.student = None
         self.courses = []
+        self.automatic_units = []
+        self.planned_units = []
+        self.attempted_units = []
 
     def parse(self):
         # capturing report date
@@ -74,68 +77,115 @@ class ReportParser:
 
             # transforming elements in versions_list in the courses in the lower lines from
             # [v. 1] to [1]
-            for index in range(len(versions_list)):
-                versions_list[index] = versions_list[index].lower().replace("v. ", "")
+            versions_list = [version.lower().replace("v. ", "") for version in versions_list if version is not ""]
+            courses_list = [course for course in courses_list if course is not ""]
 
             # adding courses to attribute courses list
             for index in range(len(courses_list)):
-                if courses_list[index] is not '':
-                    self.courses.append(CourseInstance(courses_list[index], versions_list[index]))
+                self.courses.append(CourseInstance(courses_list[index], versions_list[index]))
+
+            # remove the processed section from the report text
             self.report_text = regex_handler.strip_match(self.report_text, regex_next_course, repl_count=1)
 
-            self.handle_automatic_recognition_section()
+            # process the "automatic credit" and "recognition of prior learning" sections
+            self.process_automatic_or_recognition()
 
-    def handle_automatic_recognition_section(self):
-        # progress upto 'automatic credits' section or 'recognition of prior learning' section
-        self.report_text = regex_handler.progress_upto(
-            self.report_text, regex_handler.progress_upto_regexes['automatic_or_recognition'])
+            # process the "planned and completed componenets" section
+            self.process_planned_and_completed_components()
 
-        # grabbing the next set of unit IDs
-        tempunits = regex_handler.grab_unit_ids(self.report_text)
-        print(tempunits)
-        # progress upto the next set of corresponding credits
-        # self.report_text = regex_handler.progress_upto(self.report_text, regex_handler.progress_upto_regexes['unit_id_to_credits'])
+    def process_automatic_or_recognition(self):
+        """
+        this handles the sections titled "automatic credit" and "recognition for prior learning". both these sections
+        have the same format of information to be parsed and as such is handled by the same method.
+        since the "automatic credit" section comes first on curtin's progress reports, this section is handled first.
+        once that's processed, this method is recursively called once more to handle the section which comes after,
+        which is "recognition for prior learning"; which may or may not be empty
+        :return: None. the report text which is stored as an attribute is read and modified in place
+        """
+        # progress upto "automatic credits" section or "recognition of prior learning" section, whichever comes first
+        self.report_text = progress_upto(self.report_text, everything_upto['automatic_or_recognition'])
+
+        # check whether the report is currently at "automatic credits"
+        section_is_automatic_credit = regex_handler.check_report_is_at_automatic_credit(self.report_text)
+
+        # check whether the report is currently at "recognition of prior learning"
+        section_is_recognition = regex_handler.check_report_is_at_recognition_of_prior_learning(self.report_text)
+
+        # if "recognition of prior learning" section is empty, skip it and move to the
+        # "planned and completed components" section
+        if not (section_is_recognition & regex_handler.check_recognition_of_prior_is_empty(self.report_text)):
+            # at this point, the leading entry in the report text and as such the section being processed by the parse
+            # must either be "automatic credits" or "recognition of prior learning"
+            if not (section_is_automatic_credit | section_is_recognition):
+                raise ParseFailure("section is neither 'automatic credits' nor 'recognition of prior learning'")
+
+            # grabbing the next set of unit IDs, credits and versions
+            fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
+            fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+            fetchedversions = regex_handler.grab_next_versions(self.report_text)
+
+            for i in range(len(fetchedunits)):
+                auto_unit = UnitInstance(fetchedunits[i], fetchedversions[i], fetchedcredits[i])
+                self.automatic_units.append(auto_unit)
+
+            # if the parser is currently at the "automatic credit" section, advance the report text to the next section,
+            # which is recognition of prior learning" and then make a recursive call to this same function so that it
+            # can be processed
+            if section_is_automatic_credit:
+                self.report_text = progress_upto(self.report_text, everything_upto['recognition_of_prior_learning'])
+                self.process_automatic_or_recognition()
+
+    def process_planned_and_completed_components(self):
+        # progress to the "planned and completed components" section
+        self.report_text = progress_upto(self.report_text, everything_upto['next_semester'])
+
+        # grabbing the next set of unit IDs, credits and versions
+        fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
+        fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+        fetchedversions = regex_handler.grab_next_versions(self.report_text)
+        fetchedstatuses = regex_handler.grab_next_unit_statuses(self.report_text)
+
+        for i in range(len(fetchedunits)):
+            unit = UnitInstance(fetchedunits[i], fetchedversions[i], fetchedcredits[i], unit_status=fetchedstatuses[i])
+            if unit.is_planned():
+                self.planned_units.append(unit)
+            # if the unit has already been attempted, increment the value of attempt by 1 to reflect that
+            elif unit in self.attempted_units:
+                self.attempted_units[self.attempted_units.index(unit)].increment_attempt()
+            else:
+                self.attempted_units.append(unit)
 
     def __str__(self):
-        output = "\n" * 2 + "Report date\t\t: " + self.report_date + "\n\n"
-        output += str(self.student) + "\n" * 2
-        output += "Sanction status\t: {}".format(self.sanction_reason) + "\n" * 2
-        output += "Courses\t:\n"
-        output += pprint.pformat(self.courses)
-        output += "\n" + "-" * 150
+        def print_heading(heading):
+            return "\n\n" + heading + " : \n" + "-" * 100 + "\n"
 
-        return output
+        output = "Report date\t\t: " + self.report_date
+        output += "\nSanction status\t: {}".format(self.sanction_reason)
+        output += print_heading("Student") + str(self.student)
+        output += print_heading("Courses") + pprint.pformat(self.courses, indent=3)
+        output += print_heading("Automatically credited units") + pprint.pformat(self.automatic_units, indent=3)
+        output += print_heading("Planned units") + pprint.pformat(self.planned_units, indent=3)
+        output += print_heading("Attempted units") + pprint.pformat(self.attempted_units, indent=3)
+
+        return output + "\n\n"
 
 
 def fetch_pdf_list():
     # return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
-    return ["parser_tests/test_inputs/XiMingWong-pr.pdf",
-            "parser_tests/test_inputs/Campbell-pr.pdf",
-            "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf",
-            "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
+    return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
+            "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
+
+    # return ["parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
     # return ['parser_tests/dummy_reports/Term - Stream Not Expanded.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
     # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
 
 
-def maintwo():
-    # xr = re.compile(r"student id\s?:\s*(\d{8})\s*student name\s?:\s*([\w ]*)", re.IGNORECASE | re.DOTALL)
-    # regexes.print_regex_groups(xr)
-    # xr = regexes.garbage.get("garbage_per_page_page_number")
-    # regexes.check_regex_match([xr])
-    # regex = regex_handler.garbage['garbage_per_page_report_id_1']
-    # regex = re.compile(r"^\d{6}[a-z]$", re.IGNORECASE | re.MULTILINE)
-    # regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$', re.IGNORECASE | re.MULTILINE)
-    # regex = data['first_course_on_page']
-    # regex = data['next_courses']
-    # regex = regex_handler.situational_regexes['progress_upto']
-    # regex = garbage['garbage_default_location']
-    # regex_handler.print_regex_groups(regex, garbage_remove=True)
-    regex = regex_handler.data['sanction']
-    # regex_handler.check_regex_match([regex])
-    regex_handler.print_regex_groups(regex)
+class ParseFailure(Exception):
+    def __init__(self, message):
+        super().__init__(message)
 
 
 def main():
@@ -143,8 +193,7 @@ def main():
         report = ReportParser(PDFMinerWrapper(filepath).parse_data())
         report.parse()
 
-        # print(report)
+        print(report)
 
 
 main()
-# maintwo()

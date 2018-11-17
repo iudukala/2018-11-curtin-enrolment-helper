@@ -92,8 +92,9 @@ data = {
     # [a collection of corresponding versions on multiple lines]
     # group 1 : lines of courses
     # group 2 : lines of versions
+    # todo : check if negative lookbehind is foolproof
     'next_courses':
-        re.compile(r"((?:(?!^F-IN)(?<!^course:\s\n\n)^(?:[a-z]+-[a-z]+|[0-9]{6})$\n)+)\s*((?:^v.\s?\d{1,2}$\n)+)",
+        re.compile(r"((?:(?!^F-IN)(?<!^course:\s\n\n)^(?:[a-z]+-[a-z]+|[0-9]{6})$\s*)+)\s*((?:^v.\s?\d{1,2}$\s*)+)",
                    re.MULTILINE | re.IGNORECASE),
 
     # group 1 : reason for sanction
@@ -103,9 +104,17 @@ data = {
 
 }
 
-progress_upto_regexes = {
+everything_upto = {
     'automatic_or_recognition':
         re.compile(r"[\s\S]*?(?=^recognition of prior learning$|^automatic credit$)", re.MULTILINE | re.IGNORECASE),
+
+    'recognition_of_prior_learning':
+        re.compile(r"[\s\S]+?(?=^recognition\sof\sprior\slearning$)", re.MULTILINE | re.IGNORECASE),
+
+    # eg :  2015 Semester 2
+    #       2016 full year
+    'next_semester':
+        re.compile(r"[\s\S]+?(?=^\d{4}[ \t]*(semester[ \t]\d|full[ \t]year)$)", re.MULTILINE | re.IGNORECASE)
 
     # clears up all unnecessary data between the first set of course IDs and the next set of lines from the 'credits'
     # or 'credit received' column
@@ -114,24 +123,42 @@ progress_upto_regexes = {
 }
 
 data_groups = {
-    # captures all contiguous unit ids until the regex meets something that is NOT a unit ID
-    # ensures that no unit IDs are missed for existing after a few empty newlines
+    # each regex in this dictionary captures a block of text containing (possibly multiple lines of) what is implied by
+    # the key of the particular dictionary value.
+    #
+    # the regex uses negative lookahed to match all lines until it meets a line that is NOT what is being matched for
+    # is found. this is to ensure that the search for the value being searched for is not cut short due to a rogue
+    # empty newline inbetween valid values added by the pdfparser.
+    # due to this the block of text can contain empty newlines in the middle that must be removed later.
+
+    # unit id block
     'unit_id_group':
         re.compile(r"(?:^(\d{6}|[a-z]{4}\d{4})$\s*)+?(?!^(\d{6}|[a-z]{4}\d{4})$)", re.MULTILINE | re.IGNORECASE),
 
-    # captures all contiguous credits until the regex meets something that is NOT a credit
-    # ensures that no credits are missed for existing after a few empty newlines
+    # credits
     'credits_or_credit_received_group':
-        re.compile(r"(?:^\d{1,2}\.\d{1,2}$\s*)+?(?!\d{1,2}\.\d{1,2})", re.MULTILINE | re.IGNORECASE)
+        re.compile(r"(?:^\d{1,2}\.\d{1,2}$\s*)+?(?!\d{1,2}\.\d{1,2})", re.MULTILINE | re.IGNORECASE),
+
+    # unit versions
+    'versions_group':
+        re.compile(r"(?:^\d$\s*)+?(?!\d)", re.MULTILINE | re.IGNORECASE),
+
+    # unit statuses.
+    # Note: IGNORECASE flag not set because all statuses are uppercase and there appears to be no
+    # reason for this to be lowercase
+    'unit_status_group':
+        re.compile(r"(?:^(PASS|FAIL|ENR|PLN)$\s*)+?(?!^(PASS|FAIL|ENR|PLN)$)", re.MULTILINE)
 }
 
 
-def grab_unit_ids(text) -> list:
+def grab_next_unit_ids(text) -> list:
     """
-    grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the source.
+    grabs the first set of unit IDs that can be found on the arg 'text'
     ie. grabs :
     ----------
     COMP1000
+    COMP2000
+    
     ISAD3000
     ----------
     as a single block and then splits it to lines
@@ -139,31 +166,75 @@ def grab_unit_ids(text) -> list:
     :return: a list containing the (split) unit IDs fetched
     """
     unit_id_result = data_groups['unit_id_group'].search(text).group(0)
-    unit_id_list = unit_id_result.splitlines(keepends=False)
 
-    # removing empty lines
-    unit_id_list = [unit for unit in unit_id_list if unit is not ""]
-
-    return unit_id_list
+    return fetch_group_and_splitlines(unit_id_result)
 
 
-def grab_credits(text) -> list:
+def grab_next_credits(text) -> list:
     """
-    grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the source.
+    grabs the first set of unit IDs that can be found on the arg 'text'.
     ie. grabs :
     ----------
     25.0
+    
+    25.0
     12.5
     ----------
-    as a single block and then splits it to lines
+    as a single block, splits it to lines and then removes empty entries (empty newlines)
     :param text: the report text from which the credits are to be fetched
     :return: a list containing the (split) credits fetched
     """
     credits_result = data_groups['credits_or_credit_received_group'].search(text).group(0)
-    credit_list = credits_result.splitlines(keepends=False)
-    credit_list = [credit for credit in credit_list if credit is not ""]
 
-    return credit_list
+    return fetch_group_and_splitlines(credits_result)
+
+
+def grab_next_versions(text) -> list:
+    """
+    grabs the first set of versions that can be found on the arg 'text'.
+    ie. grabs :
+    ----------
+    1
+    
+    2
+    4
+    ----------
+    as a single block, splits it to lines and then removes empty entries (empty newlines)
+    :param text: the report text from which the versions are to be fetched
+    :return: a list containing the (split) versions fetched
+    """
+    versions_result = data_groups['versions_group'].search(text).group(0)
+
+    return fetch_group_and_splitlines(versions_result)
+
+
+def grab_next_unit_statuses(text) -> list:
+    """
+    grabs the first set of versions that can be found on the arg 'text'.
+    ie. grabs :
+    ----------
+    PASS
+
+    FAIL
+    ENR
+    PLN
+    ----------
+    as a single block, splits it to lines and then removes empty entries (empty newlines)
+    :param text: the report text from which the unit statuses are to be fetched
+    :return: a list containing the (split) statuses fetched
+    """
+    status_result = data_groups['unit_status_group'].search(text).group(0)
+
+    return fetch_group_and_splitlines(status_result)
+
+
+def fetch_group_and_splitlines(resultblock) -> list:
+    result_list = str(resultblock).splitlines(keepends=False)
+
+    # removing empty entries
+    result_list = [result for result in result_list if result is not ""]
+
+    return result_list
 
 
 def progress_upto(text, progup_regex) -> str:
@@ -181,6 +252,11 @@ def progress_upto(text, progup_regex) -> str:
 
 
 def remove_garbage(text) -> str:
+    """
+    removes the garbage as specified in the dictionary 'garbage'
+    :param text: the report text from which the 'garbage' values are to be removed
+    :return: the tranformed report text
+    """
     text = remove_spaces(text)
     for rgx_garbage_key in garbage.keys():
         if not rgx_garbage_key.startswith("skip"):
@@ -189,6 +265,41 @@ def remove_garbage(text) -> str:
     text = re.sub(r"^\s*|\s*$", "", text)
 
     return text
+
+
+def check_report_is_at_automatic_credit(text) -> bool:
+    """
+    checks if the current position of the report is the section titled "automatic credit". this check is performed since
+    if the current section is indeed 'automatic credits', there exists an immediate "recognition of prior learning"
+    section that follows. (which may or may not be empty)
+    :param text: the report text to be checked
+    :return: a boolean value that states whether the report is at said section
+    """
+    automatic_credit_check_regex = re.compile(r"^automatic\scredit", re.IGNORECASE).match(text)
+    check_flag_auto = automatic_credit_check_regex is not None
+
+    return check_flag_auto
+
+
+def check_report_is_at_recognition_of_prior_learning(text) -> bool:
+    """
+    checks if the current position of the report is the section titled "recognition of prior learning".
+    :param text: the report text to be checked
+    :return: a boolean value that states whether the report is at said section
+    """
+    recog_check_regex = re.compile(r"^recognition\sof\sprior\slearning", re.IGNORECASE).match(text)
+    check_flag_recog = recog_check_regex is not None
+
+    return check_flag_recog
+
+
+def check_recognition_of_prior_is_empty(text) -> bool:
+    recog_empty_check_regex = \
+        re.compile(r"^recognition\sof\sprior\slearning$\s*^planned\sand\scompleted\scomponents$",
+                   re.IGNORECASE | re.MULTILINE).match(text)
+    check_recog_empty_flag = recog_empty_check_regex is not None
+
+    return check_recog_empty_flag
 
 
 def strip_match(text, regex, repl_count=0) -> str:
