@@ -1,9 +1,9 @@
 # Author    : Isuru Udukala (iudukala@gmail.com)
+#
 
-
+import collections
 import glob
 import re
-import collections
 
 from wrapper import PDFMinerWrapper
 
@@ -15,10 +15,31 @@ garbage = collections.OrderedDict({
     #
 
     # eg : Curtin University Student Progress Report Student One As At 21 Feb 2017
-    'garbage_per_page_file_start':
+    # group 1 : report date
+    'garbage_per_page_file_start_and_date':
         re.compile(
-            r'curtin\s*university\s*student\s*progress\s*report\s*student\s*one\s*as\s*at\s*\d+\s*[a-z]+\s*\d+\s*',
+            r'curtin\s*university\s*student\s*progress\s*report\s*'
+            r'student\s*one\s*'
+            r'as\s*at\s*(\d+\s*[a-z]+\s*\d+)\s*',
             re.IGNORECASE),
+
+    'garbage_headers':
+        re.compile(
+            r"^spk\scd$|"
+            r"^spk\stitle$|"
+            r"^spk\sver$|"
+            r"^type$|"
+            r"^designated$|"
+            r"^credit\sreceived$|"
+            r"^grade$|"
+            r"^mark$|"
+            r"^general$|"
+            r"^on\sstudy\splan\?$|"
+            r"^status$|"
+            r"^boe$|"
+            r"^final$|"
+            r"^credits$",
+            re.MULTILINE | re.IGNORECASE),
 
     # garbage at the end of the page
     #
@@ -66,21 +87,83 @@ data = {
             r"^course\s?:\s*^(\d{6}|[a-z]+-[a-z]+)\s*^v.\s?(\d)\s*attempt\s?:\s?\d[\s\S]*?(?=^\d{6}|^[a-z]+-[a-z]+)",
             re.MULTILINE | re.IGNORECASE),
 
-    # courses that come after the first course line. matched as groups of
-    # [coursecollection]
-    # [versioncollection]
-    # group 1 : multiple lines of courses
-    # group 2 : multiple lines of versions
+    # courses that come after the first course line. matched as
+    # [a collection of course IDs on multiple lines]
+    # [a collection of corresponding versions on multiple lines]
+    # group 1 : lines of courses
+    # group 2 : lines of versions
     'next_courses':
         re.compile(r"((?:(?!^F-IN)(?<!^course:\s\n\n)^(?:[a-z]+-[a-z]+|[0-9]{6})$\n)+)\s*((?:^v.\s?\d{1,2}$\n)+)",
+                   re.MULTILINE | re.IGNORECASE),
+
+    # group 1 : reason for sanction
+    'sanction':
+        re.compile(r"^warning\s?:\s?this student has a current sanction.\s*reason\s?:\s*^([\s\S]*?(?=$))",
                    re.MULTILINE | re.IGNORECASE)
 
 }
 
 progress_upto_regexes = {
-    'recognition_of_prior_learning':
-        re.compile(r"[\s\S]*?(?=^recognition of prior learning$)", re.MULTILINE | re.IGNORECASE)
+    'automatic_or_recognition':
+        re.compile(r"[\s\S]*?(?=^recognition of prior learning$|^automatic credit$)", re.MULTILINE | re.IGNORECASE),
+
+    # clears up all unnecessary data between the first set of course IDs and the next set of lines from the 'credits'
+    # or 'credit received' column
+    # 'unit_id_to_credits':
+    #     re.compile(r"(?<=^\d{6}\n\n$)[\s\S]*?(?=^\d\d.[0|5]$\n)", re.MULTILINE | re.IGNORECASE)
 }
+
+data_groups = {
+    # captures all contiguous unit ids until the regex meets something that is NOT a unit ID
+    # ensures that no unit IDs are missed for existing after a few empty newlines
+    'unit_id_group':
+        re.compile(r"(?:^(\d{6}|[a-z]{4}\d{4})$\s*)+?(?!^(\d{6}|[a-z]{4}\d{4})$)", re.MULTILINE | re.IGNORECASE),
+
+    # captures all contiguous credits until the regex meets something that is NOT a credit
+    # ensures that no credits are missed for existing after a few empty newlines
+    'credits_or_credit_received_group':
+        re.compile(r"(?:^\d{1,2}\.\d{1,2}$\s*)+?(?!\d{1,2}\.\d{1,2})", re.MULTILINE | re.IGNORECASE)
+}
+
+
+def grab_unit_ids(text) -> list:
+    """
+    grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the source.
+    ie. grabs :
+    ----------
+    COMP1000
+    ISAD3000
+    ----------
+    as a single block and then splits it to lines
+    :param text: the report text from which the unit IDs are to be fetched
+    :return: a list containing the (split) unit IDs fetched
+    """
+    unit_id_result = data_groups['unit_id_group'].search(text).group(0)
+    unit_id_list = unit_id_result.splitlines(keepends=False)
+
+    # removing empty lines
+    unit_id_list = [unit for unit in unit_id_list if unit is not ""]
+
+    return unit_id_list
+
+
+def grab_credits(text) -> list:
+    """
+    grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the source.
+    ie. grabs :
+    ----------
+    25.0
+    12.5
+    ----------
+    as a single block and then splits it to lines
+    :param text: the report text from which the credits are to be fetched
+    :return: a list containing the (split) credits fetched
+    """
+    credits_result = data_groups['credits_or_credit_received_group'].search(text).group(0)
+    credit_list = credits_result.splitlines(keepends=False)
+    credit_list = [credit for credit in credit_list if credit is not ""]
+
+    return credit_list
 
 
 def progress_upto(text, progup_regex) -> str:
@@ -98,8 +181,10 @@ def progress_upto(text, progup_regex) -> str:
 
 
 def remove_garbage(text) -> str:
-    for rgx_garbage in garbage.values():
-        text = rgx_garbage.sub("", text)
+    text = remove_spaces(text)
+    for rgx_garbage_key in garbage.keys():
+        if not rgx_garbage_key.startswith("skip"):
+            text = garbage[rgx_garbage_key].sub("", text)
     # removing newlines or spaces at the start of report data
     text = re.sub(r"^\s*|\s*$", "", text)
 
@@ -166,30 +251,19 @@ def check_regex_match(regex_list):
                 print("\t\t\t{}.\t{}".format(index, transformed_text))
 
 
-def print_regex_groups(regex, garbage_remove=False):
+def print_regex_groups(regex, remove_garbage_before=False):
     print("\n\nGroups for regex {} :".format(regex))
 
     for filepath in fetch_all_files():
         pdffile = PDFMinerWrapper(filepath).parse_data()
         pdftext = pdffile.text
-        if garbage_remove is True:
+        if remove_garbage_before is True:
             pdftext = remove_garbage(pdftext)
 
         regex_match_count = len(regex.findall(pdftext))
         print("\t{} matches in file [{}] : ".format(regex_match_count, pdffile.file_name))
         for index, regex_group in enumerate(regex.findall(pdftext)):
             print("\t\t{}:\t{}".format(index, regex_group))
-
-        # print(regex.search(pdftext).group(1))
-        # print(regex.group)
-        # regex.group()
-        # matches = regex.findall(pdftext)
-        # matches = re.match(regex, pdftext)
-        # print(matches)
-
-        # print(regex)
-        # for index, group in enumerate(re.match(regex, pdftext).groups()):
-        #     print(group)
 
 
 def fetch_all_files():

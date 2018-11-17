@@ -3,12 +3,10 @@
 
 import os.path
 import pprint
-import re
-import glob
 
 import regex_handler
 from entities import Student, CourseInstance
-from regex_handler import garbage, data
+from regex_handler import data
 from wrapper import PDFMinerWrapper
 
 LOGGING_DIR = "Logging"
@@ -19,12 +17,19 @@ class ReportParser:
         self.pdffile = pdffile
         self.report_text = self.pdffile.text
 
+        self.report_date = None
+
+        # sanction flag and reason
+        self.sanction = False
+        self.sanction_reason = None
+
         self.student = None
         self.courses = []
 
     def parse(self):
-        # removing garbage
-        print("\n{} - {}".format(self.report_text.count("\n"), self.pdffile.file_name))
+        # capturing report date
+        self.report_date = regex_handler.garbage['garbage_per_page_file_start_and_date']. \
+            match(self.report_text).group(1)
 
         initial_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_initial.txt")
         with open(initial_outputlogname, "w") as filehandle:
@@ -33,14 +38,19 @@ class ReportParser:
         # removing garbage
         self.report_text = regex_handler.remove_garbage(self.report_text)
 
-        print("{} - {}".format(self.report_text.count("\n"), self.pdffile.file_name))
-
         # collecting student data
         student_regex = data['student_id_name']
         student_match = student_regex.search(self.report_text).groups()
-
         self.student = Student(student_match[0], student_match[1])
         self.report_text = regex_handler.strip_match(text=self.report_text, regex=student_regex)
+
+        # checking if student has a sanction
+        regex_sanction = data['sanction']
+        sanction_match = regex_sanction.match(self.report_text)
+        if sanction_match is not None:
+            self.sanction = True
+            self.sanction_reason = sanction_match.group(1)
+        self.report_text = regex_handler.strip_match(self.report_text, regex_sanction, repl_count=1)
 
         self.process_course_section()
 
@@ -55,27 +65,55 @@ class ReportParser:
         self.courses.append(CourseInstance(match_first_course[0], match_first_course[1]))
         self.report_text = regex_handler.strip_match(self.report_text, regex_first_course, repl_count=1)
 
-        # collecting courses from next lines
+        # collecting courses from the lines after the line containing the first first course id and name
         regex_next_course = data['next_courses']
-        courses_list = regex_next_course.match(self.report_text).group(1).split("\n")
-        versions_list = regex_next_course.match(self.report_text).group(2).split("\n")
+        match_next_course = regex_next_course.match(self.report_text)
+        if match_next_course is not None:
+            courses_list = match_next_course.group(1).splitlines(keepends=False)
+            versions_list = match_next_course.group(2).splitlines(keepends=False)
 
-        for index in range(len(courses_list)):
-            if courses_list[index] is not '':
-                self.courses.append(CourseInstance(courses_list[index], versions_list[index].lower().replace("v. ", "")))
+            # transforming elements in versions_list in the courses in the lower lines from
+            # [v. 1] to [1]
+            for index in range(len(versions_list)):
+                versions_list[index] = versions_list[index].lower().replace("v. ", "")
 
-        self.report_text = regex_handler.strip_match(self.report_text, regex_next_course, repl_count=1)
+            # adding courses to attribute courses list
+            for index in range(len(courses_list)):
+                if courses_list[index] is not '':
+                    self.courses.append(CourseInstance(courses_list[index], versions_list[index]))
+            self.report_text = regex_handler.strip_match(self.report_text, regex_next_course, repl_count=1)
+
+            self.handle_automatic_recognition_section()
+
+    def handle_automatic_recognition_section(self):
+        # progress upto 'automatic credits' section or 'recognition of prior learning' section
+        self.report_text = regex_handler.progress_upto(
+            self.report_text, regex_handler.progress_upto_regexes['automatic_or_recognition'])
+
+        # grabbing the next set of unit IDs
+        tempunits = regex_handler.grab_unit_ids(self.report_text)
+        print(tempunits)
+        # progress upto the next set of corresponding credits
+        # self.report_text = regex_handler.progress_upto(self.report_text, regex_handler.progress_upto_regexes['unit_id_to_credits'])
 
     def __str__(self):
-        output = str(self.student) + "\n"
+        output = "\n" * 2 + "Report date\t\t: " + self.report_date + "\n\n"
+        output += str(self.student) + "\n" * 2
+        output += "Sanction status\t: {}".format(self.sanction_reason) + "\n" * 2
+        output += "Courses\t:\n"
         output += pprint.pformat(self.courses)
+        output += "\n" + "-" * 150
+
         return output
 
 
 def fetch_pdf_list():
     # return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
-    return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf"]
+    return ["parser_tests/test_inputs/XiMingWong-pr.pdf",
+            "parser_tests/test_inputs/Campbell-pr.pdf",
+            "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf",
+            "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
     # return ['parser_tests/dummy_reports/Term - Stream Not Expanded.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
@@ -92,10 +130,12 @@ def maintwo():
     # regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$', re.IGNORECASE | re.MULTILINE)
     # regex = data['first_course_on_page']
     # regex = data['next_courses']
-    regex = regex_handler.situational_regexes['progress_upto']
+    # regex = regex_handler.situational_regexes['progress_upto']
     # regex = garbage['garbage_default_location']
     # regex_handler.print_regex_groups(regex, garbage_remove=True)
-    regex_handler.check_regex_match([regex])
+    regex = regex_handler.data['sanction']
+    # regex_handler.check_regex_match([regex])
+    regex_handler.print_regex_groups(regex)
 
 
 def main():
