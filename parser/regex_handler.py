@@ -7,8 +7,8 @@ import re
 
 from wrapper import PDFMinerWrapper
 
-# dictionary containing garbage regular expressions. "per_page" in the identifier key in the dictionary in certain entries
-# is used to identify the regexes that are supposed to exist per page ot make debugging easier
+# dictionary containing garbage regular expressions. "per_page" in the identifier key in the dictionary in certain
+# entries is used to identify the regexes that are supposed to exist per page ot make debugging easier
 garbage = collections.OrderedDict({
     # garbage at start of page
     #
@@ -200,9 +200,9 @@ def grab_next_unit_ids(rcv_text) -> (str, list):
     return rtr_text, result_list
 
 
-def grab_next_credits(rcv_text) -> (str, list):
+def grab_next_credits(text) -> list:
     """
-    grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the text
+    grabs the first set of unit IDs that can be found on the arg 'text'.
     ie. grabs :
     ----------
     25.0
@@ -211,20 +211,17 @@ def grab_next_credits(rcv_text) -> (str, list):
     12.5
     ----------
     as a single block, splits it to lines and then removes empty entries (empty newlines)
-    :param rcv_text: the received report text from which the credits are to be fetched
-    :return str: the modified report text from which the matched block has been removed
+    :param text: the report text from which the credits are to be fetched
     :return: a list containing the (split) credits fetched
     """
-    # extracting data and removing from the report text
-    regex = data_groups['credits_or_credit_received_group']
-    rtr_text, extracted_data = extract_from_block_and_remove(regex, rcv_text)
+    credits_regex = data_groups['credits_or_credit_received_group']
 
-    return rtr_text, extracted_data
+    return fetch_group_and_splitlines(credits_regex, text)
 
 
-def grab_next_versions(rcv_text) -> (str, list):
+def grab_next_versions(text) -> list:
     """
-    grabs the first set of versions that can be found on the arg 'text' and then removes it from the text
+    grabs the first set of versions that can be found on the arg 'text'.
     ie. grabs :
     ----------
     1
@@ -233,19 +230,17 @@ def grab_next_versions(rcv_text) -> (str, list):
     4
     ----------
     as a single block, splits it to lines and then removes empty entries (empty newlines)
-    :param rcv_text: the report text from which the versions are to be fetched
-    :return str: the modified report text from which the matched block has been removed
+    :param text: the report text from which the versions are to be fetched
     :return: a list containing the (split) versions fetched
     """
-    regex = data_groups['versions_group']
-    rtr_text, extracted_data = extract_from_block_and_remove(regex, rcv_text)
+    versions_regex = data_groups['versions_group']
 
-    return rtr_text, extracted_data
+    return fetch_group_and_splitlines(versions_regex, text)
 
 
-def grab_next_unit_statuses(rcv_text) -> (str, list):
+def grab_next_unit_statuses(text) -> list:
     """
-    grabs the first set of versions that can be found on the arg 'text' and then removes it from the text
+    grabs the first set of versions that can be found on the arg 'text'.
     ie. grabs :
     ----------
     PASS
@@ -255,24 +250,21 @@ def grab_next_unit_statuses(rcv_text) -> (str, list):
     PLN
     ----------
     as a single block, splits it to lines and then removes empty entries (empty newlines)
-    :param rcv_text: the report text from which the unit statuses are to be fetched
-    :return str: the modified report text from which the matched block has been removed
+    :param text: the report text from which the unit statuses are to be fetched
     :return: a list containing the (split) statuses fetched
     """
-    regex = data_groups['unit_status_group']
-    rtr_text, extracted_data = extract_from_block_and_remove(regex, rcv_text)
+    status_regex = data_groups['unit_status_group']
 
-    return rtr_text, extracted_data
+    return fetch_group_and_splitlines(status_regex, text)
 
 
-def extract_from_block_and_remove(regex, text) -> (str, list):
+def fetch_group_and_splitlines(regex, text) -> list:
     """
     internal function that offers functionality shared by multiple methods. fetches a block as specified by the regex
     and then return the non empty lines as a list.
-    the block of data matched by the regex is removed from the original text
     :param regex: the compiled regular expression object that is used to
-    :param text:
-    :return:
+    :param text: the report text from which the block is extracted from
+    :return: a list containing the (split) results fetched
     """
     resultblock = regex.search(text).group(0)
     result_list = str(resultblock).splitlines(keepends=False)
@@ -280,10 +272,7 @@ def extract_from_block_and_remove(regex, text) -> (str, list):
     # removing empty entries
     result_list = [result for result in result_list if result is not ""]
 
-    # removing extracted data from the source text (the report text)
-    text = strip_match(text, regex, repl_count=1)
-
-    return text, result_list
+    return result_list
 
 
 def progress_upto(text, progup_regex) -> str:

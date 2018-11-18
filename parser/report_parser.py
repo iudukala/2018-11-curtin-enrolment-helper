@@ -94,7 +94,7 @@ class ReportParser:
 
         # collecting courses from the lines after the line containing the first course id and name
         regex_next_course = data_capture_regex['next_courses']
-        match_next_course = regex_next_course.match(self.report_text)
+        match_next_course = regex_next_course.search(self.report_text)
         if match_next_course is not None:
             courses_list = match_next_course.group(1).splitlines(keepends=False)
             versions_list = match_next_course.group(2).splitlines(keepends=False)
@@ -142,8 +142,8 @@ class ReportParser:
 
             # grabbing the next set of unit IDs, credits and versions and then removing them from the text
             self.report_text, fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
-            self.report_text, fetchedcredits = regex_handler.grab_next_credits(self.report_text)
-            self.report_text, fetchedversions = regex_handler.grab_next_versions(self.report_text)
+            fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+            fetchedversions = regex_handler.grab_next_versions(self.report_text)
 
             for i in range(len(fetchedunits)):
                 auto_unit = UnitInstance(fetchedunits[i], fetchedversions[i], fetchedcredits[i], unit_attempt=None)
@@ -167,9 +167,9 @@ class ReportParser:
 
         # grabbing the next set of unit IDs, credits and versions
         self.report_text, fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
-        self.report_text, fetchedcredits = regex_handler.grab_next_credits(self.report_text)
-        self.report_text, fetchedversions = regex_handler.grab_next_versions(self.report_text)
-        self.report_text, fetchedstatuses = regex_handler.grab_next_unit_statuses(self.report_text)
+        fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+        fetchedversions = regex_handler.grab_next_versions(self.report_text)
+        fetchedstatuses = regex_handler.grab_next_unit_statuses(self.report_text)
 
         # compiling the fetched unit information to UnitInstance objects
         for i in range(len(fetchedunits)):
@@ -211,17 +211,18 @@ class ReportParser:
 def fetch_pdf_list():
     # return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
-    return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
-            "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
+    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
+    #         "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
 
     # return ["parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
     # return ["parser_tests/test_inputs/AAAMODOFIED_ChienFeiLin-pr copy.pdf"]
-    # return ['parser_tests/dummy_reports/Term - Stream Not Expanded.pdf']
+    return ['parser_tests/test_inputs/DUMMY - Conditional - 75 cr enrolled.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
     # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
 
     # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
+    # return ["parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf"]
 
 
 class ParseFailure(Exception):
