@@ -7,9 +7,8 @@ import re
 
 from wrapper import PDFMinerWrapper
 
-# dictionary containing regular expressions. "per_page" in the identifier key in the dictionary in certain entries
+# dictionary containing garbage regular expressions. "per_page" in the identifier key in the dictionary in certain entries
 # is used to identify the regexes that are supposed to exist per page ot make debugging easier
-
 garbage = collections.OrderedDict({
     # garbage at start of page
     #
@@ -74,17 +73,22 @@ garbage = collections.OrderedDict({
         re.compile(r"^default location\s?:\s?[\w\-\s]+$", re.IGNORECASE | re.MULTILINE)
 })
 
-data = {
+raw_regexes = {
+    'semester_sep':
+        r"^not[\s]assigned[\s]to[\s]a[\s]specific[\s]year$|^\d{4}[ \t]*(semester[ \t]\d|full[ \t]?year)"
+}
+
+data_capture_regex = {
     # group 1 : student ID
     # group 2 : student name
     'student_id_name':
-        re.compile(r"student id\s?:\s*(\d{8})\s*student name\s?:\s*([\w ]*)", re.DOTALL | re.IGNORECASE),
+        re.compile(r"student id\s?:\s*(\d{8})\s*student name\s?:\s*([\w \-]*)", re.DOTALL | re.IGNORECASE),
 
     # group 1 : course ID
     # group 2 : course version
-    'first_course_on_page':
+    'first_course_in_section':
         re.compile(
-            r"^course\s?:\s*^(\d{6}|[a-z]+-[a-z]+)\s*^v.\s?(\d)\s*attempt\s?:\s?\d[\s\S]*?(?=^\d{6}|^[a-z]+-[a-z]+)",
+            r"course\s?:\s*^(\d{6}|[a-z]+-[a-z]+)\s*^v.\s?(\d)\s*attempt\s?:\s?\d[\s\S]*?(?=^\d{6}|^[a-z]+-[a-z]+)",
             re.MULTILINE | re.IGNORECASE),
 
     # courses that come after the first course line. matched as
@@ -94,7 +98,7 @@ data = {
     # group 2 : lines of versions
     # todo : check if negative lookbehind is foolproof
     'next_courses':
-        re.compile(r"((?:(?!^F-IN)(?<!^course:\s\n\n)^(?:[a-z]+-[a-z]+|[0-9]{6})$\s*)+)\s*((?:^v.\s?\d{1,2}$\s*)+)",
+        re.compile(r"((?:(?!^F-IN)(?<!^course:\n\n)^(?:[a-z]+-[a-z]+|[0-9]{6})$\s*)+)\s*((?:^v.\s?\d{1,2}$\s*)+)",
                    re.MULTILINE | re.IGNORECASE),
 
     # group 1 : reason for sanction
@@ -104,22 +108,35 @@ data = {
 
 }
 
-everything_upto = {
+# regexes that are used to match all text upto a certain point. these are used by functions that deal with specific
+# sections to progress the report to the point where the function is concerned with. (by stripping away everything
+# before that)
+#
+# eg: when the function that processes the section with the list of courses is called, it removes everything upto the
+# line "Course:"
+match_everything_upto = {
+    # eg : Course:
+    'course':
+        re.compile(r"[\s\S]*?(?=^course\s?:\s?$)", re.MULTILINE | re.IGNORECASE),
+
+    # eg : Automatic Credit
     'automatic_or_recognition':
         re.compile(r"[\s\S]*?(?=^recognition of prior learning$|^automatic credit$)", re.MULTILINE | re.IGNORECASE),
 
+    # eg : RECOGNITION OF PRIOR LEARNING
     'recognition_of_prior_learning':
         re.compile(r"[\s\S]+?(?=^recognition\sof\sprior\slearning$)", re.MULTILINE | re.IGNORECASE),
 
     # eg :  2015 Semester 2
     #       2016 full year
+    #       Course:
     'next_semester':
-        re.compile(r"[\s\S]+?(?=^\d{4}[ \t]*(semester[ \t]\d|full[ \t]year)$)", re.MULTILINE | re.IGNORECASE)
+        re.compile(r"[\s\S]+?(?=("
+                   + raw_regexes['semester_sep']
+                   + ")|^course\s?:$)", re.IGNORECASE | re.MULTILINE)
+    # re.compile(r"[\s\S]+?(?=(^\d{4}[ \t]*(semester[ \t]\d|full[ \t]year))|^course\s?:$)", re.MULTILINE | re.I)
+    # [\s\S]+?(?=^\d{4}[ \t]*(semester[ \t]\d|full[ \t]year)$)
 
-    # clears up all unnecessary data between the first set of course IDs and the next set of lines from the 'credits'
-    # or 'credit received' column
-    # 'unit_id_to_credits':
-    #     re.compile(r"(?<=^\d{6}\n\n$)[\s\S]*?(?=^\d\d.[0|5]$\n)", re.MULTILINE | re.IGNORECASE)
 }
 
 data_groups = {
@@ -133,7 +150,7 @@ data_groups = {
 
     # unit id block
     'unit_id_group':
-        re.compile(r"(?:^(\d{6}|[a-z]{4}\d{4})$\s*)+?(?!^(\d{6}|[a-z]{4}\d{4})$)", re.MULTILINE | re.IGNORECASE),
+        re.compile(r"(?:^(\d{4,6}|[a-z]{4}\d{4})$\s*)+?(?!^(\d{4,6}|[a-z]{4}\d{4})$)", re.MULTILINE | re.IGNORECASE),
 
     # credits
     'credits_or_credit_received_group':
@@ -141,13 +158,13 @@ data_groups = {
 
     # unit versions
     'versions_group':
-        re.compile(r"(?:^\d$\s*)+?(?!\d)", re.MULTILINE | re.IGNORECASE),
+        re.compile(r"(?:^\d{1,2}$\s*)+?(?!\d{1,2})", re.MULTILINE | re.IGNORECASE),
 
     # unit statuses.
     # Note: IGNORECASE flag not set because all statuses are uppercase and there appears to be no
-    # reason for this to be lowercase
+    # reason for them to be recorded in lowercase
     'unit_status_group':
-        re.compile(r"(?:^(PASS|FAIL|ENR|PLN)$\s*)+?(?!^(PASS|FAIL|ENR|PLN)$)", re.MULTILINE)
+        re.compile(r"(?:^(PASS|FAIL|ENR|PLN|WD)$\s*)+?(?!^(PASS|FAIL|ENR|PLN|WD)$)", re.MULTILINE)
 }
 
 
@@ -158,7 +175,7 @@ def grab_next_unit_ids(text) -> list:
     ----------
     COMP1000
     COMP2000
-    
+
     ISAD3000
     ----------
     as a single block and then splits it to lines
@@ -176,7 +193,7 @@ def grab_next_credits(text) -> list:
     ie. grabs :
     ----------
     25.0
-    
+
     25.0
     12.5
     ----------
@@ -195,7 +212,7 @@ def grab_next_versions(text) -> list:
     ie. grabs :
     ----------
     1
-    
+
     2
     4
     ----------
@@ -239,10 +256,10 @@ def fetch_group_and_splitlines(resultblock) -> list:
 
 def progress_upto(text, progup_regex) -> str:
     """
-    progresses upto certain points of the report by removing all irrelevant text before that point, leaving the parsed
-    report data starting with the next section of relevant text so that the next section of the parser con continue
-    from that point onwards. this function is in essence just a wrapper around the function strip_match() but exists
-    for the sake of (hopefully) increasing readability of the code
+    progresses upto certain points of the report by removing all irrelevant/already parsed text before that point,
+    leaving the parsed report data starting with the next section of relevant text so that the parser con continue from
+    that point onwards. this function is in essence just a wrapper around the function strip_match() but exists for
+    the sake of (hopefully) increasing readability of the code
     :param text: the parsed report text
     :param progup_regex: regular expression that specifies the location upto which the text should be trimmed to
                          (achieved through the use of lookaround assertions)
@@ -294,12 +311,56 @@ def check_report_is_at_recognition_of_prior_learning(text) -> bool:
 
 
 def check_recognition_of_prior_is_empty(text) -> bool:
+    """
+    checks if the "recognition of prior learning" section is empty. ie, whether it contains units for which credit is
+    automatically awarded
+    :param text: the report text
+    :return: a boolean flag with the status of the condition in question
+    """
     recog_empty_check_regex = \
         re.compile(r"^recognition\sof\sprior\slearning$\s*^planned\sand\scompleted\scomponents$",
                    re.IGNORECASE | re.MULTILINE).match(text)
     check_recog_empty_flag = recog_empty_check_regex is not None
 
     return check_recog_empty_flag
+
+
+def check_current_semester_is_last_in_course(text) -> bool:
+    """
+    checks if the topmost semester on the report text is the last semester listed in the current course.
+    ie. checks whether the current course has been parsed completely so that the parser can move on to the next
+    course on the progress report if one exists
+    :param text: the report text
+    :return: a boolean flag that with the status of the condition in question
+    """
+    # regex matches a semester header line or a course line, which comes first is used to decide
+    is_last_semester = re.compile(
+        r"(^\d{4}[ \t]*(semester[ \t]\d|full[ \t]year)$)|(^course\s?:$)", re.MULTILINE | re.IGNORECASE)
+
+    report_substring = text[text.index("\n") + 1:]
+    result_match = is_last_semester.search(report_substring)
+
+    if result_match is None:
+        return True
+    elif "course" in result_match.group(0).lower():
+        return True
+    else:
+        return False
+
+
+def check_course_section_exists(text) -> bool:
+    """
+    checks if a "course" section exists in the report text or not (ie. all course sections have been
+    parsed and removed from the report text) if no more course sections exist, the parser has completed and can exist)
+    :param text: the report text
+    :return: a boolean flag that states the condition in question
+    """
+    check_rgx = re.compile(r"^course\s?:\s?$", re.IGNORECASE | re.MULTILINE)
+    course_search = check_rgx.search(text)
+
+    if course_search is None:
+        return False
+    return True
 
 
 def strip_match(text, regex, repl_count=0) -> str:
@@ -341,7 +402,7 @@ def check_regex_match(regex_list):
     checks the progress reports in the parser_tests/ dir to see if there exists matches for a particular
     regular expression
     :param regex_list: list containing compiled regular expressions to check for
-    :return: None
+    :return: None. output is printed to stdout
     """
     for rgx in regex_list:
         print("\n\nmatches for regex {} :".format(rgx))
@@ -363,6 +424,14 @@ def check_regex_match(regex_list):
 
 
 def print_regex_groups(regex, remove_garbage_before=False):
+    """
+    function used to assist debugging regexes. returns groups matched by the regex passed on all pdf files in
+    project dir
+    :param regex: the compiled regular expression object to be checked
+    :param remove_garbage_before:   flag that specifies whether garbage removal is to be performed on the report text
+                                    before the regular expression is executed on it
+    :return: None. output is printed to stdout
+    """
     print("\n\nGroups for regex {} :".format(regex))
 
     for filepath in fetch_all_files():
@@ -378,5 +447,8 @@ def print_regex_groups(regex, remove_garbage_before=False):
 
 
 def fetch_all_files():
+    """
+    fetches all pdf files located in project dir
+    :return: a list containing the paths to pdf files
+    """
     return glob.glob("*/**/*.pdf")
-    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf"]
