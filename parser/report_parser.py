@@ -4,6 +4,7 @@
 import os.path
 import pprint
 import glob
+import collections
 
 import regex_handler
 from entities import Student, CourseInstance, UnitInstance
@@ -25,6 +26,8 @@ class ReportParser:
         self.automatic_units = []
         self.planned_units = []
         self.attempted_units = []
+
+        self.report_dictionary = {}
 
     def parse_progress_report(self):
         # capturing report date
@@ -153,7 +156,8 @@ class ReportParser:
             # which is recognition of prior learning" and then make a recursive call to this same function so that it
             # can be processed
             if section_is_automatic_credit:
-                self.report_text = progress_upto(self.report_text, match_everything_upto['recognition_of_prior_learning'])
+                self.report_text = progress_upto(self.report_text,
+                                                 match_everything_upto['recognition_of_prior_learning'])
                 self.process_section_automatic_or_recognition()
 
     def process_section_planned_completed(self):
@@ -197,7 +201,7 @@ class ReportParser:
             strout += pprint.pformat(data_list, indent=strout_indent) + "\n"
             return strout
 
-        output = "Report date\t\t: {}\n".format(self.report_date)
+        output = "\nReport date\t\t: {}\n\n".format(self.report_date)
         output += "Student : \n{}{}".format(print_seperator(), str(self.student))
 
         output += print_section("Courses", self.courses)
@@ -206,6 +210,15 @@ class ReportParser:
         output += print_section("Attempted units", self.attempted_units)
 
         return output + "\n\n"
+
+    def format_report(self):
+        self.report_dictionary['date'] = self.report_date
+
+        self.report_dictionary['name'] = self.student.student_name
+        self.report_dictionary['id'] = self.student.student_id
+
+        # for autounit in self.automatic_units:
+        # pprint.pprint(self.report_dictionary)
 
 
 def fetch_pdf_list():
@@ -216,12 +229,12 @@ def fetch_pdf_list():
 
     # return ["parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
     # return ["parser_tests/test_inputs/AAAMODOFIED_ChienFeiLin-pr copy.pdf"]
-    return ['parser_tests/test_inputs/DUMMY - Conditional - 75 cr enrolled.pdf']
+    # return ['parser_tests/test_inputs/DUMMY - Conditional - 75 cr enrolled.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
     # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
 
-    # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
+    return ["parser_tests/test_inputs/Campbell-pr.pdf"]
     # return ["parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf"]
 
 
@@ -232,13 +245,12 @@ class ParseFailure(Exception):
 
 def main():
     for filepath in fetch_pdf_list():
-        print(filepath)
+        # print(filepath)
         report = ReportParser(PDFMinerWrapper(filepath).parse_data())
         report.parse_progress_report()
 
         print(report)
-
-        # account for not assigned toa  specific year
+        # report.format_report()
 
 
 main()
