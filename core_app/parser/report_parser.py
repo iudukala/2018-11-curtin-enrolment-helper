@@ -3,6 +3,7 @@
 
 import os.path
 import pprint
+import glob
 
 import regex_handler
 from entities import Student, CourseInstance, UnitInstance
@@ -16,6 +17,7 @@ class ReportParser:
     def __init__(self, pdffile):
         self.pdffile = pdffile
         self.report_text = self.pdffile.text
+        self.cleaned_text = self.pdffile.text
 
         self.report_date = None
 
@@ -36,12 +38,13 @@ class ReportParser:
 
         # removing garbage lines from report text
         self.report_text = regex_handler.remove_garbage(self.report_text)
+        # saving garbage removed text to cleaned_text to assist debugging
+        self.cleaned_text = self.report_text
 
         # parsing student details
         self.process_student_details()
 
-        # check if report text has a course section to parse
-
+        # check if report text has a course section to parse, if it does, repeat process
         while regex_handler.check_course_section_exists(self.report_text):
             # parsing the course details section
             self.process_course_section()
@@ -266,7 +269,7 @@ class ReportParser:
 
 
 def fetch_pdf_list():
-    # return glob.glob("*/**/*.pdf")
+    return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
     #         "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
@@ -278,7 +281,7 @@ def fetch_pdf_list():
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
     # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
 
-    return ["parser_tests/test_inputs/Campbell-pr.pdf"]
+    # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
     # return ["parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf"]
 
 
