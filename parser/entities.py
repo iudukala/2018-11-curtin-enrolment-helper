@@ -46,6 +46,10 @@ class UnitInstance:
         return (self.unit_status == "PLN") | (self.unit_status == "ENR")
 
     def increment_attempt(self):
+        """
+        increments the value of the attempt in the unit
+        :return: None. attribute is modified
+        """
         self.unit_attempt += 1
 
     def __eq__(self, other):

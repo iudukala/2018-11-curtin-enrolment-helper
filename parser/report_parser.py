@@ -3,8 +3,6 @@
 
 import os.path
 import pprint
-import glob
-import collections
 
 import regex_handler
 from entities import Student, CourseInstance, UnitInstance
@@ -27,11 +25,9 @@ class ReportParser:
         self.planned_units = []
         self.attempted_units = []
 
-        self.report_dictionary = {}
-
     def parse_progress_report(self):
         # capturing report date
-        self.report_date = regex_handler.garbage['garbage_per_page_file_start_and_date']. \
+        self.report_date = regex_handler.garbage['per_page_file_start_and_date']. \
             match(self.report_text).group(1)
 
         initial_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_initial.txt")
@@ -180,9 +176,15 @@ class ReportParser:
             unit = UnitInstance(fetchedunits[i], fetchedversions[i], fetchedcredits[i], unit_status=fetchedstatuses[i])
             if unit.is_planned():
                 self.planned_units.append(unit)
-            # if the unit has already been attempted, increment the value of attempt by 1 to reflect that
+            # if the unit has already been attempted, update the units and increment the value of 'attempt'
+            # by 1 to reflect that
             elif unit in self.attempted_units:
-                self.attempted_units[self.attempted_units.index(unit)].increment_attempt()
+                cur_attempt_val = self.attempted_units[self.attempted_units.index(unit)].unit_attempt
+                unit.unit_attempt = cur_attempt_val
+                unit.increment_attempt()
+
+                # updating the unit in the report
+                self.attempted_units[self.attempted_units.index(unit)] = unit
             else:
                 self.attempted_units.append(unit)
 
@@ -211,14 +213,56 @@ class ReportParser:
 
         return output + "\n\n"
 
+    def __repr__(self):
+        return self.__str__()
+
     def format_report(self):
-        self.report_dictionary['date'] = self.report_date
+        """
+        collates information into a dictionary object in the format accepted by the system
+        :return: 
+        """
+        from collections import OrderedDict
+        report_dictionary = {'date': self.report_date,
+                             'name': self.student.student_name,
+                             'id': self.student.student_id}
 
-        self.report_dictionary['name'] = self.student.student_name
-        self.report_dictionary['id'] = self.student.student_id
+        # courses under key 'courses'
+        courses_dict = OrderedDict()
+        for course in self.courses:
+            courses_dict[course.course_id] = course.course_version
+        report_dictionary['course'] = courses_dict
 
-        # for autounit in self.automatic_units:
-        # pprint.pprint(self.report_dictionary)
+        # planned units under key 'planned'
+        planned_dict = {}
+        for unit in self.planned_units:
+            planned_dict[unit.unit_id] = {
+                'credits': unit.unit_credits,
+                'status': unit.unit_status,
+                'ver': unit.unit_version
+            }
+        report_dictionary['planned'] = planned_dict
+
+        # automatically credited units under key 'automatic'
+        automatic_dict = {}
+        for unit in self.automatic_units:
+            automatic_dict[unit.unit_id] = {
+                'ver': unit.unit_version,
+                'credits': unit.unit_credits,
+            }
+        report_dictionary['automatic'] = automatic_dict
+
+        # attempted units under key 'units'
+        attempted_dict = {}
+        for unit in self.attempted_units:
+            attempted_dict[unit.unit_id] = {
+                'status': unit.unit_status,
+                'ver': unit.unit_version,
+                'credits': unit.unit_credits,
+            }
+        report_dictionary['units'] = attempted_dict
+
+        # pprint.pformat(report_dictionary, indent=3, width=90)
+        return report_dictionary
 
 
 def fetch_pdf_list():
@@ -245,7 +289,6 @@ class ParseFailure(Exception):
 
 def main():
     for filepath in fetch_pdf_list():
-        # print(filepath)
         report = ReportParser(PDFMinerWrapper(filepath).parse_data())
         report.parse_progress_report()
 
@@ -253,4 +296,11 @@ def main():
         # report.format_report()
 
 
+def maintwo():
+    import re
+    regex = re.compile(r"^status\s?:.*$", re.IGNORECASE | re.MULTILINE)
+    regex_handler.check_regex_match([regex], False)
+
+
 main()
+# maintwo()

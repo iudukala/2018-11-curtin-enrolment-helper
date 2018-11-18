@@ -15,14 +15,14 @@ garbage = collections.OrderedDict({
 
     # eg : Curtin University Student Progress Report Student One As At 21 Feb 2017
     # group 1 : report date
-    'garbage_per_page_file_start_and_date':
+    'per_page_file_start_and_date':
         re.compile(
             r'curtin\s*university\s*student\s*progress\s*report\s*'
             r'student\s*one\s*'
             r'as\s*at\s*(\d+\s*[a-z]+\s*\d+)\s*',
             re.IGNORECASE),
 
-    'garbage_headers':
+    'headers':
         re.compile(
             r"^spk\scd$|"
             r"^spk\stitle$|"
@@ -44,33 +44,68 @@ garbage = collections.OrderedDict({
     #
 
     # eg : Page 1 of 3
-    'garbage_per_page_page_number':
+    'per_page_page_number':
         re.compile(r"page\s*\d+\s*of\s*\d+\s*", re.IGNORECASE),
 
     # eg : 12:53:30PM
-    'garbage_per_page_timestamp':
+    'per_page_timestamp':
         re.compile(r"\d{1,2}:\d{1,2}:\d{1,2}\s*(?:am|pm)", re.IGNORECASE),
 
     # [CuS1PG010j]
-    'garbage_per_page_report_id_1':
-        re.compile(r"^\[[a-z0-9]{10}\]$(?=[\s\S]*?^[0-9]{6}[a-z]$)", re.IGNORECASE | re.MULTILINE),
-    #     re.compile(r"^\[[a-z0-9]{10}\]$", re.IGNORECASE | re.MULTILINE),
+    'per_page_report_id_1':
+        re.compile(r"^\[[a-z0-9]{10}\]$", re.IGNORECASE | re.MULTILINE),
+    # re.compile(r"^\[[a-z0-9]{10}\]$(?=[\s\S]*?^[0-9]{6}[a-z]$)", re.IGNORECASE | re.MULTILINE),
 
     # 212311I
-    'garbage_per_page_report_id_2':
+    'per_page_report_id_2':
         re.compile(r"^\d{6}[a-z]$", re.IGNORECASE | re.MULTILINE),
 
     # eg : Total number of credits for course completion: 1000.0
-    'garbage_credits_for_course_completion':
+    'credits_for_course_completion':
         re.compile(r"total\s*number\s*of\s*credits\s*for\s*course\s*completion\s*:\s*\d+(\.\d+)?", re.IGNORECASE),
 
     # eg : Total number of credits completed: 325.0
-    'garbage_credits_completed':
+    'credits_completed':
         re.compile(r"total\s*number\s*of\s*credits\s*completed\s*:\s*\d+(\.\d+)?", re.IGNORECASE),
 
     # Default Location: Bentley Campus
-    'garbage_default_location':
-        re.compile(r"^default location\s?:\s?[\w\-\s]+$", re.IGNORECASE | re.MULTILINE)
+    'default_location':
+        re.compile(r"^default location\s?:\s?[\w\-\s]+$", re.IGNORECASE | re.MULTILINE),
+
+    # SWA:  61.00
+    # CWA: 61.00
+    # SWA:
+    'cwa_and_swa':
+        re.compile(r"^[cs]wa[ \t]?:[ \t]*(\d{1,2}(\.\d{1,2})?$)?", re.IGNORECASE | re.MULTILINE),
+
+    # Academic Status: Conditional
+    # Academic Status:  Conditional
+    # Academic Status:
+    # Academic Status:  Good Standing
+    # Academic Status:  Terminated
+    'academic_status':
+        re.compile(r"academic[ \t]{1,3}status\s?:[ \t]*(good[ \t]{1,3}standing|conditional|terminated)?",
+                   re.IGNORECASE | re.MULTILINE),
+
+    # Conditional
+    # Good Standing
+    'standalone_academic_status':
+        re.compile(r"^(good[ \t]{1,3}standing|conditional|terminated)$", re.MULTILINE | re.IGNORECASE),
+
+    # Not on plan
+    'not_on_plan':
+        re.compile(r"^not[ \t]{0,3}on[ \t]{0,3}plan[ \t]{0,3}", re.IGNORECASE | re.MULTILINE),
+
+    # Stage: ADM
+    # Stage: TERM
+    'stage':
+        re.compile(r"^stage\s?:[ \t]*(adm|wd|comp|term)$", re.MULTILINE | re.IGNORECASE),
+
+    # Status: AWOL
+    # Status: WD
+    # Status: TERM
+    'status':
+        re.compile(r"^status\s?:[ \t]*(adm|wd|awol|potc|pass|term)$", re.MULTILINE | re.IGNORECASE)
 })
 
 raw_regexes = {
@@ -418,7 +453,7 @@ def remove_spaces(text):
     return text
 
 
-def check_regex_match(regex_list):
+def check_regex_match(regex_list, print_filename=True):
     """
     checks the progress reports in the parser_tests/ dir to see if there exists matches for a particular
     regular expression
@@ -431,14 +466,15 @@ def check_regex_match(regex_list):
             pdffile = PDFMinerWrapper(filepath).parse_data()
             pdftext = pdffile.text
             regex_match_count = len(rgx.findall(pdftext))
-            if regex_match_count == pdffile.page_count:
-                print("\tP", end="")
-            elif regex_match_count > 0:
-                print("\t+", end="")
-            else:
-                print("\t-", end="")
-            print("\tfound {} matches in {} pages in file [{}]".
-                  format(regex_match_count, pdffile.page_count, pdffile.file_name))
+            if print_filename:
+                if regex_match_count == pdffile.page_count:
+                    print("\tP", end="")
+                elif regex_match_count > 0:
+                    print("\t+", end="")
+                else:
+                    print("\t-", end="")
+                print("\tfound {} matches in {} pages in file [{}]".
+                      format(regex_match_count, pdffile.page_count, pdffile.file_name))
             for index, rgx_match in enumerate(rgx.findall(pdftext)):
                 transformed_text = re.sub(r"\n+", '\t' * 3, rgx_match)
                 print("\t\t\t{}.\t{}".format(index, transformed_text))

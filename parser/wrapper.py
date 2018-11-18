@@ -1,8 +1,8 @@
 # Author    : Isuru Udukala (iudukala@gmail.com)
 
 
-from io import StringIO
 import os
+from io import StringIO
 
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
