@@ -82,6 +82,10 @@ class ReportParser:
         ReportParser object
         :return: None. report text is modified in place
         """
+
+        # progress the report text to the line "Course:" if it's not already there
+        self.report_text = progress_upto(self.report_text, match_everything_upto['course'])
+
         # collecting course data from the first line that contains a course
         regex_first_course = data_capture_regex['first_course_in_section']
         match_first_course = regex_first_course.search(self.report_text).groups()
@@ -110,6 +114,8 @@ class ReportParser:
         in the same format, and therefor is possible to parse in the same manner.
         since the "automatic credit" section comes first on curtin's progress reports, this section is handled first if
         it exists. once it's processed, this method calls itself after advancing the report text to the next section
+
+        todo : write here that every parsed section is consumed
         ("recognition for prior learning") which may or may not be empty
         :return: None. the report text which is stored as an attribute is read and modified in place
         """
@@ -134,10 +140,10 @@ class ReportParser:
             if not (section_is_automatic_credit | section_is_recognition):
                 raise ParseFailure("section is neither 'automatic credits' nor 'recognition of prior learning'")
 
-            # grabbing the next set of unit IDs, credits and versions
-            fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
-            fetchedcredits = regex_handler.grab_next_credits(self.report_text)
-            fetchedversions = regex_handler.grab_next_versions(self.report_text)
+            # grabbing the next set of unit IDs, credits and versions and then removing them from the text
+            self.report_text, fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
+            self.report_text, fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+            self.report_text, fetchedversions = regex_handler.grab_next_versions(self.report_text)
 
             for i in range(len(fetchedunits)):
                 auto_unit = UnitInstance(fetchedunits[i], fetchedversions[i], fetchedcredits[i], unit_attempt=None)
@@ -152,6 +158,7 @@ class ReportParser:
 
     def process_section_planned_completed(self):
         """
+        todo : write how this consumes the data as well
         this method processes the section "planned and completed components"
         :return:
         """
@@ -159,10 +166,10 @@ class ReportParser:
         self.report_text = progress_upto(self.report_text, match_everything_upto['next_semester'])
 
         # grabbing the next set of unit IDs, credits and versions
-        fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
-        fetchedcredits = regex_handler.grab_next_credits(self.report_text)
-        fetchedversions = regex_handler.grab_next_versions(self.report_text)
-        fetchedstatuses = regex_handler.grab_next_unit_statuses(self.report_text)
+        self.report_text, fetchedunits = regex_handler.grab_next_unit_ids(self.report_text)
+        self.report_text, fetchedcredits = regex_handler.grab_next_credits(self.report_text)
+        self.report_text, fetchedversions = regex_handler.grab_next_versions(self.report_text)
+        self.report_text, fetchedstatuses = regex_handler.grab_next_unit_statuses(self.report_text)
 
         # compiling the fetched unit information to UnitInstance objects
         for i in range(len(fetchedunits)):
@@ -204,11 +211,11 @@ class ReportParser:
 def fetch_pdf_list():
     # return glob.glob("*/**/*.pdf")
     # return ['parser_tests/singlepage.pdf']
-    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
-    #         "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
+    return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
+            "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
 
     # return ["parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
-    return ["parser_tests/test_inputs/AAAMODOFIED_ChienFeiLin-pr copy.pdf"]
+    # return ["parser_tests/test_inputs/AAAMODOFIED_ChienFeiLin-pr copy.pdf"]
     # return ['parser_tests/dummy_reports/Term - Stream Not Expanded.pdf']
     # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
     # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
@@ -228,7 +235,7 @@ def main():
         report = ReportParser(PDFMinerWrapper(filepath).parse_data())
         report.parse_progress_report()
 
-        # print(report)
+        print(report)
 
         # account for not assigned toa  specific year
 
