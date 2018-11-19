@@ -4,8 +4,8 @@
 import glob
 import unittest
 
-import regex_handler
-from wrapper import PDFMinerWrapper
+from core_app.parser import regex_handler
+from core_app.parser.wrapper import PDFMinerWrapper
 
 
 class RegexTestCases(unittest.TestCase):

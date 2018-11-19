@@ -342,12 +342,14 @@ def main():
                 print(report.parser_output_summary())
         except:
             print("\nParsing failed for file : " + filepath)
-        # print(report)
 
 
 def parse_progress_report(fp):
     try:
-        report = ReportParser(PDFMinerWrapper(fp).parse_data())
+        raw_pdf_data = PDFMinerWrapper(fp).parse_data()
+        report = ReportParser(raw_pdf_data)
+        report.parse()
+
         return report.format_report()
     except:
         return None
