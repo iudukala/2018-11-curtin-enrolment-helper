@@ -423,14 +423,18 @@ def convert_pdf_to_txt(fp):
 # Notes:    IMPORT THIS METHOD, THEN CALL IT
 def parse_progress_report(fp):
     # import pdb; pdb.set_trace();
+    # print(fp.name)
+    # fp.close()
+    #
+    # print(fp.name)
+    # import os
     report = convert_pdf_to_txt(fp)  # Converts PDF to text
     report = remove_garbage(report)  # Removes unneeded labels from report
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
 
-    import pprint
-    pprint.pprint(report_dict)
+    # pprint.pprint(report_dict)
 
     return report_dict
 

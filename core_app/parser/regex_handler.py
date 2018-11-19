@@ -5,7 +5,7 @@ import collections
 import glob
 import re
 
-from wrapper import PDFMinerWrapper
+from core_app.parser.wrapper import PDFMinerWrapper
 
 # dictionary containing garbage regular expressions. "per_page" in the identifier key in the dictionary in certain
 # entries is used to identify the regexes that are supposed to exist per page ot make debugging easier

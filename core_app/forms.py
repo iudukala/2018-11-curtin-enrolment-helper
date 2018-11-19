@@ -7,7 +7,8 @@ import time
 
 from django import forms
 from django.core.files import File
-from core_app.parser.progress_parser import parse_progress_report
+from core_app.parser.report_parser import parse_progress_report
+# from core_app.parser.progress_parser import parse_progress_report
 from .models import *
 
 # logging.getLogger(__name__)

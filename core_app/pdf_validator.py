@@ -1,6 +1,8 @@
 import datetime
 
-from core_app.parser.progress_parser import parse_progress_report
+# from core_app.parser.progress_parser import parse_progress_report
+from core_app.parser.report_parser import parse_progress_report
+
 from .models import *
 
 

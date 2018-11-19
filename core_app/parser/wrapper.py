@@ -1,7 +1,6 @@
 # Author    : Isuru Udukala (iudukala@gmail.com)
 
 
-import os
 from io import StringIO
 
 from pdfminer.converter import TextConverter
@@ -12,18 +11,18 @@ from pdfminer.pdfpage import PDFPage
 
 
 class PDFFile:
-    def __init__(self, file_path, extracted_text, page_count):
-        self.file_path = file_path
-        self.file_name = os.path.basename(file_path)
+    def __init__(self, file_name, extracted_text, page_count):
+        self.file_name = file_name
 
         self.text = extracted_text
         self.page_count = page_count
 
 
 class PDFMinerWrapper:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, fp):
+        self.fp = fp
 
+        self.file_name = None
         self.pdf_processed = False
         self.pdf_extracted_text = None
         self.pdf_page_count = -1
@@ -43,14 +42,15 @@ class PDFMinerWrapper:
 
         self.pdf_page_count = 0
 
-        with open(self.file_path, "rb") as file:
-            for page in PDFPage.get_pages(file, pagenos, maxpages=maxpages, password=password, caching=caching,
-                                          check_extractable=True):
-                self.pdf_page_count += 1
-                interpreter.process_page(page)
+        for page in PDFPage.get_pages(self.fp, pagenos, maxpages=maxpages, password=password, caching=caching,
+                                      check_extractable=True):
+            self.pdf_page_count += 1
+            interpreter.process_page(page)
 
+        self.file_name = self.fp.name
+        self.fp.close()
         self.pdf_extracted_text = text_stream.getvalue()
         text_stream.close()
         device.close()
 
-        return PDFFile(self.file_path, self.pdf_extracted_text, self.pdf_page_count)
+        return PDFFile(self.file_name, self.pdf_extracted_text, self.pdf_page_count)

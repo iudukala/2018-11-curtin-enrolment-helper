@@ -1,16 +1,12 @@
 # Author    : Isuru Udukala (iudukala@gmail.com)
 #
 
-import os.path
 import pprint
-import glob
 
-import regex_handler
-from entities import Student, CourseInstance, UnitInstance
-from regex_handler import data_capture_regex, match_everything_upto, progress_upto
-from wrapper import PDFMinerWrapper
-
-LOGGING_DIR = "Logging"
+from core_app.parser import regex_handler
+from core_app.parser.entities import Student, CourseInstance, UnitInstance
+from core_app.parser.regex_handler import data_capture_regex, match_everything_upto, progress_upto
+from core_app.parser.wrapper import PDFMinerWrapper
 
 
 class ReportParser:
@@ -27,14 +23,10 @@ class ReportParser:
         self.planned_units = []
         self.attempted_units = []
 
-    def parse_progress_report(self):
+    def parse(self):
         # capturing report date
         self.report_date = regex_handler.garbage['per_page_file_start_and_date']. \
             match(self.report_text).group(1)
-
-        initial_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_initial.txt")
-        with open(initial_outputlogname, "w") as filehandle:
-            filehandle.write(self.report_text)
 
         # removing garbage lines from report text
         self.report_text = regex_handler.remove_garbage(self.report_text)
@@ -54,10 +46,6 @@ class ReportParser:
 
             # process the "planned and completed components" section
             self.process_section_planned_completed()
-
-        final_outputlogname = os.path.join(LOGGING_DIR, self.pdffile.file_name + "_final.txt")
-        with open(final_outputlogname, "w") as filehandle:
-            filehandle.write(self.report_text)
 
     def process_student_details(self):
         """
@@ -224,6 +212,10 @@ class ReportParser:
         collates information into a dictionary object in the format accepted by the system
         :return: 
         """
+        # run parse() on the report object to parse the data if the report has not been run
+        if self.report_date is None:
+            self.parse()
+
         from collections import OrderedDict
         report_dictionary = {'date': self.report_date,
                              'name': self.student.student_name,
@@ -261,6 +253,7 @@ class ReportParser:
                 'status': unit.unit_status,
                 'ver': unit.unit_version,
                 'credits': unit.unit_credits,
+                'attempt': unit.unit_attempt
             }
         report_dictionary['units'] = attempted_dict
 
@@ -269,20 +262,14 @@ class ReportParser:
 
 
 def fetch_pdf_list():
-    return glob.glob("*/**/*.pdf")
-    # return ['parser_tests/singlepage.pdf']
-    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf", "parser_tests/test_inputs/Campbell-pr.pdf",
-    #         "parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf", "parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
-
-    # return ["parser_tests/test_inputs/AAAAAAAEugene-pr copy.pdf"]
-    # return ["parser_tests/test_inputs/AAAMODOFIED_ChienFeiLin-pr copy.pdf"]
-    # return ['parser_tests/test_inputs/DUMMY - Conditional - 75 cr enrolled.pdf']
-    # return ["parser_tests/test_inputs/XiMingWong-pr.pdf"]
-    # return ["parser_tests/test_inputs/Eugene-pr.pdf"]
-    # return ["parser_tests/test_inputs/ChienFeiLin-pr.pdf"]
-
-    # return ["parser_tests/test_inputs/Campbell-pr.pdf"]
-    # return ["parser_tests/test_inputs/DUMMY - Sanction - BSc.pdf"]
+    pdflist = [
+        "parser_tests/test_inputs/XiMingWong-pr.pdf",
+        "parser_tests/test_inputs/Eugene-pr.pdf",
+        "parser_tests/test_inputs/ChienFeiLin-pr.pdf",
+        "parser_tests/test_inputs/Campbell-pr.pdf"
+    ]
+    # return glob.glob("*/**/*.pdf")
+    return pdflist
 
 
 class ParseFailure(Exception):
@@ -292,18 +279,17 @@ class ParseFailure(Exception):
 
 def main():
     for filepath in fetch_pdf_list():
-        report = ReportParser(PDFMinerWrapper(filepath).parse_data())
-        report.parse_progress_report()
+        with open(filepath, "rb") as file:
+            report = ReportParser(PDFMinerWrapper(file).parse_data())
+            report.parse()
 
         print(report)
-        # report.format_report()
 
 
-def maintwo():
-    import re
-    regex = re.compile(r"^status\s?:.*$", re.IGNORECASE | re.MULTILINE)
-    regex_handler.check_regex_match([regex], False)
+def parse_progress_report(fp):
+    report = ReportParser(PDFMinerWrapper(fp).parse_data())
+    return report.format_report()
 
 
-main()
-# maintwo()
+if __name__ == "__main__":
+    main()
