@@ -9,7 +9,7 @@ class Student:
         self.student_sanction = None
 
     def __str__(self):
-        return "Student name\t: [{}]\nStudent ID\t\t: [{}]\nSanction\t\t: {}".\
+        return "Student name\t: [{}]\nStudent ID\t\t: [{}]\nSanction\t\t: {}". \
             format(self.student_name, self.student_id, self.student_sanction)
 
     def __repr__(self):
@@ -22,7 +22,13 @@ class CourseInstance:
         self.course_version = str(course_ver).strip()
 
     def __str__(self):
-        return "Course ID\t\t: [{}]\tCourse version\t: [{}]".format(self.course_id, self.course_version)
+        if len(self.course_id) > 9:
+            tabcount = 2
+        else:
+            tabcount = 3
+        return "Course ID\t: [{}]{}Course version\t: [{}]".format(self.course_id,
+                                                                  "\t" * tabcount,
+                                                                  self.course_version)
 
     def __repr__(self):
         return self.__str__()
@@ -48,7 +54,7 @@ class UnitInstance:
     def increment_attempt(self):
         """
         increments the value of the attempt in the unit
-        :return: None. attribute is modified
+        :return: None. attribute unit_attempt is modified
         """
         self.unit_attempt += 1
 
@@ -58,7 +64,14 @@ class UnitInstance:
 
     # todo handle none values in mark and status properly
     def __str__(self):
-        strout = "[{}]\t\t:\tVersion : [{}]\tCredits : [{}]".format(self.unit_id, self.unit_version, self.unit_credits)
+        if len(self.unit_id) > 7:
+            tabcount = 2
+        else:
+            tabcount = 3
+        strout = "[{}]{}:\tVersion : [{}]\tCredits : [{}]".format(self.unit_id,
+                                                                  "\t" * tabcount,
+                                                                  self.unit_version,
+                                                                  self.unit_credits)
         if self.unit_status is not None:
             strout += "\tStatus : [{}]".format(self.unit_status)
         if self.unit_attempt is not None:

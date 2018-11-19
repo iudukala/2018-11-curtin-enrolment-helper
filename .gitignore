@@ -305,7 +305,7 @@ dmypy.json
 
 .idea/
 .vscode/
-core_app/parser/parser_tests/
+# core_app/parser/parser_tests/
 final_output.txt
 initial output.txt
 */**/Logging/

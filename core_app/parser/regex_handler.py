@@ -203,7 +203,7 @@ data_groups = {
 }
 
 
-def grab_next_unit_ids(rcv_text) -> (str, list):
+def grab_remove_next_unit_ids(rcv_text) -> (str, list):
     """
     grabs the first set of unit IDs that can be found on the arg 'text' and then removes it from the text
     ie. grabs :
@@ -233,6 +233,25 @@ def grab_next_unit_ids(rcv_text) -> (str, list):
     rtr_text = strip_match(rcv_text, replace_upto_regex, repl_count=1)
 
     return rtr_text, result_list
+
+
+def grab_next_unit_ids(text) -> list:
+    """
+    grabs the first set of unit IDs that can be found on the arg 'text' but does not remove it from the original text
+    ie. grabs :
+    ----------
+    COMP1000
+    COMP2000
+
+    ISAD3000
+    ----------
+    as a single block and then splits it to lines
+    :param text: the report text from which the unit IDs are to be fetched
+    :return list: a list containing the (split) unit IDs fetched
+    """
+    unit_regex = data_groups['unit_id_group']
+
+    return fetch_group_and_splitlines(unit_regex, text)
 
 
 def grab_next_credits(text) -> list:
@@ -308,6 +327,12 @@ def fetch_group_and_splitlines(regex, text) -> list:
     result_list = [result for result in result_list if result is not ""]
 
     return result_list
+
+
+def remove_first_instance_of(replace, text):
+    regex = re.compile(r"^" + re.escape(replace) + "$", re.MULTILINE)
+    replaced_text = regex.sub("", text, count=1)
+    return replaced_text
 
 
 def progress_upto(text, progup_regex) -> str:

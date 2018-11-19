@@ -1,12 +1,12 @@
-# Yoakim's added
-import collections
-import re
-from io import StringIO
-
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
+from io import StringIO
+import re
+
+# Yoakim's added
+import collections
 
 # # # # # # # # # # # # # # # # #
 # REGULAR EXPRESSIONS (compiled)#
@@ -14,7 +14,6 @@ from pdfminer.pdfpage import PDFPage
 
 # Regex for finding specific data points in the report output
 course_id_regex = re.compile(r'^([0-9, A-Z]+-)?[0-9, A-Z]{4,}$')
-
 semester_header_regex = re.compile(
     r'^([0-9]{4}\s+Semester\s+[1-2]{1}|Automatic Credit|Exempt|General|Elective|Designated|Not assigned to a specific year)$')
 elective_header_regex = re.compile(r'^(Automatic Credit|Exempt|Elective|Designated|General)$')
@@ -134,13 +133,7 @@ def extract_student_details(report):
 # Return:   A python dictionary which now contains a student's progress details.
 #
 # Notes:    None
-def extract_progress_details(report, report_dict) -> object:
-    """
-
-    :param report:
-    :param report_dict:
-    :return:
-    """
+def extract_progress_details(report, report_dict):
     lines = report.split('\n')  # Split report into lines
     indexCount = len(lines) - 1
     i = 0  # Index for line counting
@@ -176,7 +169,7 @@ def extract_progress_details(report, report_dict) -> object:
         while i < indexCount and 'Course' not in lines[i]:  # While not at EOF and not at the next course header
             semHeaderPrev = semHeaderRecent  # Keep track of last sem header seen
             while i < indexCount and (
-                    'Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
+                            'Course' not in lines[i] and semHeaderRecent == semHeaderPrev):  # For each semester
                 semUnitIDs = []  # Stores the units taken in each semester
                 semUnitDetails = []  # Stores the units version, credit worth and status as dictionaries
 
@@ -184,8 +177,8 @@ def extract_progress_details(report, report_dict) -> object:
 
                 ### GET UNIT IDs ###
                 # Advance to first unit ID from semester header that hasn't been read already
-                while (i < indexCount and not re.match(unit_id_regex, lines[i])) \
-                        or i == semHeaderRecentIdx or i in ignoredUnits:
+                while (i < indexCount and not re.match(unit_id_regex,
+                                                       lines[i])) or i == semHeaderRecentIdx or i in ignoredUnits:
                     i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
                                                                           semHeaderRecentIdx)
 
@@ -202,8 +195,7 @@ def extract_progress_details(report, report_dict) -> object:
                         electiveCount += 1
                     semUnitIDs.append(unitID)  # Add unit ID to list
                     ignoredUnits.add(i)  # Add current line to ignored index list
-                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
-                                                                          semHeaderRecentIdx)
+                    i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,semHeaderRecentIdx)
 
                 improperList = improper_unit_location(semUnitIDs)
 
@@ -258,7 +250,6 @@ def extract_progress_details(report, report_dict) -> object:
                         ignoredStatus.add(i)  # Add current line to ignored version list
                         i, semHeaderRecent, semHeaderRecentIdx = advance_line(lines, i, semHeaderPrev, semHeaderRecent,
                                                                               semHeaderRecentIdx)
-
 
                 ### ADD UNITS TO DICTIONARY ###
                 for index, unit in enumerate(semUnitIDs):
@@ -356,7 +347,6 @@ def advance_line(lines, i, semHeaderPrev, semHeaderRecent, semHeaderRecentIdx):
 def extract_course_details(lines, report_dict, i):
     # courseDetails = {}
     # MODIFIED to use a OrderedDict() rather then dict
-
     courseDetails = collections.OrderedDict()
     ignoredVersions = set()
     semHeader = True
@@ -422,22 +412,12 @@ def convert_pdf_to_txt(fp):
 #
 # Notes:    IMPORT THIS METHOD, THEN CALL IT
 def parse_progress_report(fp):
-    # import pdb; pdb.set_trace();
-    # print(fp.name)
-    # fp.close()
-    #
-    # print(fp.name)
-    # import os
     report = convert_pdf_to_txt(fp)  # Converts PDF to text
     report = remove_garbage(report)  # Removes unneeded labels from report
     report_dict, report = extract_student_details(report)  # Extracts student details, including report date
     report_dict = extract_progress_details(report,
                                            report_dict)  # Extracts unit details, including units done and units planned
-
-    # pprint.pprint(report_dict)
-
     return report_dict
-
 
 
 # Test code
